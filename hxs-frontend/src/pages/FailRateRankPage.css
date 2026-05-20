@@ -1,0 +1,37 @@
+.fail-rate-rank-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.fail-rate-rank-container .ant-layout-header {
+  background-color: #001529;
+  padding: 0;
+  height: 56px;
+  line-height: 56px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.fail-rate-rank-container .ant-layout-content {
+  padding: 16px;
+}
+
+.fail-rate-card {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.fail-rate-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.fail-rate-item:last-child {
+  border-bottom: none;
+}

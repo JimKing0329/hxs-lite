@@ -1,0 +1,28 @@
+.admin-dashboard {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.admin-dashboard .ant-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+}
+
+.admin-dashboard .ant-statistic-title {
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 16px;
+}
+
+.admin-dashboard .ant-table {
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .admin-dashboard .ant-row {
+    margin-bottom: 16px;
+  }
+
+  .admin-dashboard .ant-col {
+    margin-bottom: 16px;
+  }
+}

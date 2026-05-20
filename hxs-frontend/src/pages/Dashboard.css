@@ -1,0 +1,99 @@
+.dashboard-container {
+  min-height: 100vh;
+  background: #f0f2f5;
+  padding-bottom: 60px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.module-grid {
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+.module-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.score-badge {
+  background: #1890ff;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.ant-list-item {
+  padding: 12px !important;
+}
+
+.exam-item {
+  width: 100%;
+  padding: 8px 0;
+}
+
+.exam-subject {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.exam-details {
+  display: flex;
+  justify-content: space-between;
+  color: #666;
+}
+
+.exam-time {
+  color: #d48806;
+}
+
+.exam-location {
+  color: #096dd9;
+}
+
+.dashboard-collapse {
+  background: transparent;
+}
+
+.collapse-panel {
+  margin: 0 16px 16px;
+  background: white;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ant-collapse-header {
+  padding: 16px !important;
+  font-weight: 500 !important;
+}
+
+.ant-collapse-content-box {
+  padding: 0 !important;
+}
+
+
+/* 添加按钮组间距 */
+.ant-btn-link {
+  margin-left: 8px;
+}
+
+/* 课程表页面样式 */
+.course-table-header {
+  display: flex;
+  gap: 8px;
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 16px;
+}

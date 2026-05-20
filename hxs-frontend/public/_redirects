@@ -1,0 +1,2 @@
+/* /index.html 200  Cache-Control: no-cache, no-store, must-revalidate
+/static/*  /static/:splat  200  Cache-Control: public, max-age=31536000, immutable

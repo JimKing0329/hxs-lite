@@ -1,0 +1,70 @@
+.profile-container {
+  padding: 24px;
+  padding-bottom: 60px;
+  /* Add padding for bottom navigation */
+}
+
+.user-header-card {
+  margin-bottom: 16px;
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.user-basic-info {
+  display: flex;
+  flex-direction: column;
+  margin-left: 16px;
+}
+
+.user-name {
+  font-size: 20px;
+  font-weight: 500;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.user-id {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.info-card {
+  margin-bottom: 16px;
+}
+
+.info-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+}
+
+.info-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.info-value {
+  color: #1890ff;
+  max-width: 60%;
+  text-align: right;
+}
+
+.ant-card-head-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.info-collapse .ant-collapse-header {
+  padding-left: 0 !important;
+  font-size: 15px;
+  color: #1890ff;
+}
+
+.info-collapse .ant-collapse-content-box {
+  padding: 0 16px !important;
+}
