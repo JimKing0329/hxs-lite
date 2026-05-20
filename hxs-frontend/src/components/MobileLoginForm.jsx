@@ -82,7 +82,6 @@ export default function MobileLogin() {
         }
 
         localStorage.setItem('token', result.data.token);
-        localStorage.setItem('studentInfo', JSON.stringify(result.data.studentInfo));
         localStorage.setItem('token_expire', Date.now() + 3600000); // 有效期
 
         message.success('登录成功');

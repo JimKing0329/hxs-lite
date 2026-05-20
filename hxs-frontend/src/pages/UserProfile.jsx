@@ -300,9 +300,19 @@ export default function UserProfile() {
           <Button
             type="primary"
             danger
-            onClick={() => {
+            onClick={async () => {
+              try {
+                await fetch(API_PATHS.LOGOUT, {
+                  method: 'POST',
+                  headers: {
+                    'token': localStorage.getItem('token'),
+                    'Content-Type': 'application/json'
+                  }
+                });
+              } catch (e) {
+                // 即使 API 调用失败也清除本地状态
+              }
               localStorage.removeItem('token');
-              localStorage.removeItem('studentInfo');
               message.success('已退出登录');
               history.push('/');
             }}

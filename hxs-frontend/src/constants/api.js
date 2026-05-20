@@ -20,11 +20,12 @@ export const API_PATHS = {
   UPDATE_WECHAT_MENU: `${API_HOST}/admin/updateMenu`,
   // 用户相关
   LOGIN: `${API_HOST}/user/login`,
-  STUDENT_INFO: `${API_HOST}/user/studentInfo`,
+  LOGOUT: `${API_HOST}/user/logout`,
+  STUDENT_INFO: `${API_HOST}/user/student-info`,
   UPDATE_GPA: `${API_HOST}/study/studySituation`,
-  GET_EXECUTE_PLAN: `${API_HOST}/user/getExecutePlan`,
+  GET_EXECUTE_PLAN: `${API_HOST}/user/execute-plan`,
   UNBIND: `${API_HOST}/user/unbind`,
-  UPDATE_MAJOR: `${API_HOST}/user/updateMajorCode`,
+  UPDATE_MAJOR: `${API_HOST}/user/major-code`,
 
   // 课程相关
   TODAY_COURSE: `${API_HOST}/course/todayCourse`,
