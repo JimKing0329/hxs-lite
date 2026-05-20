@@ -3,6 +3,7 @@ import { Button, Card, Form, Input, message } from 'antd';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { API_PATHS } from '../constants/api';
+import { saveToken } from '../utils/request';
 import './AdminLogin.css';
 
 export default function AdminLogin() {
@@ -20,7 +21,7 @@ export default function AdminLogin() {
       const result = await response.json();
 
       if (result.code === 1) {
-        localStorage.setItem('Authorization', result.data.token);
+        saveToken(result.data.token, true);
         message.success('登录成功');
         history.push('/admin/dashboard');
       } else {

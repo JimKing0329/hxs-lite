@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Layout, Button, Checkbox, Radio, Table, Typography, message, Spin, Tag } from 'antd';
 
 import { API_PATHS } from '../constants/api';
+import { authFetch } from '../utils/request';
 import './GPACalculatorPage.css';
 import { useHistory } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -26,13 +27,7 @@ const GPACalculatorPage = () => {
   const fetchScores = async () => {
     try {
       setLoading(true);
-      const response = await fetch(API_PATHS.GET_SCORES, {
-        method: 'GET',
-        headers: {
-          'token': localStorage.getItem('token'),
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await authFetch(API_PATHS.GET_SCORES);
       const data = await response.json();
       
       if (data.code === 1 && data.data) {

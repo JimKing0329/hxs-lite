@@ -4,6 +4,7 @@ import { ArrowLeftOutlined, ReloadOutlined, LeftOutlined, RightOutlined } from '
 import { useHistory } from 'react-router-dom';
 import './CourseTablePage.css';
 import { API_PATHS } from '../constants/api';
+import { authFetch } from '../utils/request';
 
 const { Header, Content } = Layout;
 const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日'];
@@ -37,11 +38,7 @@ export default function CourseTablePage() {
 
         setLoading(true);
         try {
-            const res = await fetch(`${API_PATHS.WEEK_COURSE}?week=${w}`, {
-                headers: {
-                    'token': localStorage.getItem('token'),
-                }
-            });
+            const res = await authFetch(`${API_PATHS.WEEK_COURSE}?week=${w}`);
             const result = await res.json();
             if (result.code === 1) {
                 setTableData(result.data.weekCourse || {});

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Layout, Card, List, Skeleton, Typography, Modal, Divider, Collapse, message, Button } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { API_PATHS } from '../constants/api';
+import { authFetch } from '../utils/request';
 import BottomNav from '../components/BottomNav';
 import './ExecutePlanPage.css';
 
@@ -21,11 +22,7 @@ export default function ExecutePlanPage() {
     useEffect(() => {
         const fetchExecutePlan = async () => {
             try {
-                const response = await fetch(API_PATHS.GET_EXECUTE_PLAN, {
-                    headers: {
-                        'token': localStorage.getItem('token'),
-                    },
-                });
+                const response = await authFetch(API_PATHS.GET_EXECUTE_PLAN);
 
                 const result = await response.json();
                 if (result.code === 1 && result.data) {
@@ -110,13 +107,9 @@ export default function ExecutePlanPage() {
     const handleUpdateMajor = async () => {
         setUpdateMajorLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(API_PATHS.UPDATE_MAJOR, {
+            const response = await authFetch(API_PATHS.UPDATE_MAJOR, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'token': token
-                }
+                headers: { 'Content-Type': 'application/json' }
             });
 
             const result = await response.json();

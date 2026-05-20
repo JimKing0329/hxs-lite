@@ -1,16 +1,14 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import { message } from 'antd';
+import { isAuthenticated } from '../utils/request';
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
-  // Move hook calls to top level
-  const isAuthenticated = localStorage.getItem('token');
-
   return (
     <Route
       {...rest}
       render={props =>
-        isAuthenticated ? (
+        isAuthenticated() ? (
           <Component {...props} />
         ) : (
           <>

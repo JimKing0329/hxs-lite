@@ -5,6 +5,7 @@ import './MobileLogin.css';
 import { useHistory } from 'react-router-dom';
 import { API_PATHS } from '../constants/api';
 import { encrypt, decrypt } from '../utils/crypto';
+import { saveToken } from '../utils/request';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 export default function MobileLogin() {
@@ -81,8 +82,7 @@ export default function MobileLogin() {
           localStorage.removeItem('rememberedPassword');
         }
 
-        localStorage.setItem('token', result.data.token);
-        localStorage.setItem('token_expire', Date.now() + 3600000); // 有效期
+        saveToken(result.data.token);
 
         message.success('登录成功');
         setTimeout(() => history.push('/dashboard'), 500);

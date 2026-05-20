@@ -1,7 +1,7 @@
 package com.hxs.service.user.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.hxs.client.EduClient;
+import com.hxs.client.*;
 import com.hxs.component.TermDateManager;
 import com.hxs.constant.MessageConstant;
 import com.hxs.context.UserContext;
@@ -10,7 +10,7 @@ import com.hxs.mapper.ExecuteCourseMapper;
 import com.hxs.mapper.UserMapper;
 import com.hxs.model.dto.UserLoginDTO;
 import com.hxs.model.entity.ExecuteCourseItem;
-import com.hxs.model.entity.StudentInfo;
+import com.hxs.model.entity.User;
 import com.hxs.model.vo.ExecutePlanVO;
 import com.hxs.service.user.UserService;
 import com.hxs.utils.AesUtil;
@@ -18,6 +18,7 @@ import com.hxs.utils.StringParseUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -30,22 +31,29 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final EduClient eduClient;
+    private final EduSessionManager sessionManager;
     private final UserMapper userMapper;
     private final ExecuteCourseMapper executeCourseMapper;
     private final TermDateManager termDateManager;
 
     @Override
-    public StudentInfo login(UserLoginDTO dto) {
+    public User login(UserLoginDTO dto) {
         long start = System.currentTimeMillis();
 
-        Map<String, String> cookie = eduClient.login(dto.getSid(), dto.getPassword());
+        // 1. 登录获取已认证的 EduSession（复用登录时的 HttpClient 连接）
+        EduSession loginSession = eduClient.login(dto.getSid(), dto.getPassword());
+        Map<String, String> cookie = loginSession.getCookies();
 
-        StudentInfo info = userMapper.selectById(dto.getSid());
+        // 2. 用同一个 Session 创建模块 Client（复用同一个 HttpClient，无需重建 TCP/SSL 连接）
+        EduUserClient userClient = new EduUserClient(loginSession);
+        EduMajorClient majorClient = new EduMajorClient(loginSession);
+
+        User info = userMapper.selectById(dto.getSid());
         boolean exist = info != null;
 
         if (!exist) {
-            info = eduClient.getStudentInfo().getData();
-            info.setMajorCode(StringParseUtil.extractParenthesesContent(eduClient.getMajorCode()));
+            info = userClient.getStudentInfo().getData();
+            info.setMajorCode(StringParseUtil.extractParenthesesContent(majorClient.getMajorCode()));
         }
 
         try {
@@ -69,20 +77,26 @@ public class UserServiceImpl implements UserService {
             userMapper.insert(info);
         }
 
+        // 关闭 session（不再需要）
+        loginSession.close();
+
         log.info("登录耗时 {} ms", System.currentTimeMillis() - start);
         return info;
     }
 
     @Override
-    public StudentInfo getStudentInfo() {
+    public User getStudentInfo() {
         return userMapper.selectById(UserContext.getCurrentId());
     }
 
     @Override
     public ExecutePlanVO getExecutePlan() {
         ExecutePlanVO vo = new ExecutePlanVO();
-        vo.setYear(termDateManager.getYear());
-        vo.setTerm(termDateManager.getTerm());
+        //TODO 修改termDate
+        vo.setYear(2025);
+        vo.setTerm(1);
+//        vo.setYear(termDateManager.getYear());
+//        vo.setTerm(termDateManager.getTerm());
 
         String majorCode = userMapper.queryMajorCodeByMajorId(UserContext.getCurrentId().toString());
         if (majorCode == null) {
@@ -97,7 +111,13 @@ public class UserServiceImpl implements UserService {
             return vo;
         }
 
-        List<ExecuteCourseItem> planList = eduClient.getExecutePlan(majorCode);
+        // 按需创建模块 Client（通过 SessionManager 恢复当前用户的 Session）
+        EduSession session = sessionManager.getOrCreateSession();
+        EduMajorClient majorClient = new EduMajorClient(session);
+        List<ExecuteCourseItem> planList = majorClient.getExecutePlan(majorCode);
+        if(CollectionUtils.isEmpty(planList)){
+            throw new RuntimeException("执行计划列表为空 code ：" + majorCode);
+        }
         planList.forEach(i -> i.setMajorCode(majorCode));
         executeCourseMapper.insertBatch(planList);
 
@@ -107,16 +127,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void unbind() {
-        StudentInfo user = userMapper.selectById(UserContext.getCurrentId());
+        User user = userMapper.selectById(UserContext.getCurrentId());
         user.setOpenId("");
         userMapper.updateById(user);
     }
 
     @Override
     public void updateMajorCode() {
-        String major = eduClient.getMajorCode();
+        EduSession session = sessionManager.getOrCreateSession();
+        EduMajorClient majorClient = new EduMajorClient(session);
+        String major = majorClient.getMajorCode();
         String code = StringParseUtil.extractParenthesesContent(major);
-        StudentInfo user = StudentInfo.builder()
+        User user = User.builder()
                 .majorCode(code).sid(UserContext.getCurrentId().toString()).build();
         userMapper.updateById(user);
     }

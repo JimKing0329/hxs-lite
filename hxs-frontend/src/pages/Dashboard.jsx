@@ -6,6 +6,7 @@ import './Dashboard.css';
 import { Collapse } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { API_PATHS } from '../constants/api';
+import { authFetch, isAuthenticated } from '../utils/request';
 import BottomNav from '../components/BottomNav';
 
 const { Header, Content } = Layout;
@@ -30,40 +31,20 @@ export default function Dashboard() {
   const [scoreDetail, setScoreDetail] = useState(null);
   const [grades, setGrades] = useState([]);
   const [gradesLoading, setGradesLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
-
   // 导航到GPA计算器页面
   const navigateToGPACalculator = () => {
     history.push('/gpa-calculator');
   };
 
-  // Handle authentication check in useEffect
-  useEffect(() => {
-    if (!localStorage.getItem('token')) {
-      setIsAuthenticated(false);
-      history.replace('/');
-    }
-  }, [history]);
-
   // Add back the fetchCourses effect
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated()) return;
 
     const fetchCourses = async () => {
       try {
         const [todayRes, tomorrowRes] = await Promise.all([
-          fetch(API_PATHS.TODAY_COURSE, {
-            headers: {
-              'token': localStorage.getItem('token'),
-              'Content-Type': 'application/json'
-            }
-          }),
-          fetch(API_PATHS.TOMORROW_COURSE, {
-            headers: {
-              'token': localStorage.getItem('token'),
-              'Content-Type': 'application/json'
-            }
-          })
+          authFetch(API_PATHS.TODAY_COURSE),
+          authFetch(API_PATHS.TOMORROW_COURSE)
         ]);
 
         const todayData = await todayRes.json();
@@ -96,12 +77,9 @@ export default function Dashboard() {
   const fetchScoreDetail = async (courseName, classId, year, term) => {
     try {
       setScoreDetailLoading(true);
-      const response = await fetch(API_PATHS.GET_SCORE_DETAIL, {
+      const response = await authFetch(API_PATHS.GET_SCORE_DETAIL, {
         method: 'POST',
-        headers: {
-          'token': localStorage.getItem('token'),
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ courseName, classId, year, term })
       });
       const result = await response.json();
@@ -134,18 +112,13 @@ export default function Dashboard() {
 
   // Add back the grades effect
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated()) return;
 
     const fetchGrades = async () => {
       try {
 
         // 在请求URL中添加参数
-        const response = await fetch(`${API_PATHS.GET_SCORES}?year=-114&term=-514`, {
-          headers: {
-            'token': localStorage.getItem('token'),
-            'Content-Type': 'application/json'
-          }
-        });
+        const response = await authFetch(`${API_PATHS.GET_SCORES}?year=-114&term=-514`);
         const result = await response.json();
         if (result.code === 1) {
           setGrades(result.data.map(item => ({
@@ -171,16 +144,11 @@ export default function Dashboard() {
 
   // Add back the exams effect
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated()) return;
 
     const fetchExams = async () => {
       try {
-        const response = await fetch(API_PATHS.GET_EXAM_INFO, {
-          headers: {
-            'token': localStorage.getItem('token'),
-            'Content-Type': 'application/json'
-          }
-        });
+        const response = await authFetch(API_PATHS.GET_EXAM_INFO);
         const result = await response.json();
         if (result.code === 1) {
           setExams(result.data);
@@ -195,7 +163,7 @@ export default function Dashboard() {
     fetchExams();
   }, [isAuthenticated]);
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated()) {
     return null;
   }
 
@@ -203,17 +171,12 @@ export default function Dashboard() {
   const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated()) return;
 
     const fetchInitialData = async () => {
       try {
         // 并行请求改为分批请求或优先级请求
-        const todayRes = await fetch(API_PATHS.TODAY_COURSE, {
-          headers: {
-            'token': localStorage.getItem('token'),
-            'Content-Type': 'application/json'
-          }
-        });
+        const todayRes = await authFetch(API_PATHS.TODAY_COURSE);
         
         const todayData = await todayRes.json();
         if (todayData.code === 1) setCourses(todayData.data);
@@ -298,30 +261,17 @@ export default function Dashboard() {
                     onClick={async () => {
                       try {
                         setUpdating(true);
-                        const response = await fetch(API_PATHS.UPDATE_COURSE_TABLE, {
+                        const response = await authFetch(API_PATHS.UPDATE_COURSE_TABLE, {
                           method: 'PUT',
-                          headers: {
-                            'token': localStorage.getItem('token'),
-                            'Content-Type': 'application/json'
-                          }
+                          headers: { 'Content-Type': 'application/json' }
                         });
                         const result = await response.json();
                         if (result.code === 1) {
                           message.success('课表更新成功');
                           // 更新后重新获取课表
                           const [todayRes, tomorrowRes] = await Promise.all([
-                            fetch(API_PATHS.TODAY_COURSE, {
-                              headers: {
-                                'token': localStorage.getItem('token'),
-                                'Content-Type': 'application/json'
-                              }
-                            }),
-                            fetch(API_PATHS.TOMORROW_COURSE, {
-                              headers: {
-                                'token': localStorage.getItem('token'),
-                                'Content-Type': 'application/json'
-                              }
-                            })
+                            authFetch(API_PATHS.TODAY_COURSE),
+                            authFetch(API_PATHS.TOMORROW_COURSE)
                           ]);
 
                           const todayData = await todayRes.json();
@@ -427,23 +377,15 @@ export default function Dashboard() {
                     onClick={async () => {
                       try {
                         setUpdateScoreLoading(true);
-                        const response = await fetch(API_PATHS.UPDATE_SCORE_TABLE, {
+                        const response = await authFetch(API_PATHS.UPDATE_SCORE_TABLE, {
                           method: 'PUT',
-                          headers: {
-                            'token': localStorage.getItem('token'),
-                            'Content-Type': 'application/json'
-                          }
+                          headers: { 'Content-Type': 'application/json' }
                         });
                         const result = await response.json();
                         if (result.code === 1) {
                           message.success('成绩更新成功');
                           // 更新后重新获取成绩
-                          const gradesRes = await fetch(`${API_PATHS.GET_SCORES}?year=-114&term=-514`, {
-                            headers: {
-                              'token': localStorage.getItem('token'),
-                              'Content-Type': 'application/json'
-                            }
-                          });
+                          const gradesRes = await authFetch(`${API_PATHS.GET_SCORES}?year=-114&term=-514`);
                           const gradesData = await gradesRes.json();
                           if (gradesData.code === 1) {
                             setGrades(gradesData.data.map(item => ({
@@ -522,23 +464,15 @@ export default function Dashboard() {
                   onClick={async () => {
                     try {
                       setUpdateExamLoading(true);
-                      const response = await fetch(API_PATHS.UPDATE_EXAM_INFO, {
+                      const response = await authFetch(API_PATHS.UPDATE_EXAM_INFO, {
                         method: 'PUT',
-                        headers: {
-                          'token': localStorage.getItem('token'),
-                          'Content-Type': 'application/json'
-                        }
+                        headers: { 'Content-Type': 'application/json' }
                       });
                       const result = await response.json();
                       if (result.code === 1) {
                         message.success('考试信息更新成功');
                         // 更新后重新获取考试信息
-                        const examsRes = await fetch(API_PATHS.GET_EXAM_INFO, {
-                          headers: {
-                            'token': localStorage.getItem('token'),
-                            'Content-Type': 'application/json'
-                          }
-                        });
+                        const examsRes = await authFetch(API_PATHS.GET_EXAM_INFO);
                         const examsData = await examsRes.json();
                         if (examsData.code === 1) {
                           setExams(examsData.data);

@@ -15,25 +15,47 @@ public class ExecuteCourseItem {
 
     private String majorCode;
 
+    /**
+     * 课程名称
+     */
     @JSONField(name = "kcmc")
     private String courseName;
 
+    /**
+     * 课程学分
+     */
     @JSONField(name = "xf")
     private String coursePoint;
 
-    @JSONField(name = "zxs")
+    /**
+     * 课程教学周
+     */
+    @JSONField(name = "qsjsz")
     private String courseWeek;
 
-    @JSONField(name = "kkxymc")
+    /**
+     * 课程所属学院名称
+     */
+    @JSONField(name = "kkbmmc")
     private String collegeName;
 
+    /**
+     * 课程学时
+     */
     @JSONField(name = "zxs")
     private String courseTime;
 
-    @JSONField(name = "jyxdxq")
+    /**
+     * 课程推荐学期
+     */
+    @JSONField(name = "yyxdxnxqmc")
     private String recommendTerm;
 
-    @JSONField(name = "kclbmc")
+    /**
+     * 课程性质
+     */
+
+    @JSONField(name = "kcxzmc")
     private String courseType;
 
 }

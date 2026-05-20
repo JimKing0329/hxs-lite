@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Checkbox, Radio, Table, Typography, message, Spin, Tag } from 'antd';
 import { API_PATHS } from '../constants/api';
+import { authFetch } from '../utils/request';
 import './GPACalculator.css';
 
 const { Title, Text } = Typography;
@@ -32,12 +33,7 @@ const GPACalculator = ({ visible, onCancel }) => {
   const fetchScores = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8008/exam/getScores', {
-        headers: {
-          'token': localStorage.getItem('token'),
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await authFetch(API_PATHS.GET_SCORES);
       const data = await response.json();
       
       if (data.code === 1 && data.data) {

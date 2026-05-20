@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 import './UserProfile.css';
 import { Statistic, Row, Col, Progress } from 'antd';
 import { API_PATHS } from '../constants/api';
+import { authFetch, clearAuth } from '../utils/request';
 import BottomNav from '../components/BottomNav';
 
 const { Header } = Layout;
@@ -20,13 +21,7 @@ export default function UserProfile() {
     const fetchUserInfo = async () => {
       try {
         // 在fetch请求中添加CORS模式配置
-        const response = await fetch(API_PATHS.STUDENT_INFO, {
-          // 显式声明CORS模式
-          headers: {
-            'token': `${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          }
-        });
+        const response = await authFetch(API_PATHS.STUDENT_INFO);
         const result = await response.json();
         setUserInfo(result.data);
       } catch (error) {
@@ -40,13 +35,7 @@ export default function UserProfile() {
     const fetchStudySituation = async () => {
       try {
         setStudyLoading(true);
-        const response = await fetch(API_PATHS.UPDATE_GPA, {
-          method: 'GET',
-          headers: {
-            'token': `${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
-          }
-        });
+        const response = await authFetch(API_PATHS.UPDATE_GPA);
         const result = await response.json();
         setStudySituation(result.data);
       } catch (error) {
@@ -259,24 +248,15 @@ export default function UserProfile() {
               try {
                 message.info('该功能请求极慢，建议使用成绩计算器计算GPA...', 5); // 添加提示信息，5秒后自动消失
                 setStudyLoading(true);
-                const response = await fetch(API_PATHS.UPDATE_GPA, {
+                const response = await authFetch(API_PATHS.UPDATE_GPA, {
                   method: 'PUT',
-                  headers: {
-                    'token': localStorage.getItem('token'),
-                    'Content-Type': 'application/json'
-                  }
+                  headers: { 'Content-Type': 'application/json' }
                 });
                 const result = await response.json();
                 if (result.code === 1) {
                   message.success('学习情况更新成功');
                   // 刷新学习情况数据
-                  const refreshResponse = await fetch(API_PATHS.UPDATE_GPA, {
-                    method: 'GET',
-                    headers: {
-                      'token': localStorage.getItem('token'),
-                      'Content-Type': 'application/json'
-                    }
-                  });
+                  const refreshResponse = await authFetch(API_PATHS.UPDATE_GPA);
                   const refreshResult = await refreshResponse.json();
                   setStudySituation(refreshResult.data);
                 } else {
@@ -302,17 +282,14 @@ export default function UserProfile() {
             danger
             onClick={async () => {
               try {
-                await fetch(API_PATHS.LOGOUT, {
+                await authFetch(API_PATHS.LOGOUT, {
                   method: 'POST',
-                  headers: {
-                    'token': localStorage.getItem('token'),
-                    'Content-Type': 'application/json'
-                  }
+                  headers: { 'Content-Type': 'application/json' }
                 });
               } catch (e) {
                 // 即使 API 调用失败也清除本地状态
               }
-              localStorage.removeItem('token');
+              clearAuth();
               message.success('已退出登录');
               history.push('/');
             }}
@@ -410,24 +387,16 @@ export default function UserProfile() {
                   centered: true,
                   async onOk() {
                     try {
-                      const response = await fetch(API_PATHS.UNBIND, {
+                      const response = await authFetch(API_PATHS.UNBIND, {
                         method: 'PUT',
-                        headers: {
-                          'token': `${localStorage.getItem('token')}`,
-                          'Content-Type': 'application/json'
-                        }
+                        headers: { 'Content-Type': 'application/json' }
                       });
                       const result = await response.json();
                       
                       if (result.code === 1) {
                         message.success('解绑成功');
                         // 刷新用户信息
-                        const userResponse = await fetch(API_PATHS.STUDENT_INFO, {
-                          headers: {
-                            'token': `${localStorage.getItem('token')}`,
-                            'Content-Type': 'application/json'
-                          }
-                        });
+                        const userResponse = await authFetch(API_PATHS.STUDENT_INFO);
                         const userResult = await userResponse.json();
                         setUserInfo(userResult.data);
                       } else {

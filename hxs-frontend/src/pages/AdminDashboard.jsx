@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Layout, Card, Row, Col, Table, Statistic, Spin, message, Typography, Modal, Form, DatePicker, Input, Button, Select } from 'antd';
 import { UserOutlined, LoginOutlined, TeamOutlined } from '@ant-design/icons';
 import { API_PATHS } from '../constants/api';
+import { authFetch, saveToken } from '../utils/request';
 import moment from 'moment';
 import './AdminDashboard.css';
 
@@ -38,18 +39,10 @@ export default function AdminDashboard() {
         setLoading(true);
         // 并行请求三个接口
         const [distributionRes, userCountRes, loginCountRes, sevenDayLoginCountRes] = await Promise.all([
-          fetch(API_PATHS.GET_USER_DISTRIBUTION, {
-            headers: { 'Authorization': token }
-          }),
-          fetch(API_PATHS.GET_USER_COUNT, {
-            headers: { 'Authorization': token }
-          }),
-          fetch(API_PATHS.GET_TODAY_LOGIN_COUNT, {
-            headers: { 'Authorization': token }
-          }),
-          fetch(API_PATHS.GET_SEVEN_DAY_LOGIN_COUNT, {
-            headers: { 'Authorization': token }
-          })
+          authFetch(API_PATHS.GET_USER_DISTRIBUTION),
+          authFetch(API_PATHS.GET_USER_COUNT),
+          authFetch(API_PATHS.GET_TODAY_LOGIN_COUNT),
+          authFetch(API_PATHS.GET_SEVEN_DAY_LOGIN_COUNT)
         ]);
 
         // 解析响应数据
@@ -99,9 +92,7 @@ export default function AdminDashboard() {
       const token = localStorage.getItem('Authorization');
       // 添加时间戳参数避免缓存
       const timestamp = new Date().getTime();
-      const response = await fetch(`${API_PATHS.GET_CURRENT_TERM_START_DATE}?id=${dateType}&_t=${timestamp}`, {
-        headers: { 'Authorization': token }
-      });
+      const response = await authFetch(`${API_PATHS.GET_CURRENT_TERM_START_DATE}?id=${dateType}&_t=${timestamp}`);
       const result = await response.json();
       if (result.code === 1 && result.data) {
         console.log(`获取到日期类型 ${dateType} 的数据:`, result.data);
@@ -130,13 +121,8 @@ export default function AdminDashboard() {
 
   const handleUpdateMajorInfo = async () => {
     try {
-      const token = localStorage.getItem('Authorization');
-      const response = await fetch(API_PATHS.UPDATE_MAJOR_INFO, {
+      const response = await authFetch(API_PATHS.UPDATE_MAJOR_INFO, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
-        }
       });
 
       const result = await response.json();
@@ -174,13 +160,8 @@ export default function AdminDashboard() {
 
     setUpdateWeekLoading(true);
     try {
-      const token = localStorage.getItem('Authorization');
-      const response = await fetch(`${API_PATHS.UPDATE_EMPTY_CLASSROOM}?week=${updateWeek}`, {
+      const response = await authFetch(`${API_PATHS.UPDATE_EMPTY_CLASSROOM}?week=${updateWeek}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
-        }
       });
 
       const result = await response.json();
@@ -201,13 +182,8 @@ export default function AdminDashboard() {
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      const token = localStorage.getItem('Authorization');
-      const response = await fetch(API_PATHS.UPDATE_TERM_START_DATE, {
+      const response = await authFetch(API_PATHS.UPDATE_TERM_START_DATE, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
-        },
         body: JSON.stringify({
           year: values.year,
           term: values.term,
@@ -247,13 +223,8 @@ export default function AdminDashboard() {
     }
 
     try {
-      const token = localStorage.getItem('Authorization');
-      const response = await fetch(`${API_PATHS.UPDATE_WECHAT_MENU}?type=${selectedMenu}`, {
+      const response = await authFetch(`${API_PATHS.UPDATE_WECHAT_MENU}?type=${selectedMenu}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
-        }
       });
 
       const result = await response.json();

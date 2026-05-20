@@ -3,6 +3,7 @@ import { Layout, Card, Select, Button, Collapse, Spin, Empty, message, Modal } f
 import { useHistory } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import { API_PATHS } from '../constants/api';
+import { authFetch } from '../utils/request';
 import './EmptyClassroomPage.css';
 
 const { Header, Content } = Layout;
@@ -84,12 +85,7 @@ export default function EmptyClassroomPage() {
         params.append('endSession', endSession.toString());
       }
 
-      const response = await fetch(`${API_PATHS.EMPTY_CLASSROOM}?${params}`, {
-        headers: {
-          'token': localStorage.getItem('token'),
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await authFetch(`${API_PATHS.EMPTY_CLASSROOM}?${params}`);
 
       const result = await response.json();
       

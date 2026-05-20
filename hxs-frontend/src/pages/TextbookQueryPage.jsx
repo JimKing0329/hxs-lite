@@ -4,6 +4,7 @@ import { CopyOutlined, BookOutlined, ArrowLeftOutlined } from '@ant-design/icons
 import { useHistory } from 'react-router-dom';
 import './TextbookQueryPage.css';
 import { API_PATHS } from '../constants/api';
+import { authFetch } from '../utils/request';
 
 
 const { Header, Content } = Layout;
@@ -44,12 +45,7 @@ export default function TextbookQueryPage() {
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_PATHS.GET_TEXT_BOOK}?year=${selectedYear}&term=${selectedTerm}`, {
-        headers: {
-          'token': localStorage.getItem('token'),
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await authFetch(`${API_PATHS.GET_TEXT_BOOK}?year=${selectedYear}&term=${selectedTerm}`);
       const result = await response.json();
       
       if (result.code === 1) {

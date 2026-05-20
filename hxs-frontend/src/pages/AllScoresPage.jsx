@@ -3,6 +3,7 @@ import { Layout, Card, List, Skeleton, Typography, Modal, Divider, Collapse, mes
 import { ArrowLeftOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import { API_PATHS } from '../constants/api';
+import { authFetch, isAuthenticated as checkAuth } from '../utils/request';
 import './AllScoresPage.css';
 
 const { Header, Content } = Layout;
@@ -39,7 +40,7 @@ export default function ScorePage() {
 
   // 认证检查
   useEffect(() => {
-    if (!localStorage.getItem('token')) {
+    if (!checkAuth()) {
       setIsAuthenticated(false);
       history.replace('/');
     }
@@ -51,11 +52,7 @@ export default function ScorePage() {
 
     const fetchScores = async () => {
       try {
-        const response = await fetch(API_PATHS.GET_SCORES, {
-          headers: {
-            'token': localStorage.getItem('token'),
-          },
-        });
+        const response = await authFetch(API_PATHS.GET_SCORES);
 
         const result = await response.json();
         if (result.code === 1 && result.data) {
@@ -88,11 +85,7 @@ export default function ScorePage() {
   const fetchRanking = async (flag = false) => {
     try {
       setRankingLoading(true);
-      const response = await fetch(`${API_PATHS.GET_RANKING}?flag=${flag}`, {
-        headers: {
-          'token': localStorage.getItem('token'),
-        },
-      });
+      const response = await authFetch(`${API_PATHS.GET_RANKING}?flag=${flag}`);
 
       const result = await response.json();
       if (result.code === 1 && result.data) {
@@ -170,12 +163,9 @@ export default function ScorePage() {
   const fetchScoreDetail = async (course) => {
     try {
       setScoreDetailLoading(true);
-      const response = await fetch(API_PATHS.GET_SCORE_DETAIL, {
+      const response = await authFetch(API_PATHS.GET_SCORE_DETAIL, {
         method: 'POST',
-        headers: {
-          'token': localStorage.getItem('token'),
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           courseName: course.courseName,
           classId: course.classId,

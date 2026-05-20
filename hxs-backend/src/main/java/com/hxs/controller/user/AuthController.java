@@ -3,7 +3,7 @@ package com.hxs.controller.user;
 import com.hxs.constant.JwtClaimsConstant;
 import com.hxs.context.UserContext;
 import com.hxs.model.dto.UserLoginDTO;
-import com.hxs.model.entity.StudentInfo;
+import com.hxs.model.entity.User;
 import com.hxs.model.vo.UserLoginVO;
 import com.hxs.properties.JwtProperties;
 import com.hxs.result.Result;
@@ -32,7 +32,7 @@ public class AuthController {
     @PostMapping("/login")
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO dto) {
         log.info("用户登录: {}", dto.getSid());
-        StudentInfo user = userService.login(dto);
+        User user = userService.login(dto);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.USER_ID, user.getSid());

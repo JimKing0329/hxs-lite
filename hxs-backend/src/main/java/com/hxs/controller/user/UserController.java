@@ -1,7 +1,7 @@
 package com.hxs.controller.user;
 
 import com.hxs.context.UserContext;
-import com.hxs.model.entity.StudentInfo;
+import com.hxs.model.entity.User;
 import com.hxs.model.vo.ExecutePlanVO;
 import com.hxs.result.Result;
 import com.hxs.service.user.UserService;
@@ -27,9 +27,9 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/student-info")
-    public Result<StudentInfo> getStudentInfo() {
+    public Result<User> getStudentInfo() {
         log.info("获取用户信息: {}", UserContext.getCurrentId());
-        StudentInfo info = userService.getStudentInfo();
+        User info = userService.getStudentInfo();
         info.setPassword(null);
         return Result.success(info);
     }

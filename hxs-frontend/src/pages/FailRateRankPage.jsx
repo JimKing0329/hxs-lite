@@ -4,6 +4,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import './FailRateRankPage.css';
 import { API_PATHS } from '../constants/api';
+import { authFetch } from '../utils/request';
 
 
 const { Header, Content } = Layout;
@@ -27,12 +28,7 @@ export default function FailRateRankPage() {
   const fetchFailRateRank = async (pageNum = 1, reset = false) => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_PATHS.GET_FAIL_RATE_RANK}?onlyExamined=${onlyExamined}&page=${pageNum}&num=${pageSize}`, {
-        headers: {
-          'token': localStorage.getItem('token'),
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await authFetch(`${API_PATHS.GET_FAIL_RATE_RANK}?onlyExamined=${onlyExamined}&page=${pageNum}&num=${pageSize}`);
       const result = await response.json();
       if (result.code === 1) {
         if (result.data.length < pageSize) {
