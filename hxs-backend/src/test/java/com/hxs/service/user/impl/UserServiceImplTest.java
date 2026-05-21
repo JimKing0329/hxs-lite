@@ -9,7 +9,7 @@ import com.hxs.context.UserContext;
 import com.hxs.mapper.ExecuteCourseMapper;
 import com.hxs.mapper.UserMapper;
 import com.hxs.model.dto.UserLoginDTO;
-import com.hxs.model.entity.ExecuteCourseItem;
+import com.hxs.model.entity.ExecuteCourse;
 import com.hxs.model.entity.User;
 import com.hxs.model.vo.ExecutePlanVO;
 import org.junit.jupiter.api.*;
@@ -149,7 +149,7 @@ class UserServiceImplTest {
             when(termDateManager.getTerm()).thenReturn(3);
             when(userMapper.queryMajorCodeByMajorId("2023015529")).thenReturn("080901");
 
-            ExecuteCourseItem item = new ExecuteCourseItem();
+            ExecuteCourse item = new ExecuteCourse();
             item.setCourseName("数据结构");
             when(executeCourseMapper.selectList(any(QueryWrapper.class))).thenReturn(List.of(item));
 

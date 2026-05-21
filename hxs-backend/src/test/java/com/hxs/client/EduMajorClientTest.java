@@ -1,7 +1,7 @@
 package com.hxs.client;
 
 import com.hxs.exception.RequestFailException;
-import com.hxs.model.entity.ExecuteCourseItem;
+import com.hxs.model.entity.ExecuteCourse;
 import com.hxs.model.support.MajorInfoItem;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -81,7 +81,7 @@ class EduMajorClientTest extends HttpMockSupport {
             EduSession session = spySession(mockHttpClient(200, EXECUTE_PLAN_JSON));
             EduMajorClient client = new EduMajorClient(session);
 
-            List<ExecuteCourseItem> result = client.getExecutePlan("PLAN001");
+            List<ExecuteCourse> result = client.getExecutePlan("PLAN001");
 
             assertNotNull(result);
             assertEquals(1, result.size());
