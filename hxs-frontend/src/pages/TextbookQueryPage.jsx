@@ -45,7 +45,7 @@ export default function TextbookQueryPage() {
 
     setLoading(true);
     try {
-      const response = await authFetch(`${API_PATHS.GET_TEXT_BOOK}?year=${selectedYear}&term=${selectedTerm}`);
+      const response = await authFetch(`${API_PATHS.GET_TEXT_BOOK}/${selectedYear}/${selectedTerm}`);
       const result = await response.json();
       
       if (result.code === 1) {

@@ -9,6 +9,6 @@ public class TextBookItem {
     @JSONField(name = "jcmc") private String bookName;
     @JSONField(name = "jcbb") private String edition;
     @JSONField(name = "zz") private String author;
-    @JSONField(name = "cbs") private String publisher;
+    @JSONField(name = "cbs") private String press;
     @JSONField(name = "isbn") private String isbn;
 }

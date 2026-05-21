@@ -22,7 +22,10 @@ export const API_PATHS = {
   LOGIN: `${API_HOST}/user/login`,
   LOGOUT: `${API_HOST}/user/logout`,
   STUDENT_INFO: `${API_HOST}/user/student-info`,
-  UPDATE_GPA: `${API_HOST}/study/studySituation`,
+  // 学习情况
+  STUDY: {
+    SITUATION: `${API_HOST}/study/situation`,
+  },
   GET_EXECUTE_PLAN: `${API_HOST}/user/execute-plan`,
   UNBIND: `${API_HOST}/user/unbind`,
   UPDATE_MAJOR: `${API_HOST}/user/major-code`,
@@ -48,7 +51,7 @@ export const API_PATHS = {
   // 空教室查询
   EMPTY_CLASSROOM: `${API_HOST}/emptyClassroom/getEmptyClassroom`,
   //教材查询
-  GET_TEXT_BOOK: `${API_HOST}/textBook/getTextBook`,
+  GET_TEXT_BOOK: `${API_HOST}/textbooks`,  // 调用时追加 /{year}/{term}
 
 
 };
