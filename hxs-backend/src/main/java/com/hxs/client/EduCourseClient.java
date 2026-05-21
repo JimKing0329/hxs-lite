@@ -1,11 +1,11 @@
 package com.hxs.client;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.hxs.constant.MessageConstant;
 import com.hxs.exception.MessageEmptyException;
 import com.hxs.exception.RequestFailException;
 import com.hxs.model.support.CourseTableItem;
-import com.hxs.model.support.CourseTableResponse;
 import com.hxs.utils.StringParseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -54,15 +54,16 @@ public class EduCourseClient {
                 String responseBody = EntityUtils.toString(response.getEntity());
                 session.checkLogin(responseBody);
 
-                CourseTableResponse courseTableResponse = JSON.parseObject(responseBody, CourseTableResponse.class);
-                if (courseTableResponse.getItems().isEmpty()) {
+                JSONObject root = JSON.parseObject(responseBody);
+                List<CourseTableItem> items = root.getList("items", CourseTableItem.class);
+                if (items.isEmpty()) {
                     throw new MessageEmptyException(MessageConstant.MESSAGE_EMPTY_ERROR);
                 }
-                courseTableResponse.getItems().forEach(item ->
+                items.forEach(item ->
                         item.setWeekList(StringParseUtil.parseWeekList(item.getWeeks()))
                 );
-                log.info("获取课表成功 {} 条", courseTableResponse.getItems().size());
-                return courseTableResponse.getItems();
+                log.info("获取课表成功 {} 条", items.size());
+                return items;
             }
         } catch (URISyntaxException | IOException e) {
             log.error("获取课表失败", e);
