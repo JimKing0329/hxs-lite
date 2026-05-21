@@ -36,17 +36,20 @@ export const API_PATHS = {
   WEEK_COURSE: `${API_HOST}/course/weekCourse`,
   UPDATE_COURSE_TABLE: `${API_HOST}/course/updateCourseTable`,
 
-  // 成绩相关
-  GET_SCORES: `${API_HOST}/exam/getScores`,
-  GET_SCORE_DETAIL: `${API_HOST}/exam/getScoreDetail`,
-  UPDATE_SCORE_TABLE: `${API_HOST}/exam/updateScoreTable`,
-  GET_FAIL_RATE_RANK: `${API_HOST}/exam/getFailRateRank`,
-  GET_RANKING: `${API_HOST}/exam/ranking`,
+  // 成绩相关（ScoreController）
+  SCORE: {
+    LIST: `${API_HOST}/scores`,
+    DETAIL: `${API_HOST}/scores/detail`,
+    FAIL_RATE_RANK: `${API_HOST}/scores/fail-rate-rank`,
+    RANKING: `${API_HOST}/scores/ranking`,
+    REFRESH: `${API_HOST}/scores`,
+  },
 
-
-  // 考试相关
-  GET_EXAM_INFO: `${API_HOST}/exam/getExamInfo`,
-  UPDATE_EXAM_INFO: `${API_HOST}/exam/updateExamInfo`,
+  // 考试相关（ExamController）
+  EXAM: {
+    LIST: `${API_HOST}/exams`,
+    REFRESH: `${API_HOST}/exams`,
+  },
 
   // 空教室查询
   EMPTY_CLASSROOM: `${API_HOST}/emptyClassroom/getEmptyClassroom`,

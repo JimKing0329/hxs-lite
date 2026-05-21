@@ -27,7 +27,7 @@ const GPACalculatorPage = () => {
   const fetchScores = async () => {
     try {
       setLoading(true);
-      const response = await authFetch(API_PATHS.GET_SCORES);
+      const response = await authFetch(API_PATHS.SCORE.LIST);
       const data = await response.json();
       
       if (data.code === 1 && data.data) {

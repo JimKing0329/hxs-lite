@@ -35,7 +35,7 @@ export default function UserProfile() {
     const fetchStudySituation = async () => {
       try {
         setStudyLoading(true);
-        const response = await authFetch(API_PATHS.UPDATE_GPA);
+        const response = await authFetch(API_PATHS.STUDY.SITUATION);
         const result = await response.json();
         setStudySituation(result.data);
       } catch (error) {
@@ -248,7 +248,7 @@ export default function UserProfile() {
               try {
                 message.info('该功能请求极慢，建议使用成绩计算器计算GPA...', 5); // 添加提示信息，5秒后自动消失
                 setStudyLoading(true);
-                const response = await authFetch(API_PATHS.UPDATE_GPA, {
+                const response = await authFetch(API_PATHS.STUDY.SITUATION, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' }
                 });
@@ -256,7 +256,7 @@ export default function UserProfile() {
                 if (result.code === 1) {
                   message.success('学习情况更新成功');
                   // 刷新学习情况数据
-                  const refreshResponse = await authFetch(API_PATHS.UPDATE_GPA);
+                  const refreshResponse = await authFetch(API_PATHS.STUDY.SITUATION);
                   const refreshResult = await refreshResponse.json();
                   setStudySituation(refreshResult.data);
                 } else {

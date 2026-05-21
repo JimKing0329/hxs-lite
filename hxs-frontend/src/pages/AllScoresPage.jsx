@@ -52,7 +52,7 @@ export default function ScorePage() {
 
     const fetchScores = async () => {
       try {
-        const response = await authFetch(API_PATHS.GET_SCORES);
+        const response = await authFetch(API_PATHS.SCORE.LIST);
 
         const result = await response.json();
         if (result.code === 1 && result.data) {
@@ -85,7 +85,7 @@ export default function ScorePage() {
   const fetchRanking = async (flag = false) => {
     try {
       setRankingLoading(true);
-      const response = await authFetch(`${API_PATHS.GET_RANKING}?flag=${flag}`);
+      const response = await authFetch(`${API_PATHS.SCORE.RANKING}?flag=${flag}`);
 
       const result = await response.json();
       if (result.code === 1 && result.data) {
@@ -163,16 +163,13 @@ export default function ScorePage() {
   const fetchScoreDetail = async (course) => {
     try {
       setScoreDetailLoading(true);
-      const response = await authFetch(API_PATHS.GET_SCORE_DETAIL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          courseName: course.courseName,
-          classId: course.classId,
-          year: course.year,
-          term: course.term
-        })
+      const params = new URLSearchParams({
+        courseName: course.courseName,
+        classId: course.classId,
+        year: course.year,
+        term: course.term
       });
+      const response = await authFetch(`${API_PATHS.SCORE.DETAIL}?${params}`);
 
       const result = await response.json();
       if (result.code === 1) {
@@ -183,7 +180,7 @@ export default function ScorePage() {
           teacherName: course.teacherName,
           credit: course.credit,
           gradePoint: course.gradePoint,
-          details: result.data.scoreDetails
+          details: result.data.items
         });
         setScoreDetailVisible(true);
       } else {
@@ -453,24 +450,24 @@ export default function ScorePage() {
                 <Table
                   dataSource={scoreDetail.details}
                   pagination={false}
-                  rowKey="gradeColumn"
+                  rowKey="scoreColumn"
                   columns={[
                     {
                       title: '成绩分项',
-                      dataIndex: 'gradeColumn',
-                      key: 'gradeColumn',
+                      dataIndex: 'scoreColumn',
+                      key: 'scoreColumn',
                       width: '50%'
                     },
                     {
                       title: '比例',
-                      dataIndex: 'gradeRatio',
-                      key: 'gradeRatio',
+                      dataIndex: 'scoreRatio',
+                      key: 'scoreRatio',
                       width: '20%'
                     },
                     {
                       title: '成绩',
-                      dataIndex: 'grade',
-                      key: 'grade',
+                      dataIndex: 'score',
+                      key: 'score',
                       width: '30%',
                       render: (text) => (
                         <span style={{ color: '#1890ff', fontWeight: 'bold' }}>{text}</span>

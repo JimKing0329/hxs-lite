@@ -9,7 +9,7 @@ import com.hxs.exception.MessageEmptyException;
 import com.hxs.mapper.ExecuteCourseMapper;
 import com.hxs.mapper.UserMapper;
 import com.hxs.model.dto.UserLoginDTO;
-import com.hxs.model.entity.ExecuteCourseItem;
+import com.hxs.model.entity.ExecuteCourse;
 import com.hxs.model.entity.User;
 import com.hxs.model.vo.ExecutePlanVO;
 import com.hxs.service.user.UserService;
@@ -103,8 +103,8 @@ public class UserServiceImpl implements UserService {
             throw new MessageEmptyException(MessageConstant.MAJOR_CODE_NULL);
         }
 
-        List<ExecuteCourseItem> items = executeCourseMapper
-                .selectList(new QueryWrapper<ExecuteCourseItem>().eq("major_code", majorCode));
+        List<ExecuteCourse> items = executeCourseMapper
+                .selectList(new QueryWrapper<ExecuteCourse>().eq("major_code", majorCode));
 
         if (!items.isEmpty()) {
             vo.setExecuteCourseList(items);
@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
         // 按需创建模块 Client（通过 SessionManager 恢复当前用户的 Session）
         EduSession session = sessionManager.getOrCreateSession();
         EduMajorClient majorClient = new EduMajorClient(session);
-        List<ExecuteCourseItem> planList = majorClient.getExecutePlan(majorCode);
+        List<ExecuteCourse> planList = majorClient.getExecutePlan(majorCode);
         if(CollectionUtils.isEmpty(planList)){
             throw new RuntimeException("执行计划列表为空 code ：" + majorCode);
         }

@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @TableName("execute_course")
-public class ExecuteCourseItem {
+public class ExecuteCourse {
 
     @TableId(type = IdType.AUTO)
     private Long id;

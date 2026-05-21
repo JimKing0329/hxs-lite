@@ -136,7 +136,7 @@ public class EduExamClient {
                 ScoreDetailResponse detailResp = JSON.parseObject(responseBody, ScoreDetailResponse.class);
                 List<ScoreDetail> scoreDetails = detailResp.getItems();
                 scoreDetails.forEach(item ->
-                        item.setGradeRatio(StringParseUtil.extractParenthesesContent(item.getScoreItem()))
+                        item.setScoreRatio(StringParseUtil.extractParenthesesContent(item.getScoreColumn()))
                 );
                 return new ScoreDetailVO(courseName, scoreDetails);
             }

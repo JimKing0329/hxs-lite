@@ -28,7 +28,7 @@ export default function FailRateRankPage() {
   const fetchFailRateRank = async (pageNum = 1, reset = false) => {
     try {
       setLoading(true);
-      const response = await authFetch(`${API_PATHS.GET_FAIL_RATE_RANK}?onlyExamined=${onlyExamined}&page=${pageNum}&num=${pageSize}`);
+      const response = await authFetch(`${API_PATHS.SCORE.FAIL_RATE_RANK}?onlyExamined=${onlyExamined}&page=${pageNum}&num=${pageSize}`);
       const result = await response.json();
       if (result.code === 1) {
         if (result.data.length < pageSize) {

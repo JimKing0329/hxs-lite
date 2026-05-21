@@ -1,6 +1,6 @@
 package com.hxs.model.vo;
 
-import com.hxs.model.entity.ExecuteCourseItem;
+import com.hxs.model.entity.ExecuteCourse;
 import lombok.Data;
 
 import java.util.List;
@@ -9,5 +9,5 @@ import java.util.List;
 public class ExecutePlanVO {
     private Integer year;
     private Integer term;
-    private List<ExecuteCourseItem> executeCourseList;
+    private List<ExecuteCourse> executeCourseList;
 }

@@ -3,7 +3,7 @@ package com.hxs.client;
 import com.alibaba.fastjson2.JSON;
 import com.hxs.constant.MessageConstant;
 import com.hxs.exception.RequestFailException;
-import com.hxs.model.entity.ExecuteCourseItem;
+import com.hxs.model.entity.ExecuteCourse;
 import com.hxs.model.support.ExecutePlanResponse;
 import com.hxs.model.support.MajorInfoItem;
 import com.hxs.model.support.MajorInfoResponse;
@@ -65,7 +65,7 @@ public class EduMajorClient {
     /**
      * 获取执行计划
      */
-    public List<ExecuteCourseItem> getExecutePlan(String majorCode) {
+    public List<ExecuteCourse> getExecutePlan(String majorCode) {
         try {
             URI executePlan = new URI(session.getBaseUrl())
                     .resolve("jxzxjhgl/jxzxjhkcxx_cxJxzxjhkcxxIndex.html?doType=query&gnmkdm=N153540");
@@ -87,8 +87,8 @@ public class EduMajorClient {
                 session.checkLogin(responseBody);
 
                 ExecutePlanResponse planResp = JSON.parseObject(responseBody, ExecutePlanResponse.class);
-                log.info("获取执行计划成功 {}", planResp.getExecuteCourseItems().size());
-                return planResp.getExecuteCourseItems();
+                log.info("获取执行计划成功 {}", planResp.getExecuteCourses().size());
+                return planResp.getExecuteCourses();
             }
         } catch (URISyntaxException | IOException e) {
             log.error("获取执行计划失败", e);

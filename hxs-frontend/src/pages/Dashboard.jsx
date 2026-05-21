@@ -73,15 +73,12 @@ export default function Dashboard() {
 
 
 
-  // Add back the fetchScoreDetail function
+  // 获取分项成绩详情
   const fetchScoreDetail = async (courseName, classId, year, term) => {
     try {
       setScoreDetailLoading(true);
-      const response = await authFetch(API_PATHS.GET_SCORE_DETAIL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseName, classId, year, term })
-      });
+      const params = new URLSearchParams({ courseName, classId, year, term });
+      const response = await authFetch(`${API_PATHS.SCORE.DETAIL}?${params}`);
       const result = await response.json();
       if (result.code === 1) {
         // 从成绩列表中获取教师、学分和绩点信息
@@ -94,6 +91,7 @@ export default function Dashboard() {
 
         setScoreDetail({
           ...result.data,
+          scoreDetails: result.data.items, // 兼容旧的字段名
           teacherName: courseInfo?.teacherName,
           credit: courseInfo?.credit,
           gradePoint: courseInfo?.gradePoint
@@ -118,7 +116,7 @@ export default function Dashboard() {
       try {
 
         // 在请求URL中添加参数
-        const response = await authFetch(`${API_PATHS.GET_SCORES}?year=-114&term=-514`);
+        const response = await authFetch(`${API_PATHS.SCORE.LIST}?year=-114&term=-514`);
         const result = await response.json();
         if (result.code === 1) {
           setGrades(result.data.map(item => ({
@@ -148,10 +146,19 @@ export default function Dashboard() {
 
     const fetchExams = async () => {
       try {
-        const response = await authFetch(API_PATHS.GET_EXAM_INFO);
+        const response = await authFetch(`${API_PATHS.EXAM.LIST}?year=2024&term=3`);
         const result = await response.json();
         if (result.code === 1) {
-          setExams(result.data);
+          // 适配新的字段名
+          setExams(result.data.map(item => ({
+            title: item.courseName,
+            examTime: item.examTime,
+            examMethod: item.examForm,
+            campus: item.examPlace,  // 考试地点
+            location: '',
+            seat: item.seatNo,
+            examName: ''
+          })));
         }
       } catch (error) {
         console.error('获取考试信息失败:', error);
@@ -377,7 +384,7 @@ export default function Dashboard() {
                     onClick={async () => {
                       try {
                         setUpdateScoreLoading(true);
-                        const response = await authFetch(API_PATHS.UPDATE_SCORE_TABLE, {
+                        const response = await authFetch(API_PATHS.SCORE.REFRESH, {
                           method: 'PUT',
                           headers: { 'Content-Type': 'application/json' }
                         });
@@ -385,7 +392,7 @@ export default function Dashboard() {
                         if (result.code === 1) {
                           message.success('成绩更新成功');
                           // 更新后重新获取成绩
-                          const gradesRes = await authFetch(`${API_PATHS.GET_SCORES}?year=-114&term=-514`);
+                          const gradesRes = await authFetch(`${API_PATHS.SCORE.LIST}?year=-114&term=-514`);
                           const gradesData = await gradesRes.json();
                           if (gradesData.code === 1) {
                             setGrades(gradesData.data.map(item => ({
@@ -464,7 +471,7 @@ export default function Dashboard() {
                   onClick={async () => {
                     try {
                       setUpdateExamLoading(true);
-                      const response = await authFetch(API_PATHS.UPDATE_EXAM_INFO, {
+                      const response = await authFetch(`${API_PATHS.EXAM.REFRESH}?year=2024&term=3`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' }
                       });
@@ -472,10 +479,18 @@ export default function Dashboard() {
                       if (result.code === 1) {
                         message.success('考试信息更新成功');
                         // 更新后重新获取考试信息
-                        const examsRes = await authFetch(API_PATHS.GET_EXAM_INFO);
+                        const examsRes = await authFetch(`${API_PATHS.EXAM.LIST}?year=2024&term=3`);
                         const examsData = await examsRes.json();
                         if (examsData.code === 1) {
-                          setExams(examsData.data);
+                          setExams(examsData.data.map(item => ({
+                            title: item.courseName,
+                            examTime: item.examTime,
+                            examMethod: item.examForm,
+                            campus: item.examPlace,
+                            location: '',
+                            seat: item.seatNo,
+                            examName: ''
+                          })));
                         }
                       } else {
                         message.error(result.msg || '更新失败');
@@ -559,24 +574,24 @@ export default function Dashboard() {
               <Table
                 dataSource={scoreDetail.scoreDetails}
                 pagination={false}
-                rowKey="gradeColumn"
+                rowKey="scoreColumn"
                 columns={[
                   {
                     title: '成绩分项',
-                    dataIndex: 'gradeColumn',
-                    key: 'gradeColumn',
+                    dataIndex: 'scoreColumn',
+                    key: 'scoreColumn',
                     width: '50%'
                   },
                   {
                     title: '比例',
-                    dataIndex: 'gradeRatio',
-                    key: 'gradeRatio',
+                    dataIndex: 'scoreRatio',
+                    key: 'scoreRatio',
                     width: '20%'
                   },
                   {
                     title: '成绩',
-                    dataIndex: 'grade',
-                    key: 'grade',
+                    dataIndex: 'score',
+                    key: 'score',
                     width: '30%',
                     render: (text) => (
                       <span style={{ color: '#1890ff', fontWeight: 'bold' }}>{text}</span>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hxs.mapper.ScoreMapper">
+
+    <!-- 挂科率排行（聚合查询） -->
+    <select id="selectFailRate" resultType="com.hxs.model.vo.FailRateRankVO">
+        SELECT
+            course_name AS courseName,
+            COUNT(*) AS allCount,
+            SUM(CASE WHEN CAST(grade AS DECIMAL) >= 60 OR grade = '合格' THEN 0 ELSE 1 END) AS failCount,
+            ROUND(SUM(CASE WHEN CAST(grade AS DECIMAL) >= 60 OR grade = '合格' THEN 0 ELSE 1 END)
+                  * 1.0 / NULLIF(COUNT(*), 0), 4) AS failRate
+        FROM score
+        <where>
+            <if test="onlyExamined != false">
+                course_name IN (
+                    SELECT course_name FROM score WHERE sid = #{sid}
+                )
+            </if>
+        </where>
+        GROUP BY course_name
+        ORDER BY failRate DESC
+    </select>
+
+    <!-- 同年级同专业成绩聚合（排名用，JOIN 查询） -->
+    <resultMap id="majorGradeResultMap" type="com.hxs.model.dto.RankingDTO">
+        <id property="sid" column="sid"/>
+        <result property="name" column="name"/>
+        <collection property="scores" ofType="com.hxs.model.vo.ScoreVO">
+            <result property="grade" column="grade"/>
+            <result property="gradePoint" column="grade_point"/>
+            <result property="courseName" column="course_name"/>
+            <result property="classId" column="class_id"/>
+            <result property="year" column="year"/>
+            <result property="term" column="term"/>
+            <result property="credit" column="credit"/>
+            <result property="teacherName" column="teacher_name"/>
+            <result property="courseType" column="course_type"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectMajorGrade" resultMap="majorGradeResultMap">
+        SELECT stu.sid, stu.name,
+               gra.grade, gra.grade_point, gra.course_name,
+               gra.class_id, gra.year, gra.term, gra.credit,
+               gra.teacher_name, gra.course_type
+        FROM student_info stu
+        LEFT JOIN score gra ON stu.sid = gra.sid
+        <where>
+            stu.sid LIKE CONCAT(#{sidPrefix}, '%')
+            AND stu.major_name = #{majorName}
+            AND gra.course_type = '必修'
+            <if test="flag == true">
+                AND gra.year = #{year}
+            </if>
+        </where>
+    </select>
+
+</mapper>
