@@ -1,10 +1,10 @@
 package com.hxs.client;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.hxs.constant.MessageConstant;
 import com.hxs.exception.RequestFailException;
 import com.hxs.model.support.TextBookItem;
-import com.hxs.model.support.TextBookResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -56,7 +56,8 @@ public class EduTextbookClient {
                 String responseBody = EntityUtils.toString(response.getEntity());
                 session.checkLogin(responseBody);
 
-                List<TextBookItem> allBooks = JSON.parseObject(responseBody, TextBookResponse.class).getTextBooks();
+                JSONObject root = JSON.parseObject(responseBody);
+                List<TextBookItem> allBooks = root.getList("items", TextBookItem.class);
                 List<TextBookItem> books = allBooks.stream()
                         .filter(item -> !StringUtil.isBlank(item.getCourseName())
                                 && !"无教材".equals(item.getBookName()))

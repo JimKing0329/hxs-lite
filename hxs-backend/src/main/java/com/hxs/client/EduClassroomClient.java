@@ -1,10 +1,10 @@
 package com.hxs.client;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.hxs.constant.MessageConstant;
 import com.hxs.exception.RequestFailException;
 import com.hxs.model.support.EmptyClassRoomItem;
-import com.hxs.model.support.EmptyClassroomResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -57,9 +57,8 @@ public class EduClassroomClient {
                     throw new RequestFailException(MessageConstant.SYSTEM_ERROR);
                 }
                 String responseBody = EntityUtils.toString(response.getEntity());
-                EmptyClassroomResponse emptyResp = JSON.parseObject(responseBody, EmptyClassroomResponse.class);
-
-                List<EmptyClassRoomItem> list = emptyResp.getEmptyClassRoomItems();
+                JSONObject root = JSON.parseObject(responseBody);
+                List<EmptyClassRoomItem> list = root.getList("items", EmptyClassRoomItem.class);
                 log.debug("获取空教室成功 {} 条", list.size());
                 return list;
             }

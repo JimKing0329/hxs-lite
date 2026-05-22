@@ -1,9 +1,12 @@
 package com.hxs.service.user.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hxs.client.EduSession;
 import com.hxs.client.EduSessionManager;
 import com.hxs.client.EduStudyClient;
 import com.hxs.context.UserContext;
+import com.hxs.mapper.StudySituationMapper;
+import com.hxs.model.entity.StudySituationEntity;
 import com.hxs.model.support.StudySituation;
 import com.hxs.model.vo.StudySituationVO;
 import com.hxs.service.user.StudyService;
@@ -21,33 +24,58 @@ import org.springframework.stereotype.Service;
 public class StudyServiceImpl implements StudyService {
 
     private final EduSessionManager sessionManager;
+    private final StudySituationMapper studySituationMapper;
 
     @Override
     public StudySituationVO getStudySituation() {
-        return fetchStudySituation();
+        Long userId = UserContext.getCurrentId();
+        // 优先从本地库查询，避免每次请求教务系统
+        StudySituationEntity cached = studySituationMapper.selectOne(
+                new QueryWrapper<StudySituationEntity>().eq("sid", userId));
+        if (cached != null) {
+            log.info("从本地库获取学习情况 userId={}", userId);
+            return entityToVO(cached);
+        }
+        // 本地无记录则从教务系统拉取
+        return fetchAndSave();
     }
 
     @Override
     public StudySituationVO updateStudySituation() {
-        return fetchStudySituation();
+        return fetchAndSave();
     }
 
     /**
-     * 从教务系统获取学习情况并转换为 VO
+     * 从教务系统拉取学习情况，入库并返回 VO
      */
-    private StudySituationVO fetchStudySituation() {
-        log.info("获取学习情况 userId={}", UserContext.getCurrentId());
+    private StudySituationVO fetchAndSave() {
+        Long userId = UserContext.getCurrentId();
+        log.info("从教务系统拉取学习情况 userId={}", userId);
 
-        // 获取当前用户的独享 Session（天然用户隔离）
         EduSession session = sessionManager.getOrCreateSession();
-
-        // 创建学习情况模块 Client 并获取数据
         EduStudyClient studyClient = new EduStudyClient(session);
         StudySituation situation = studyClient.getStudySituation();
+
+        // 入库：先删旧再插新
+        studySituationMapper.delete(new QueryWrapper<StudySituationEntity>().eq("sid", userId));
+
+        StudySituationEntity entity = new StudySituationEntity();
+        BeanUtils.copyProperties(situation, entity);
+        entity.setSid(userId);
+        studySituationMapper.insert(entity);
+        log.info("学习情况入库成功 userId={}", userId);
 
         // 转换为 VO
         StudySituationVO vo = new StudySituationVO();
         BeanUtils.copyProperties(situation, vo);
         return vo;
     }
+
+    /** Entity → VO */
+    private StudySituationVO entityToVO(StudySituationEntity entity) {
+        StudySituationVO vo = new StudySituationVO();
+        BeanUtils.copyProperties(entity, vo);
+        return vo;
+    }
+
 }

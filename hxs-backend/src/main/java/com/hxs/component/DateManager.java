@@ -1,21 +1,21 @@
 package com.hxs.component;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 /**
  * 学期日期管理组件
+ * 由 {@link com.hxs.config.DateFactory} 在应用启动时初始化
  */
 @Data
-@Component
 @Slf4j
-@RequiredArgsConstructor
-public class TermDateManager {
+public class DateManager {
+    /** 学年 */
     private Integer year;
+    /** 学期 */
     private Integer term;
+    /** 学期开始日期，用于计算当前教学周 */
     private LocalDate termStartDate;
 }

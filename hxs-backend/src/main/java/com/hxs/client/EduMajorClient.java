@@ -1,12 +1,11 @@
 package com.hxs.client;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.hxs.constant.MessageConstant;
 import com.hxs.exception.RequestFailException;
 import com.hxs.model.entity.ExecuteCourse;
-import com.hxs.model.support.ExecutePlanResponse;
 import com.hxs.model.support.MajorInfoItem;
-import com.hxs.model.support.MajorInfoResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -86,9 +85,10 @@ public class EduMajorClient {
                 String responseBody = EntityUtils.toString(response.getEntity());
                 session.checkLogin(responseBody);
 
-                ExecutePlanResponse planResp = JSON.parseObject(responseBody, ExecutePlanResponse.class);
-                log.info("获取执行计划成功 {}", planResp.getExecuteCourses().size());
-                return planResp.getExecuteCourses();
+                JSONObject root = JSON.parseObject(responseBody);
+                List<ExecuteCourse> courses = root.getList("items", ExecuteCourse.class);
+                log.info("获取执行计划成功 {}", courses.size());
+                return courses;
             }
         } catch (URISyntaxException | IOException e) {
             log.error("获取执行计划失败", e);
@@ -118,8 +118,8 @@ public class EduMajorClient {
                 String responseBody = EntityUtils.toString(response.getEntity());
                 session.checkLogin(responseBody);
 
-                MajorInfoResponse majorInfoResponse = JSON.parseObject(responseBody, MajorInfoResponse.class);
-                List<MajorInfoItem> items = majorInfoResponse.getItems();
+                JSONObject root = JSON.parseObject(responseBody);
+                List<MajorInfoItem> items = root.getList("items", MajorInfoItem.class);
                 log.info("获取专业信息成功 {} 条", items.size());
                 return items;
             }

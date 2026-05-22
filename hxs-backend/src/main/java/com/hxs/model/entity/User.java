@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("student_info")
+@TableName("user")
 public class User {
 
     // ── 基础信息 ──

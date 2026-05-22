@@ -1,10 +1,13 @@
 package com.hxs.client;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.hxs.constant.MessageConstant;
 import com.hxs.exception.MessageEmptyException;
 import com.hxs.exception.RequestFailException;
-import com.hxs.model.support.*;
+import com.hxs.model.support.ExamScheduleItem;
+import com.hxs.model.support.ScoreDetail;
+import com.hxs.model.support.ScoreItem;
 import com.hxs.utils.StringParseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -57,9 +60,10 @@ public class EduExamClient {
                 String responseBody = EntityUtils.toString(response.getEntity());
                 session.checkLogin(responseBody);
 
-                ScorePageResponse scorePageResponse = JSON.parseObject(responseBody, ScorePageResponse.class);
-                log.info("成绩获取成功 {} 条", scorePageResponse.getItems().size());
-                return scorePageResponse.getItems();
+                JSONObject root = JSON.parseObject(responseBody);
+                List<ScoreItem> items = root.getList("items", ScoreItem.class);
+                log.info("成绩获取成功 {} 条", items.size());
+                return items;
             }
         } catch (URISyntaxException | IOException e) {
             log.error("获取学生成绩失败", e);
@@ -96,11 +100,12 @@ public class EduExamClient {
                 String responseBody = EntityUtils.toString(response.getEntity());
                 session.checkLogin(responseBody);
 
-                ExamScheduleResponse examResp = JSON.parseObject(responseBody, ExamScheduleResponse.class);
-                if (examResp.getItems().isEmpty()) {
+                JSONObject root = JSON.parseObject(responseBody);
+                List<ExamScheduleItem> items = root.getList("items", ExamScheduleItem.class);
+                if (items.isEmpty()) {
                     throw new MessageEmptyException(MessageConstant.MESSAGE_EMPTY_ERROR);
                 }
-                return examResp.getItems();
+                return items;
             }
         } catch (URISyntaxException | IOException e) {
             log.error("获取考试安排失败", e);
@@ -133,8 +138,8 @@ public class EduExamClient {
                 String responseBody = EntityUtils.toString(response.getEntity());
                 session.checkLogin(responseBody);
 
-                ScoreDetailResponse detailResp = JSON.parseObject(responseBody, ScoreDetailResponse.class);
-                List<ScoreDetail> scoreDetails = detailResp.getItems();
+                JSONObject root = JSON.parseObject(responseBody);
+                List<ScoreDetail> scoreDetails = root.getList("items", ScoreDetail.class);
                 scoreDetails.forEach(item ->
                         item.setScoreRatio(StringParseUtil.extractParenthesesContent(item.getScoreColumn()))
                 );

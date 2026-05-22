@@ -31,10 +31,10 @@ export const API_PATHS = {
   UPDATE_MAJOR: `${API_HOST}/user/major-code`,
 
   // 课程相关
-  TODAY_COURSE: `${API_HOST}/course/todayCourse`,
-  TOMORROW_COURSE: `${API_HOST}/course/tomorrowCourse`,
-  WEEK_COURSE: `${API_HOST}/course/weekCourse`,
-  UPDATE_COURSE_TABLE: `${API_HOST}/course/updateCourseTable`,
+  TODAY_COURSE: `${API_HOST}/courses/today`,
+  TOMORROW_COURSE: `${API_HOST}/courses/tomorrow`,
+  WEEK_COURSE: `${API_HOST}/courses/week`,
+  UPDATE_COURSE_TABLE: `${API_HOST}/courses`,
 
   // 成绩相关（ScoreController）
   SCORE: {
@@ -52,7 +52,7 @@ export const API_PATHS = {
   },
 
   // 空教室查询
-  EMPTY_CLASSROOM: `${API_HOST}/emptyClassroom/getEmptyClassroom`,
+  EMPTY_CLASSROOM: `${API_HOST}/classrooms`,
   //教材查询
   GET_TEXT_BOOK: `${API_HOST}/textbooks`,  // 调用时追加 /{year}/{term}
 

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hxs.client.EduClient;
 import com.hxs.client.EduSession;
 import com.hxs.client.EduSessionManager;
-import com.hxs.component.TermDateManager;
+import com.hxs.component.DateManager;
 import com.hxs.context.UserContext;
 import com.hxs.mapper.ExecuteCourseMapper;
 import com.hxs.mapper.UserMapper;
@@ -27,7 +27,7 @@ class UserServiceImplTest {
 
     private UserMapper userMapper;
     private ExecuteCourseMapper executeCourseMapper;
-    private TermDateManager termDateManager;
+    private DateManager termDateManager;
     private EduClient eduClient;
     private EduSessionManager sessionManager;
     private UserServiceImpl userService;
@@ -36,7 +36,7 @@ class UserServiceImplTest {
     void setUp() {
         userMapper = mock(UserMapper.class);
         executeCourseMapper = mock(ExecuteCourseMapper.class);
-        termDateManager = mock(TermDateManager.class);
+        termDateManager = mock(DateManager.class);
         eduClient = mock(EduClient.class);
         sessionManager = mock(EduSessionManager.class);
         userService = new UserServiceImpl(eduClient, sessionManager, userMapper, executeCourseMapper, termDateManager);
