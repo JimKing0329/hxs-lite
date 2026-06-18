@@ -1,5 +1,6 @@
 package com.hxs.controller.user;
 
+import com.hxs.component.DateManager;
 import com.hxs.context.UserContext;
 import com.hxs.model.vo.ExamInfoVO;
 import com.hxs.result.Result;
@@ -15,8 +16,8 @@ import java.util.List;
  *
  * <p>RESTful 路径：
  * <pre>
- *   GET  /exams?year=2024&term=1  → 查询考试安排列表
- *   PUT  /exams?year=2024&term=1  → 刷新考试安排
+ *   GET  /exams?year=&term=  → 查询考试安排列表（不传则默认当前学年学期）
+ *   PUT  /exams?year=&term=  → 刷新考试安排
  * </pre>
  *
  * <p>整改对照（旧 → 新）：
@@ -32,11 +33,14 @@ import java.util.List;
 public class ExamController {
 
     private final ExamService examService;
+    private final DateManager termDateManager;
 
     /** 查询考试安排 */
     @GetMapping
-    public Result<List<ExamInfoVO>> getExamSchedule(@RequestParam(defaultValue = "2024") Integer year,
-                                                     @RequestParam(defaultValue = "3") Integer term) {
+    public Result<List<ExamInfoVO>> getExamSchedule(@RequestParam(required = false) Integer year,
+                                                     @RequestParam(required = false) Integer term) {
+        year = (year != null) ? year : termDateManager.getYear();
+        term = (term != null) ? term : termDateManager.getTerm();
         log.info("查询考试安排 userId={} year={} term={}", UserContext.getCurrentId(), year, term);
         List<ExamInfoVO> exams = examService.getExamSchedule(year, term);
         return Result.success(exams);
@@ -44,8 +48,10 @@ public class ExamController {
 
     /** 刷新考试安排 */
     @PutMapping
-    public Result<List<ExamInfoVO>> updateExamSchedule(@RequestParam(defaultValue = "2024") Integer year,
-                                                        @RequestParam(defaultValue = "3") Integer term) {
+    public Result<List<ExamInfoVO>> updateExamSchedule(@RequestParam(required = false) Integer year,
+                                                        @RequestParam(required = false) Integer term) {
+        year = (year != null) ? year : termDateManager.getYear();
+        term = (term != null) ? term : termDateManager.getTerm();
         log.info("刷新考试安排 userId={} year={} term={}", UserContext.getCurrentId(), year, term);
         List<ExamInfoVO> exams = examService.updateExamSchedule(year, term);
         return Result.success(exams);

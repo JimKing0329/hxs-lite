@@ -26,3 +26,6 @@ hsxf:
     user-secret-key: hsxf
     user-ttl: 2592000000
     user-token-name: token
+  admin:
+    sid: ${HSXF_ADMIN_SID:}
+    password: ${HSXF_ADMIN_PWD:}
