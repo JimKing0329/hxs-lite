@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 微信 API 客户端 — 菜单管理
+ * 微信 API 客户端 — access_token 管理 + 菜单更新
  */
 @Slf4j
 @Component
@@ -26,6 +26,11 @@ public class WechatClient {
 
     private String appId;
     private String appSecret;
+
+    /** 缓存的 access_token + 过期时间 */
+    private volatile String cachedToken;
+    private volatile long tokenExpireTime;
+    private final Object tokenLock = new Object();
 
     @Value("${wechat.app-id}")
     public void setAppId(String appId) {
@@ -38,26 +43,41 @@ public class WechatClient {
     }
 
     /**
-     * 获取微信 access_token
+     * 获取微信 access_token（带缓存，线程安全）
      */
     public String getAccessToken() {
-        String url = String.format(
-                "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
-                appId, appSecret);
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpGet httpGet = new HttpGet(url);
-            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
-                String body = EntityUtils.toString(response.getEntity());
-                JSONObject json = JSON.parseObject(body);
-                String token = json.getString("access_token");
-                if (token == null) {
-                    log.error("获取微信 access_token 失败: {}", body);
-                    throw new RuntimeException("获取微信 access_token 失败");
-                }
-                return token;
+        // 快速路径：缓存未过期直接返回
+        if (cachedToken != null && System.currentTimeMillis() < tokenExpireTime) {
+            return cachedToken;
+        }
+        // 同步刷新
+        synchronized (tokenLock) {
+            if (cachedToken != null && System.currentTimeMillis() < tokenExpireTime) {
+                return cachedToken;
             }
-        } catch (IOException e) {
-            throw new RuntimeException("获取微信 access_token 异常", e);
+            String url = String.format(
+                    "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
+                    appId, appSecret);
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                HttpGet httpGet = new HttpGet(url);
+                try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                    String body = EntityUtils.toString(response.getEntity());
+                    JSONObject json = JSON.parseObject(body);
+                    String token = json.getString("access_token");
+                    if (token == null) {
+                        log.error("获取微信 access_token 失败: {}", body);
+                        throw new RuntimeException("获取微信 access_token 失败");
+                    }
+                    // 提前 5 分钟过期，避免边界时间窗口问题
+                    this.cachedToken = token;
+                    this.tokenExpireTime = System.currentTimeMillis() +
+                            (json.getLongValue("expires_in") - 300) * 1000L;
+                    log.info("微信 access_token 刷新成功");
+                    return token;
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("获取微信 access_token 异常", e);
+            }
         }
     }
 

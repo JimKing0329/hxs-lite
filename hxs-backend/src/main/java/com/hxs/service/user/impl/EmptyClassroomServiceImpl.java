@@ -102,4 +102,12 @@ public class EmptyClassroomServiceImpl implements EmptyClassroomService {
         if (className.contains("综合楼")) return "综合楼";
         return "";
     }
+
+    @Override
+    public void deleteHistoryRecord() {
+        log.info("清理历史空教室数据");
+        emptyClassroomMapper.deleteAllAvailability();
+        emptyClassroomMapper.deleteAllClassroom();
+        log.info("历史空教室数据清理完成");
+    }
 }

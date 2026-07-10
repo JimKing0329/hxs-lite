@@ -16,4 +16,9 @@ public interface EmptyClassroomService {
      * 更新空教室信息（管理员操作，从教务系统拉取）
      */
     void updateEmptyClassRoom(Integer week);
+
+    /**
+     * 删除历史空教室记录
+     */
+    void deleteHistoryRecord();
 }

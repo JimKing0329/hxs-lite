@@ -39,4 +39,10 @@ public interface EmptyClassroomMapper extends BaseMapper<EmptyClassroom> {
 
     @Delete("DELETE FROM empty_classroom WHERE week_number = #{week}")
     void deleteClassroomByWeek(@Param("week") Integer week);
+
+    @Delete("DELETE FROM empty_classroom")
+    void deleteAllClassroom();
+
+    @Delete("DELETE FROM classroom_availability")
+    void deleteAllAvailability();
 }

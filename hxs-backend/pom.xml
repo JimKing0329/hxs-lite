@@ -90,6 +90,20 @@
             <version>1.18.1</version>
         </dependency>
 
+        <!-- XStream XML 序列化（微信消息） -->
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.20</version>
+        </dependency>
+
+        <!-- dom4j XML 解析（微信消息） -->
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>2.1.4</version>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
