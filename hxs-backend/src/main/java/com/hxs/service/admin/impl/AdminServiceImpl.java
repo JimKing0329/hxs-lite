@@ -87,20 +87,16 @@ public class AdminServiceImpl implements AdminService {
         // 拉取专业信息，过滤近 4 年的数据并去重
         int minGrade = LocalDate.now().getYear() - 4;
         List<MajorInfo> majorList = majorClient.getMajorInfo().stream()
-                .filter(item -> {
-                    try {
-                        return Integer.parseInt(item.getGrade()) >= minGrade;
-                    } catch (NumberFormatException e) {
-                        return false;
-                    }
-                })
+                .filter(item -> item.getGrade() != null && item.getGrade() >= minGrade)
                 .distinct()
                 .map(this::toEntity)
                 .toList();
 
-        // 先删后插
+        // 先删后插（空列表时跳过插入，避免 SQL 语法错误）
         majorMapper.delete(null);
-        majorMapper.insertBatch(majorList);
+        if (!majorList.isEmpty()) {
+            majorMapper.insertBatch(majorList);
+        }
 
         session.close();
         log.info("专业信息更新成功，共 {} 条", majorList.size());
@@ -110,12 +106,9 @@ public class AdminServiceImpl implements AdminService {
     /** MajorInfoItem → MajorInfo Entity */
     private MajorInfo toEntity(MajorInfoItem item) {
         MajorInfo entity = new MajorInfo();
-        entity.setGradeId(item.getGradeId());
-        entity.setGrade(Integer.valueOf(item.getGrade()));
+        entity.setGrade(item.getGrade());
         entity.setMajorId(item.getMajorId());
         entity.setMajorName(item.getMajorName());
-        entity.setMajorDirection(item.getMajorDirection());
-        entity.setPlanId(item.getPlanId());
         entity.setCollegeId(item.getCollegeId());
         entity.setMajorCode(StringParseUtil.extractParenthesesContent(item.getMajorName()));
         return entity;

@@ -13,3 +13,8 @@ logging:
 wechat:
   app-id: wx02041c33ff5878ce
   app-secret: 407597f44deadb738ef6f6e3058c60c8
+
+hsxf:
+  admin:
+    sid: ${HSXF_ADMIN_SID:}
+    password: ${HSXF_ADMIN_PWD:}

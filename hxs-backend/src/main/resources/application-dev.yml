@@ -13,3 +13,8 @@ logging:
 wechat:
   app-id: wxd34a68970fa51736
   app-secret: 38e9f75173875c244ad08c966afccdc5
+
+hsxf:
+  admin:
+    sid: 2023015529
+    password: Wangxin050329.

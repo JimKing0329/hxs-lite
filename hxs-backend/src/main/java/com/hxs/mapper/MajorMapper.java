@@ -12,11 +12,9 @@ import java.util.List;
 public interface MajorMapper extends BaseMapper<MajorInfo> {
 
     @Insert("<script>" +
-            "INSERT IGNORE INTO major_info(grade_id, grade, major_id, major_name, major_direction, " +
-            "plan_id, college_id, major_code) VALUES " +
+            "INSERT IGNORE INTO major_info(grade, major_id, major_name, college_id, major_code) VALUES " +
             "<foreach collection='list' item='item' separator=','>" +
-            "(#{item.gradeId}, #{item.grade}, #{item.majorId}, #{item.majorName}, " +
-            "#{item.majorDirection}, #{item.planId}, #{item.collegeId}, #{item.majorCode})" +
+            "(#{item.grade}, #{item.majorId}, #{item.majorName}, #{item.collegeId}, #{item.majorCode})" +
             "</foreach>" +
             "</script>")
     void insertBatch(@Param("list") List<MajorInfo> list);
