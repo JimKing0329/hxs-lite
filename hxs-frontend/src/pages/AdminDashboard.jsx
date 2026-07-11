@@ -27,9 +27,81 @@ export default function AdminDashboard() {
   const [wechatMenuModalVisible, setWechatMenuModalVisible] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState('');
   const [termDateType, setTermDateType] = useState('1'); // 1: 开学日期, 2: 课表日期，默认开学日期
-  const [calenderUploading, setCalenderUploading] = useState(false);
-  const [calenderPreview, setCalenderPreview] = useState('');
-  const calenderFileRef = useRef(null);
+
+  // 微信素材上传状态（校历/红旗地图/裕华地图）
+  const [uploadStates, setUploadStates] = useState({
+    calender: { uploading: false, preview: '' },
+    map_hq:   { uploading: false, preview: '' },
+    map_yh:   { uploading: false, preview: '' },
+  });
+  const uploadRefs = {
+    calender: useRef(null),
+    map_hq:   useRef(null),
+    map_yh:   useRef(null),
+  };
+
+  // 素材类型配置
+  const mediaUploadTypes = [
+    { type: 'calender', title: '更新校历图片', desc: '上传新校历图片到微信公众号', iconColor: 'blue' },
+    { type: 'map_hq',  title: '更新红旗校区地图', desc: '上传红旗校区地图图片', iconColor: 'purple' },
+    { type: 'map_yh',  title: '更新裕华校区地图', desc: '上传裕华校区地图图片', iconColor: 'green' },
+  ];
+
+  const handleMediaUpload = async (type, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      message.error('仅支持 jpg/png 格式的图片');
+      e.target.value = '';
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      message.error('图片大小不能超过 10MB');
+      e.target.value = '';
+      return;
+    }
+
+    // 预览
+    const reader = new FileReader();
+    reader.onload = (ev) => setUploadStates(prev => ({
+      ...prev,
+      [type]: { ...prev[type], preview: ev.target.result },
+    }));
+    reader.readAsDataURL(file);
+
+    // 上传
+    setUploadStates(prev => ({ ...prev, [type]: { ...prev[type], uploading: true } }));
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await authFetch(`${API_PATHS.UPLOAD_MEDIA_ID}?type=${type}`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (response.ok && result.code === 1) {
+        message.success('上传成功');
+      } else {
+        message.error(result.msg || '上传失败');
+        setUploadStates(prev => ({ ...prev, [type]: { ...prev[type], preview: '' } }));
+      }
+    } catch (error) {
+      console.error('上传素材失败:', error);
+      message.error('网络错误，上传失败');
+      setUploadStates(prev => ({ ...prev, [type]: { ...prev[type], preview: '' } }));
+    } finally {
+      setUploadStates(prev => ({ ...prev, [type]: { ...prev[type], uploading: false } }));
+      e.target.value = '';
+    }
+  };
+
+  const triggerMediaUpload = (type) => {
+    uploadRefs[type]?.current?.click();
+  };
 
   useEffect(() => {
     // 检查是否已登录
@@ -247,64 +319,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleCalenderUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // 校验文件类型
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-    if (!allowedTypes.includes(file.type)) {
-      message.error('仅支持 jpg/png 格式的图片');
-      e.target.value = '';
-      return;
-    }
-
-    // 校验文件大小（2MB）
-    if (file.size > 2 * 1024 * 1024) {
-      message.error('图片大小不能超过 2MB');
-      e.target.value = '';
-      return;
-    }
-
-    // 预览
-    const reader = new FileReader();
-    reader.onload = (ev) => setCalenderPreview(ev.target.result);
-    reader.readAsDataURL(file);
-
-    // 上传
-    setCalenderUploading(true);
-    try {
-      const token = localStorage.getItem('Authorization');
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch(API_PATHS.UPDATE_CALENDER_MEDIA_ID, {
-        method: 'POST',
-        headers: { 'Authorization': token },
-        body: formData,
-      });
-
-      const result = await response.json();
-      if (response.ok && result.code === 1) {
-        message.success('校历图片上传成功');
-      } else {
-        message.error(result.msg || '上传失败');
-        setCalenderPreview('');
-      }
-    } catch (error) {
-      console.error('上传校历图片失败:', error);
-      message.error('网络错误，上传失败');
-      setCalenderPreview('');
-    } finally {
-      setCalenderUploading(false);
-      e.target.value = '';
-    }
-  };
-
-  const triggerCalenderUpload = () => {
-    calenderFileRef.current?.click();
-  };
-
   const handleLogout = () => {
     localStorage.removeItem('Authorization');
     window.location.href = '/admin/login';
@@ -465,33 +479,40 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* 更新校历图片 */}
-                <div className="action-item" style={{ flexWrap: 'wrap' }}>
-                  <div className="action-icon action-icon-blue">
-                    <PictureOutlined />
-                  </div>
-                  <div className="action-info">
-                    <span className="action-title">更新校历图片</span>
-                    <span className="action-desc">上传新校历图片到微信公众号</span>
-                  </div>
-                  <div className="action-control">
-                    <div className="calender-upload-group">
-                      {calenderPreview && (
-                        <img src={calenderPreview} alt="校历预览" className="calender-preview" />
-                      )}
-                      <input
-                        ref={calenderFileRef}
-                        type="file"
-                        accept="image/jpeg,image/jpg,image/png"
-                        onChange={handleCalenderUpload}
-                        style={{ display: 'none' }}
-                      />
-                      <Button type="primary" onClick={triggerCalenderUpload} loading={calenderUploading} size="small">
-                        {calenderPreview ? '重新上传' : '选择图片'}
-                      </Button>
+                {/* 微信素材上传（校历/红旗地图/裕华地图） */}
+                {mediaUploadTypes.map(({ type, title, desc, iconColor }) => (
+                  <div className="action-item" key={type} style={{ flexWrap: 'wrap' }}>
+                    <div className={`action-icon action-icon-${iconColor}`}>
+                      <PictureOutlined />
+                    </div>
+                    <div className="action-info">
+                      <span className="action-title">{title}</span>
+                      <span className="action-desc">{desc}</span>
+                    </div>
+                    <div className="action-control">
+                      <div className="calender-upload-group">
+                        {uploadStates[type].preview && (
+                          <img src={uploadStates[type].preview} alt="预览" className="calender-preview" />
+                        )}
+                        <input
+                          ref={uploadRefs[type]}
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png"
+                          onChange={(e) => handleMediaUpload(type, e)}
+                          style={{ display: 'none' }}
+                        />
+                        <Button
+                          type="primary"
+                          onClick={() => triggerMediaUpload(type)}
+                          loading={uploadStates[type].uploading}
+                          size="small"
+                        >
+                          {uploadStates[type].preview ? '重新上传' : '选择图片'}
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
             </Card>
           </div>

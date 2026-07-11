@@ -23,6 +23,7 @@ import com.hxs.utils.ConfigFactory;
 import com.thoughtworks.xstream.XStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -48,6 +49,13 @@ public class WechatServiceImpl implements WechatService {
     private final DateManager dateManager;
     private final ArticleFactory articleFactory;
     private final ConfigFactory configFactory;
+
+    private String baseUrl;
+
+    @Value("${hsxf.base-url}")
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
 
     @Override
     public String checkAndReply(Map<String, String> messageMap) {
@@ -126,7 +134,7 @@ public class WechatServiceImpl implements WechatService {
             // 查询用户
             User user = userMapper.selectOne(new QueryWrapper<User>().eq("binding_key", bindingKey));
             if (user == null) {
-                return textReply(messageMap, WechatMessageConstant.USER_NOT_EXISTS);
+                return textReply(messageMap, String.format(WechatMessageConstant.USER_NOT_EXISTS, baseUrl));
             }
             if (StringUtils.hasText(user.getOpenId())) {
                 return textReply(messageMap, WechatMessageConstant.USER_ALREADY_BIND);
@@ -196,7 +204,7 @@ public class WechatServiceImpl implements WechatService {
                     .append(course.getStartSession()).append("-")
                     .append(course.getEndSession()).append("节\n\n");
         }
-        reply.append("课表不准？<a href=\"http://115.190.9.5/dashboard\">更新课表</a>");
+        reply.append("课表不准？<a href=\"").append(baseUrl).append("/dashboard\">更新课表</a>");
 
         user.setLastLogin(LocalDateTime.now());
         userMapper.updateById(user);
@@ -227,7 +235,7 @@ public class WechatServiceImpl implements WechatService {
         for (Score score : scores) {
             reply.append(score.getCourseName()).append("  ").append(score.getGrade()).append("\n\n");
         }
-        reply.append("成绩不完整？<a href=\"http://115.190.9.5/all-scores\">点我查看全部成绩</a>");
+        reply.append("成绩不完整？<a href=\"").append(baseUrl).append("/all-scores\">点我查看全部成绩</a>");
         return textReply(messageMap, reply.toString());
     }
 
@@ -278,7 +286,7 @@ public class WechatServiceImpl implements WechatService {
             reply.append(classrooms.get(i).getClassName()).append("\n\n");
         }
         reply.append("仅随机展示30条空教室信息,\n")
-                .append("<a href=\"http://115.190.9.5/empty-classroom\">查询更多请点这里</a>\n")
+                .append("<a href=\"").append(baseUrl).append("/empty-classroom\">查询更多请点这里</a>\n")
                 .append("\ud83c\udf39\ud83c\udf39\ud83c\udf39");
         return textReply(messageMap, reply.toString());
     }

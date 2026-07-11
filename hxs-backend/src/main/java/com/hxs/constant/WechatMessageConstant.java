@@ -13,7 +13,7 @@ public final class WechatMessageConstant {
             + "\n\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\n"
             + "本公众号由软件学院同学独立制作，如果您觉得好用就分享给同学吧！！";
 
-    public static final String USER_NOT_EXISTS = "未查询到用户信息，请先登录系统！！\n<a href=\"http://115.190.9.5/dashboard\">点我登录系统</a>";
+    public static final String USER_NOT_EXISTS = "未查询到用户信息，请先登录系统！！\n<a href=\"%s/dashboard\">点我登录系统</a>";
     public static final String FAIL_BIND = "绑定失败,请检查您的key或者绑定格式是否正确！！\n注意：绑定与绑定码之间存在空格！！";
     public static final String USER_ALREADY_BIND = "该用户已被绑定！！请登录系统解绑后重试！！";
     public static final String SUCCESS_BIND = "绑定成功！！\n回复 \"课表\" 可获取今日课表\n回复 \"成绩\" 获取本学期成绩";

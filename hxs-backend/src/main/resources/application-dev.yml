@@ -11,10 +11,12 @@ logging:
     com.hxs.client: debug
 
 wechat:
-  app-id: wxd34a68970fa51736
-  app-secret: 38e9f75173875c244ad08c966afccdc5
+  app-id: wxa54a4b846bc4ea80
+  app-secret: 2fd98b5dee66c2732a3c30a25135bb62
 
 hsxf:
+  base-url: http://82.156.49.70
+  course-url: http://82.156.49.70:18081
   admin:
     sid: 2023015529
     password: Wangxin050329.

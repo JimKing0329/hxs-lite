@@ -326,7 +326,7 @@
   opacity: 0.6;
 }
 
-/* ===== Calender Upload ===== */
+/* ===== Media Upload ===== */
 .calender-upload-group {
   display: flex;
   align-items: center;
@@ -339,10 +339,6 @@
   object-fit: cover;
   border-radius: 6px;
   border: 1px solid #f0f0f0;
-}
-
-.calender-upload-btn {
-  cursor: pointer;
 }
 
 /* ===== Animations ===== */
@@ -459,11 +455,7 @@
     flex-wrap: wrap;
   }
 
-  .calender-upload-btn {
-    width: 100%;
-  }
-
-  .calender-upload-btn .ant-btn {
+  .calender-upload-group .ant-btn {
     width: 100%;
   }
 }

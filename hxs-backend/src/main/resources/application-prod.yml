@@ -15,6 +15,8 @@ wechat:
   app-secret: 407597f44deadb738ef6f6e3058c60c8
 
 hsxf:
+  base-url: http://82.156.49.70
+  course-url: http://82.156.49.70:18081
   admin:
     sid: ${HSXF_ADMIN_SID:}
     password: ${HSXF_ADMIN_PWD:}

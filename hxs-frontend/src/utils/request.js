@@ -30,8 +30,9 @@ export function authFetch(url, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  // 如果未指定 Content-Type 且不是 GET，默认 json
-  if (!headers['Content-Type'] && options.method && options.method !== 'GET') {
+  // 如果未指定 Content-Type 且不是 GET、且 body 不是 FormData，默认 json
+  if (!headers['Content-Type'] && options.method && options.method !== 'GET'
+      && !(options.body instanceof FormData)) {
     headers['Content-Type'] = 'application/json';
   }
 

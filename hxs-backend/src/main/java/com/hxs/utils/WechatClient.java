@@ -28,6 +28,8 @@ public class WechatClient {
 
     private String appId;
     private String appSecret;
+    private String baseUrl;
+    private String courseUrl;
 
     /** 缓存的 access_token + 过期时间 */
     private volatile String cachedToken;
@@ -42,6 +44,16 @@ public class WechatClient {
     @Value("${wechat.app-secret}")
     public void setAppSecret(String appSecret) {
         this.appSecret = appSecret;
+    }
+
+    @Value("${hsxf.base-url}")
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    @Value("${hsxf.course-url}")
+    public void setCourseUrl(String courseUrl) {
+        this.courseUrl = courseUrl;
     }
 
     /**
@@ -150,8 +162,8 @@ public class WechatClient {
     private String buildMenuJson(String type) {
         SubMenu menu1 = new SubMenu("教务工具");
         menu1.subButton = new ArrayList<>();
-        menu1.subButton.add(new ViewButton("教务查询", "http://115.190.9.5/dashboard"));
-        menu1.subButton.add(new ViewButton("成绩计算器", "http://115.190.9.5/gpa-calculator"));
+        menu1.subButton.add(new ViewButton("教务查询", baseUrl + "/dashboard"));
+        menu1.subButton.add(new ViewButton("成绩计算器", baseUrl + "/gpa-calculator"));
         menu1.subButton.add(new ViewButton("常见问题", "https://mp.weixin.qq.com/s/_VNcQx3YpF_NSKZUqwuYvg"));
 
         SubMenu menu2 = new SubMenu("校历/地图");
@@ -181,7 +193,7 @@ public class WechatClient {
         } else if ("迎新".equals(type)) {
             SubMenu menu3 = new SubMenu("新生查询");
             menu3.subButton = new ArrayList<>();
-            menu3.subButton.add(new ViewButton("新学期课表", "http://115.190.9.5:18081"));
+            menu3.subButton.add(new ViewButton("新学期课表", courseUrl));
             buttons.add(menu3);
         }
 

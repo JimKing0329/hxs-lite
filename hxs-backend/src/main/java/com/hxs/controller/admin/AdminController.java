@@ -170,17 +170,32 @@ public class AdminController {
         return Result.success();
     }
 
-    /** 获取校历 mediaId */
-    @GetMapping("/config/calender-media-id")
-    public Result<String> getCalenderMediaId() {
-        log.info("管理员获取校历 mediaId");
-        return Result.success(configFactory.get("calender_media_id"));
+    /** 微信图片素材类型 */
+    private static final Map<String, String> MEDIA_TYPE_KEY_MAP = Map.of(
+            "calender", "calender_media_id",
+            "map_hq", "school_map_hq_media_id",
+            "map_yh", "school_map_yh_media_id"
+    );
+
+    /** 获取微信素材 mediaId */
+    @GetMapping("/config/media-id")
+    public Result<String> getMediaId(@RequestParam String type) {
+        String configKey = MEDIA_TYPE_KEY_MAP.get(type);
+        if (configKey == null) {
+            return Result.error("不支持的类型: " + type);
+        }
+        log.info("管理员获取素材 mediaId type={}", type);
+        return Result.success(configFactory.get(configKey));
     }
 
-    /** 上传校历图片（后端上传到微信并更新 mediaId） */
-    @PostMapping("/config/calender-media-id")
-    public Result<String> updateCalenderMediaId(@RequestParam("file") MultipartFile file) {
-        log.info("管理员上传校历图片: name={}, size={}", file.getOriginalFilename(), file.getSize());
+    /** 上传微信图片素材（校历/地图），后端上传到微信并更新 mediaId */
+    @PostMapping("/config/media-id")
+    public Result<String> uploadMediaId(@RequestParam String type, @RequestParam("file") MultipartFile file) {
+        String configKey = MEDIA_TYPE_KEY_MAP.get(type);
+        if (configKey == null) {
+            return Result.error("不支持的类型: " + type);
+        }
+        log.info("管理员上传素材 type={}, name={}, size={}", type, file.getOriginalFilename(), file.getSize());
 
         // 校验文件
         if (file.isEmpty()) {
@@ -191,8 +206,8 @@ public class AdminController {
                 && !originalName.endsWith(".jpeg"))) {
             return Result.error("仅支持 jpg/png/jpeg 格式的图片");
         }
-        if (file.getSize() > 2 * 1024 * 1024) {
-            return Result.error("图片大小不能超过 2MB（微信临时素材限制）");
+        if (file.getSize() > 10 * 1024 * 1024) {
+            return Result.error("图片大小不能超过 10MB（微信临时素材限制）");
         }
 
         try {
@@ -200,22 +215,22 @@ public class AdminController {
             String mediaId = wechatClient.uploadMedia(file.getBytes(), originalName);
 
             // 更新数据库（存在则更新，不存在则插入）
-            SystemConfig existing = systemConfigMapper.selectById("calender_media_id");
+            SystemConfig existing = systemConfigMapper.selectById(configKey);
             if (existing != null) {
                 existing.setConfigValue(mediaId);
                 systemConfigMapper.updateById(existing);
             } else {
                 SystemConfig config = new SystemConfig();
-                config.setConfigKey("calender_media_id");
+                config.setConfigKey(configKey);
                 config.setConfigValue(mediaId);
-                config.setRemark("微信公众号校历图片 mediaId");
+                config.setRemark("微信公众号素材 mediaId");
                 systemConfigMapper.insert(config);
             }
 
             // 刷新内存缓存
             configFactory.refresh();
 
-            log.info("校历 mediaId 更新成功: {}", mediaId);
+            log.info("素材 mediaId 更新成功 type={}, mediaId={}", type, mediaId);
             return Result.success(mediaId);
         } catch (IOException e) {
             log.error("读取上传文件失败", e);
