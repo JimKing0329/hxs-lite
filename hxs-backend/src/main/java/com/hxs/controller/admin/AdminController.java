@@ -2,9 +2,11 @@ package com.hxs.controller.admin;
 
 import com.hxs.component.DateManager;
 import com.hxs.constant.JwtClaimsConstant;
+import com.hxs.mapper.SystemConfigMapper;
 import com.hxs.mapper.SystemDateMapper;
 import com.hxs.model.dto.TermStartDateUpdateDTO;
 import com.hxs.model.dto.UserLoginDTO;
+import com.hxs.model.entity.SystemConfig;
 import com.hxs.model.entity.SystemDate;
 import com.hxs.model.entity.User;
 import com.hxs.model.vo.UserDistributionVO;
@@ -13,11 +15,15 @@ import com.hxs.properties.JwtProperties;
 import com.hxs.result.Result;
 import com.hxs.service.admin.AdminService;
 import com.hxs.service.user.EmptyClassroomService;
+import com.hxs.utils.ConfigFactory;
 import com.hxs.utils.JwtUtil;
+import com.hxs.utils.WechatClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -63,8 +69,11 @@ public class AdminController {
     private final AdminService adminService;
     private final JwtProperties jwtProperties;
     private final SystemDateMapper systemDateMapper;
+    private final SystemConfigMapper systemConfigMapper;
     private final DateManager termDateManager;
     private final EmptyClassroomService emptyClassroomService;
+    private final ConfigFactory configFactory;
+    private final WechatClient wechatClient;
 
     /** 管理员登录 */
     @PostMapping("/login")
@@ -75,6 +84,7 @@ public class AdminController {
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.EMP_ID, user.getSid());
         String token = JwtUtil.createJWT(jwtProperties.getAdminSecretKey(), jwtProperties.getAdminTtl(), claims);
+        log.info("管理员登录成功: {}, token={}", user.getSid(), token);
 
         return Result.success(UserLoginVO.builder().token(token).build());
     }
@@ -158,5 +168,61 @@ public class AdminController {
         log.info("管理员刷新空教室 week={}", week);
         emptyClassroomService.updateEmptyClassRoom(week);
         return Result.success();
+    }
+
+    /** 获取校历 mediaId */
+    @GetMapping("/config/calender-media-id")
+    public Result<String> getCalenderMediaId() {
+        log.info("管理员获取校历 mediaId");
+        return Result.success(configFactory.get("calender_media_id"));
+    }
+
+    /** 上传校历图片（后端上传到微信并更新 mediaId） */
+    @PostMapping("/config/calender-media-id")
+    public Result<String> updateCalenderMediaId(@RequestParam("file") MultipartFile file) {
+        log.info("管理员上传校历图片: name={}, size={}", file.getOriginalFilename(), file.getSize());
+
+        // 校验文件
+        if (file.isEmpty()) {
+            return Result.error("文件不能为空");
+        }
+        String originalName = file.getOriginalFilename();
+        if (originalName == null || (!originalName.endsWith(".jpg") && !originalName.endsWith(".png")
+                && !originalName.endsWith(".jpeg"))) {
+            return Result.error("仅支持 jpg/png/jpeg 格式的图片");
+        }
+        if (file.getSize() > 2 * 1024 * 1024) {
+            return Result.error("图片大小不能超过 2MB（微信临时素材限制）");
+        }
+
+        try {
+            // 上传到微信
+            String mediaId = wechatClient.uploadMedia(file.getBytes(), originalName);
+
+            // 更新数据库（存在则更新，不存在则插入）
+            SystemConfig existing = systemConfigMapper.selectById("calender_media_id");
+            if (existing != null) {
+                existing.setConfigValue(mediaId);
+                systemConfigMapper.updateById(existing);
+            } else {
+                SystemConfig config = new SystemConfig();
+                config.setConfigKey("calender_media_id");
+                config.setConfigValue(mediaId);
+                config.setRemark("微信公众号校历图片 mediaId");
+                systemConfigMapper.insert(config);
+            }
+
+            // 刷新内存缓存
+            configFactory.refresh();
+
+            log.info("校历 mediaId 更新成功: {}", mediaId);
+            return Result.success(mediaId);
+        } catch (IOException e) {
+            log.error("读取上传文件失败", e);
+            return Result.error("读取文件失败");
+        } catch (RuntimeException e) {
+            log.error("上传微信素材失败", e);
+            return Result.error(e.getMessage());
+        }
     }
 }

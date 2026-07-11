@@ -19,6 +19,7 @@ import com.hxs.service.user.ScoreService;
 import com.hxs.service.wechat.WechatService;
 import com.hxs.utils.AesUtil;
 import com.hxs.utils.ArticleFactory;
+import com.hxs.utils.ConfigFactory;
 import com.thoughtworks.xstream.XStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,7 @@ public class WechatServiceImpl implements WechatService {
     private final EmptyClassroomService emptyClassroomService;
     private final DateManager dateManager;
     private final ArticleFactory articleFactory;
+    private final ConfigFactory configFactory;
 
     @Override
     public String checkAndReply(Map<String, String> messageMap) {
@@ -88,7 +90,14 @@ public class WechatServiceImpl implements WechatService {
         String eventKey = messageMap.get("EventKey");
         switch (eventKey) {
             case "getCalender":
-                return imageReply(messageMap, "POAR6TA2yHMntGxMC02clJgglwFlDdLNjhZGvVcKBKfUcE6N1ePQNkIep5IutlVS");
+                String mediaId = configFactory.get("calender_media_id");
+                return imageReply(messageMap, mediaId != null ? mediaId : "");
+            case "getMapYH":
+                String yhMediaId = configFactory.get("school_map_yh_media_id");
+                return imageReply(messageMap, yhMediaId != null ? yhMediaId : "");
+            case "getMapHQ":
+                String hqMediaId = configFactory.get("school_map_hq_media_id");
+                return imageReply(messageMap, hqMediaId != null ? hqMediaId : "");
             case "queryCourseTable":
                 return sendCourseTable(messageMap);
             case "queryGrade":

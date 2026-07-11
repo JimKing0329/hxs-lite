@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -82,6 +84,45 @@ public class WechatClient {
     }
 
     /**
+     * 上传临时素材到微信服务器（图片）
+     * @param fileBytes 文件字节数组
+     * @param fileName  文件名（如 calendar.jpg）
+     * @return 微信返回的 media_id
+     */
+    public String uploadMedia(byte[] fileBytes, String fileName) {
+        String accessToken = getAccessToken();
+        String url = String.format(
+                "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=image",
+                accessToken);
+
+        log.info("上传微信临时素材: fileName={}", fileName);
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost httpPost = new HttpPost(url);
+
+            // 构造 multipart/form-data
+            org.apache.http.HttpEntity multipartEntity = MultipartEntityBuilder.create()
+                    .addBinaryBody("media", fileBytes, ContentType.APPLICATION_OCTET_STREAM, fileName)
+                    .build();
+            httpPost.setEntity(multipartEntity);
+
+            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                String body = EntityUtils.toString(response.getEntity());
+                JSONObject json = JSON.parseObject(body);
+                String mediaId = json.getString("media_id");
+                if (mediaId == null) {
+                    log.error("上传微信素材失败: {}", body);
+                    throw new RuntimeException("上传微信素材失败: " + json.getString("errmsg"));
+                }
+                log.info("微信素材上传成功, mediaId={}", mediaId);
+                return mediaId;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("上传微信素材异常", e);
+        }
+    }
+
+    /**
      * 更新微信公众号菜单
      * @param type 菜单类型：开学 / 假期 / 迎新
      */
@@ -113,35 +154,34 @@ public class WechatClient {
         menu1.subButton.add(new ViewButton("成绩计算器", "http://115.190.9.5/gpa-calculator"));
         menu1.subButton.add(new ViewButton("常见问题", "https://mp.weixin.qq.com/s/_VNcQx3YpF_NSKZUqwuYvg"));
 
+        SubMenu menu2 = new SubMenu("校历/地图");
+        menu2.subButton = new ArrayList<>();
+        menu2.subButton.add(new ClickButton("校历", "getCalender"));
+        menu2.subButton.add(new ClickButton("地图(裕华)", "getMapYH"));
+        menu2.subButton.add(new ClickButton("地图(红旗)", "getMapHQ"));
+
+
         List<MenuItem> buttons = new ArrayList<>();
         buttons.add(menu1);
+        buttons.add(menu2);
 
         if ("开学".equals(type)) {
-            SubMenu menu2 = new SubMenu("快捷查询");
-            menu2.subButton = new ArrayList<>();
-            menu2.subButton.add(new ClickButton("查询课表", "queryCourseTable"));
-            menu2.subButton.add(new ClickButton("查询成绩", "queryGrade"));
-            menu2.subButton.add(new ClickButton("空教室(红旗)", "queryEmptyClassroomHQ"));
-            menu2.subButton.add(new ClickButton("空教室(裕华)", "queryEmptyClassroomYH"));
-            menu2.subButton.add(new ClickButton("校历", "getCalender"));
-            buttons.add(menu2);
-        } else if ("假期".equals(type)) {
-            SubMenu menu2 = new SubMenu("快捷查询");
-            menu2.subButton = new ArrayList<>();
-            menu2.subButton.add(new ClickButton("校历", "getCalender"));
-            menu2.subButton.add(new ClickButton("更新成绩", "updateGrade"));
-            buttons.add(menu2);
-        } else if ("迎新".equals(type)) {
-            SubMenu menu2 = new SubMenu("新生查询");
-            menu2.subButton = new ArrayList<>();
-            menu2.subButton.add(new ClickButton("校历", "getCalender"));
-            menu2.subButton.add(new ViewButton("新学期课表", "http://115.190.9.5:18081"));
-            buttons.add(menu2);
-
             SubMenu menu3 = new SubMenu("快捷查询");
             menu3.subButton = new ArrayList<>();
-            menu3.subButton.add(new ClickButton("校历", "getCalender"));
+            menu3.subButton.add(new ClickButton("查询课表", "queryCourseTable"));
+            menu3.subButton.add(new ClickButton("查询成绩", "queryGrade"));
+            menu3.subButton.add(new ClickButton("空教室(红旗)", "queryEmptyClassroomHQ"));
+            menu3.subButton.add(new ClickButton("空教室(裕华)", "queryEmptyClassroomYH"));
+            buttons.add(menu3);
+        } else if ("假期".equals(type)) {
+            SubMenu menu3 = new SubMenu("快捷查询");
+            menu3.subButton = new ArrayList<>();
             menu3.subButton.add(new ClickButton("更新成绩", "updateGrade"));
+            buttons.add(menu3);
+        } else if ("迎新".equals(type)) {
+            SubMenu menu3 = new SubMenu("新生查询");
+            menu3.subButton = new ArrayList<>();
+            menu3.subButton.add(new ViewButton("新学期课表", "http://115.190.9.5:18081"));
             buttons.add(menu3);
         }
 

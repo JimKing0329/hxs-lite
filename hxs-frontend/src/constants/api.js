@@ -18,6 +18,8 @@ export const API_PATHS = {
   UPDATE_MAJOR_INFO: `${API_HOST}/admin/majors`,
   UPDATE_EMPTY_CLASSROOM: `${API_HOST}/admin/empty-classrooms/refresh`,
   UPDATE_WECHAT_MENU: `${API_HOST}/admin/menu`,
+  GET_CALENDER_MEDIA_ID: `${API_HOST}/admin/config/calender-media-id`,
+  UPDATE_CALENDER_MEDIA_ID: `${API_HOST}/admin/config/calender-media-id`,
   // 用户相关
   LOGIN: `${API_HOST}/user/login`,
   LOGOUT: `${API_HOST}/user/logout`,

@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Layout, Card, Row, Col, Table, Statistic, Spin, message, Typography, Modal, Form, DatePicker, Input, Button, Select } from 'antd';
-import { UserOutlined, LoginOutlined, TeamOutlined } from '@ant-design/icons';
+import React, { useState, useEffect, useRef } from 'react';
+import { Layout, Card, Row, Col, Table, Spin, message, Modal, Form, DatePicker, Input, Button, Select } from 'antd';
+import {
+  UserOutlined, LoginOutlined, TeamOutlined, CalendarOutlined,
+  SyncOutlined, HomeOutlined, WechatOutlined, LogoutOutlined,
+  DashboardOutlined, PictureOutlined
+} from '@ant-design/icons';
 import { API_PATHS } from '../constants/api';
-import { authFetch, saveToken } from '../utils/request';
+import { authFetch } from '../utils/request';
 import moment from 'moment';
 import './AdminDashboard.css';
 
 
 const { Header, Content } = Layout;
-const { Title } = Typography;
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
@@ -24,6 +27,9 @@ export default function AdminDashboard() {
   const [wechatMenuModalVisible, setWechatMenuModalVisible] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState('');
   const [termDateType, setTermDateType] = useState('1'); // 1: 开学日期, 2: 课表日期，默认开学日期
+  const [calenderUploading, setCalenderUploading] = useState(false);
+  const [calenderPreview, setCalenderPreview] = useState('');
+  const calenderFileRef = useRef(null);
 
   useEffect(() => {
     // 检查是否已登录
@@ -241,6 +247,69 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleCalenderUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 校验文件类型
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      message.error('仅支持 jpg/png 格式的图片');
+      e.target.value = '';
+      return;
+    }
+
+    // 校验文件大小（2MB）
+    if (file.size > 2 * 1024 * 1024) {
+      message.error('图片大小不能超过 2MB');
+      e.target.value = '';
+      return;
+    }
+
+    // 预览
+    const reader = new FileReader();
+    reader.onload = (ev) => setCalenderPreview(ev.target.result);
+    reader.readAsDataURL(file);
+
+    // 上传
+    setCalenderUploading(true);
+    try {
+      const token = localStorage.getItem('Authorization');
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(API_PATHS.UPDATE_CALENDER_MEDIA_ID, {
+        method: 'POST',
+        headers: { 'Authorization': token },
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (response.ok && result.code === 1) {
+        message.success('校历图片上传成功');
+      } else {
+        message.error(result.msg || '上传失败');
+        setCalenderPreview('');
+      }
+    } catch (error) {
+      console.error('上传校历图片失败:', error);
+      message.error('网络错误，上传失败');
+      setCalenderPreview('');
+    } finally {
+      setCalenderUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const triggerCalenderUpload = () => {
+    calenderFileRef.current?.click();
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('Authorization');
+    window.location.href = '/admin/login';
+  };
+
   // 表格列定义
   const columns = [
     {
@@ -254,139 +323,193 @@ export default function AdminDashboard() {
       dataIndex: 'count',
       key: 'count',
       sorter: (a, b) => a.count - b.count,
+      render: (count) => {
+        const percentage = maxDistributionCount > 0 ? (count / maxDistributionCount) * 100 : 0;
+        return (
+          <div className="distribution-cell">
+            <span className="distribution-count">{count}</span>
+            <div className="distribution-bar" style={{ width: `${percentage}%`, flex: 1 }} />
+          </div>
+        );
+      },
     },
   ];
 
+  // 统计卡片数据
+  const statsCards = [
+    { title: '总用户数', value: userCount, icon: <UserOutlined />, color: 'blue' },
+    { title: '24H内登录数', value: todayLoginCount, icon: <LoginOutlined />, color: 'green' },
+    { title: '最近7天登录数', value: sevenDayLoginCount, icon: <LoginOutlined />, color: 'cyan' },
+    { title: '学院数量', value: userDistribution.filter(item => item.college).length, icon: <TeamOutlined />, color: 'orange' },
+  ];
+
+  // 计算分布最大值（用于进度条）
+  const maxDistributionCount = userDistribution.length > 0
+    ? Math.max(...userDistribution.map(item => item.count || 0))
+    : 1;
+
   return (
     <Layout className="admin-dashboard">
-      <Header style={{ background: '#fff', padding: '0 24px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-          <Title level={4} style={{ margin: 0 }}>管理系统仪表盘</Title>
+      <Header className="admin-header">
+        <div className="header-left">
+          <DashboardOutlined className="header-icon" />
+          <span className="header-title">河小狮 Lite 管理系统</span>
         </div>
+        <Button icon={<LogoutOutlined />} onClick={handleLogout} className="logout-btn">退出</Button>
       </Header>
 
-      <Content style={{ padding: '24px' }}>
+      <Content className="admin-content">
         <Spin spinning={loading} tip="加载中...">
           {/* 统计卡片区域 */}
-          <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-            <Col xs={24} sm={12} lg={8}>
-              <Card>
-                <Statistic
-                  title="总用户数"
-                  value={userCount}
-                  prefix={<UserOutlined style={{ color: '#1890ff' }} />
-                  }
-                  valueStyle={{ fontSize: 32 }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={8}>
-              <Card>
-                <Statistic
-                  title="24H内登录数"
-                  value={todayLoginCount}
-                  prefix={<LoginOutlined style={{ color: '#52c41a' }} />
-                  }
-                  valueStyle={{ fontSize: 32 }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={8}>
-              <Card>
-                <Statistic
-                  title="最近7天登录数"
-                  value={sevenDayLoginCount}
-                  prefix={<LoginOutlined style={{ color: '#52c41a' }} />
-                  }
-                  valueStyle={{ fontSize: 32 }}
-                />
-              </Card>
-            </Col>
+          <div className="stats-section">
+            <Row gutter={[16, 16]}>
+              {statsCards.map((card, index) => (
+                <Col xs={12} sm={12} lg={6} key={index}>
+                  <div className={`stat-card stat-card-${card.color}`}>
+                    <div className="stat-content">
+                      <div className="stat-info">
+                        <span className="stat-label">{card.title}</span>
+                        <span className="stat-value">{card.value}</span>
+                      </div>
+                      <div className="stat-icon">
+                        {card.icon}
+                      </div>
+                    </div>
+                    <div className="stat-accent" />
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          </div>
 
-            <Col xs={24} sm={24} lg={8}>
-              <Card>
-                <Statistic
-                  title="学院数量"
-                  value={userDistribution.filter(item => item.college).length}
-                  prefix={<TeamOutlined style={{ color: '#fa8c16' }} />
-                  }
-                  valueStyle={{ fontSize: 32 }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={8}>
-              <Card>
-                <Button
-                  type="primary"
-                  onClick={() => handleOpenModal(termDateType)}
-                  style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
-                  修改开学日期
-                </Button>
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={8}>
-              <Card>
-                <Button
-                  type="primary"
-                  onClick={handleUpdateMajorInfoWithConfirm}
-                  style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
-                  更新专业信息
-                </Button>
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} lg={8}>
-              <Card>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
-                  <Input
-                    type="number"
-                    placeholder="请输入第几周"
-                    value={updateWeek}
-                    onChange={(e) => setUpdateWeek(e.target.value)}
-                    min="1"
-                    style={{ width: '100%' }}
-                  />
-                  <Button
-                    type="primary"
-                    onClick={handleUpdateEmptyClassroom}
-                    loading={updateWeekLoading}
-                    style={{ width: '100%' }}
-                  >
-                    更新空教室
-                  </Button>
+          {/* 操作面板区域 */}
+          <div className="action-section">
+            <Card className="action-panel" title="系统操作">
+              <div className="action-list">
+                {/* 修改开学日期 */}
+                <div className="action-item">
+                  <div className="action-icon action-icon-blue">
+                    <CalendarOutlined />
+                  </div>
+                  <div className="action-info">
+                    <span className="action-title">修改开学日期</span>
+                    <span className="action-desc">设置新学期开学时间</span>
+                  </div>
+                  <div className="action-control">
+                    <Button type="primary" onClick={() => handleOpenModal(termDateType)} size="small">
+                      去设置
+                    </Button>
+                  </div>
                 </div>
-              </Card>
-            </Col>
-          </Row>
 
-          {/* 微信公众号菜单切换卡片 */}
-          <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-            <Col xs={24} sm={12} lg={8}>
-              <Card>
-                <Button
-                  type="primary"
-                  onClick={handleOpenWechatMenuModal}
-                  style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
-                  切换微信公众号菜单
-                </Button>
-              </Card>
-            </Col>
-          </Row>
+                {/* 更新专业信息 */}
+                <div className="action-item">
+                  <div className="action-icon action-icon-green">
+                    <SyncOutlined />
+                  </div>
+                  <div className="action-info">
+                    <span className="action-title">更新专业信息</span>
+                    <span className="action-desc">同步最新专业数据</span>
+                  </div>
+                  <div className="action-control">
+                    <Button type="primary" onClick={handleUpdateMajorInfoWithConfirm} size="small">
+                      立即更新
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 更新空教室 */}
+                <div className="action-item" style={{ flexWrap: 'wrap' }}>
+                  <div className="action-icon action-icon-purple">
+                    <HomeOutlined />
+                  </div>
+                  <div className="action-info">
+                    <span className="action-title">更新空教室</span>
+                    <span className="action-desc">按周次刷新空教室信息</span>
+                  </div>
+                  <div className="action-control">
+                    <div className="week-input-group">
+                      <Input
+                        type="number"
+                        placeholder="第几周"
+                        value={updateWeek}
+                        onChange={(e) => setUpdateWeek(e.target.value)}
+                        min="1"
+                        size="small"
+                      />
+                      <Button
+                        type="primary"
+                        onClick={handleUpdateEmptyClassroom}
+                        loading={updateWeekLoading}
+                        size="small"
+                      >
+                        更新
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 切换微信公众号菜单 */}
+                <div className="action-item">
+                  <div className="action-icon action-icon-orange">
+                    <WechatOutlined />
+                  </div>
+                  <div className="action-info">
+                    <span className="action-title">切换微信公众号菜单</span>
+                    <span className="action-desc">管理公众号底部菜单</span>
+                  </div>
+                  <div className="action-control">
+                    <Button type="primary" onClick={handleOpenWechatMenuModal} size="small">
+                      去切换
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 更新校历图片 */}
+                <div className="action-item" style={{ flexWrap: 'wrap' }}>
+                  <div className="action-icon action-icon-blue">
+                    <PictureOutlined />
+                  </div>
+                  <div className="action-info">
+                    <span className="action-title">更新校历图片</span>
+                    <span className="action-desc">上传新校历图片到微信公众号</span>
+                  </div>
+                  <div className="action-control">
+                    <div className="calender-upload-group">
+                      {calenderPreview && (
+                        <img src={calenderPreview} alt="校历预览" className="calender-preview" />
+                      )}
+                      <input
+                        ref={calenderFileRef}
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png"
+                        onChange={handleCalenderUpload}
+                        style={{ display: 'none' }}
+                      />
+                      <Button type="primary" onClick={triggerCalenderUpload} loading={calenderUploading} size="small">
+                        {calenderPreview ? '重新上传' : '选择图片'}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
 
           {/* 用户分布表格 */}
-          <Card title="用户学院分布">
-            <Table
-              columns={columns}
-              dataSource={userDistribution.map((item, index) => ({
-                ...item,
-                key: index,
-              }))}
-              pagination={false}
-              locale={{ emptyText: '暂无用户分布数据' }}
-            />
-          </Card>
+          <div className="distribution-section">
+            <Card className="distribution-card" title="用户学院分布">
+              <Table
+                columns={columns}
+                dataSource={userDistribution.map((item, index) => ({
+                  ...item,
+                  key: index,
+                }))}
+                pagination={false}
+                locale={{ emptyText: '暂无用户分布数据' }}
+              />
+            </Card>
+          </div>
           <Modal
             title="修改开学日期"
             visible={visible}
