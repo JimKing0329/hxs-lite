@@ -92,7 +92,7 @@ export default function AdminDashboard() {
       const token = localStorage.getItem('Authorization');
       // 添加时间戳参数避免缓存
       const timestamp = new Date().getTime();
-      const response = await authFetch(`${API_PATHS.GET_CURRENT_TERM_START_DATE}?id=${dateType}&_t=${timestamp}`);
+      const response = await authFetch(`${API_PATHS.GET_CURRENT_TERM_START_DATE}/${dateType}?_t=${timestamp}`);
       const result = await response.json();
       if (result.code === 1 && result.data) {
         console.log(`获取到日期类型 ${dateType} 的数据:`, result.data);
@@ -161,7 +161,7 @@ export default function AdminDashboard() {
     setUpdateWeekLoading(true);
     try {
       const response = await authFetch(`${API_PATHS.UPDATE_EMPTY_CLASSROOM}?week=${updateWeek}`, {
-        method: 'PUT',
+        method: 'POST',
       });
 
       const result = await response.json();

@@ -1,10 +1,7 @@
 package com.hxs.interceptor;
 
-import com.hxs.constant.JwtClaimsConstant;
-import com.hxs.context.UserContext;
 import com.hxs.properties.JwtProperties;
 import com.hxs.utils.JwtUtil;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -35,10 +32,8 @@ public class AdminAuthInterceptor implements HandlerInterceptor {
         }
 
         try {
-            Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
-            Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
-            UserContext.setCurrentId(empId);
-            log.debug("管理员认证通过 empId={}", empId);
+            JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
+            log.debug("管理员认证通过");
             return true;
         } catch (Exception e) {
             log.warn("管理员 JWT 校验失败: {}", e.getMessage());
@@ -50,7 +45,7 @@ public class AdminAuthInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
                                  Object handler, Exception ex) {
-        UserContext.removeCurrentId();
+        // no-op: admin 接口不使用 UserContext
     }
 
     private String extractToken(HttpServletRequest request) {
