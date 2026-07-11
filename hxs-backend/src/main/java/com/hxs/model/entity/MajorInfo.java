@@ -39,6 +39,6 @@ public class MajorInfo implements Serializable {
     @JSONField(name = "zsjg_id")
     private String collegeId;
 
-    /** 专业代码（major_code，用于关联 student_info） */
+    /** 专业代码（major_code，用于关联 user） */
     private String majorCode;
 }

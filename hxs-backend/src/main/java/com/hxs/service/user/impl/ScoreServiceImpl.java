@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hxs.client.EduExamClient;
 import com.hxs.client.EduSession;
 import com.hxs.client.EduSessionManager;
+import com.hxs.component.DateManager;
 import com.hxs.context.UserContext;
 import com.hxs.mapper.ScoreDetailMapper;
 import com.hxs.mapper.ScoreMapper;
@@ -37,9 +38,15 @@ public class ScoreServiceImpl implements ScoreService {
     private final ScoreMapper scoreMapper;
     private final ScoreDetailMapper scoreDetailMapper;
     private final UserMapper userMapper;
+    private final DateManager termDateManager;
 
     @Override
     public List<ScoreVO> getScores(Integer year, Integer term) {
+        // 年份或学期小于 0 时，使用 DateManager 中的当前学年/学期
+        if ((year != null && year < 0) || (term != null && term < 0)) {
+            year = termDateManager.getYear();
+            term = termDateManager.getTerm();
+        }
         log.info("查询成绩 userId={} year={} term={}", UserContext.getCurrentId(), year, term);
         String sid = UserContext.getCurrentId().toString();
 

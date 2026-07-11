@@ -21,8 +21,12 @@ public final class StringParseUtil {
     public static List<Integer> parseWeekList(String s) {
         List<Integer> r = new ArrayList<>();
         if (s == null || s.isEmpty()) return r;
+        // 去除"周"、"单"、"双"等非数字/非连字符字符，兼容 "5周"、"1-10周" 等格式
+        s = s.replaceAll("[^0-9,-]", "");
+        if (s.isEmpty()) return r;
         for (String p : s.split(",")) {
             p = p.trim();
+            if (p.isEmpty()) continue;
             if (p.contains("-")) {
                 String[] range = p.split("-");
                 for (int i = Integer.parseInt(range[0].trim()); i <= Integer.parseInt(range[1].trim()); i++)

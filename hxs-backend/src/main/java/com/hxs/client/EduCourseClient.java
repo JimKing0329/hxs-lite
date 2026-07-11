@@ -26,6 +26,7 @@ import java.util.List;
 @Slf4j
 public class EduCourseClient {
 
+    public static final String COURSE_TABLE_FILED = "kbList";
     private final EduSession session;
 
     public EduCourseClient(EduSession session) {
@@ -55,7 +56,7 @@ public class EduCourseClient {
                 session.checkLogin(responseBody);
 
                 JSONObject root = JSON.parseObject(responseBody);
-                List<CourseTableItem> items = root.getList("items", CourseTableItem.class);
+                List<CourseTableItem> items = root.getList(COURSE_TABLE_FILED, CourseTableItem.class);
                 if (items.isEmpty()) {
                     throw new MessageEmptyException(MessageConstant.MESSAGE_EMPTY_ERROR);
                 }

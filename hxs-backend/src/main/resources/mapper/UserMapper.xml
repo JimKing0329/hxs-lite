@@ -5,7 +5,7 @@
 <mapper namespace="com.hxs.mapper.UserMapper">
 
     <select id="selectCountGroupByCollege" resultType="com.hxs.model.vo.UserDistributionVO">
-        select college_name as college, count(*) as count from student_info
+        select college_name as college, count(*) as count from user
         where college_name is not null
         group by college_name
         order by count desc

@@ -11,7 +11,7 @@ import java.util.List;
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
 
-    @Select("select m.major_code from student_info s\n" +
+    @Select("select m.major_code from user s\n" +
             "        join major_info m on s.major_code = m.major_id\n" +
             "        where s.sid = #{sid}\n" +
             "        and m.grade = substr(s.sid, 1, 4)")

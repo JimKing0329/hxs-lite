@@ -46,7 +46,7 @@
                gra.grade, gra.grade_point, gra.course_name,
                gra.class_id, gra.year, gra.term, gra.credit,
                gra.teacher_name, gra.course_type
-        FROM student_info stu
+        FROM user stu
         LEFT JOIN score gra ON stu.sid = gra.sid
         <where>
             stu.sid LIKE CONCAT(#{sidPrefix}, '%')
