@@ -3,6 +3,7 @@ package com.hxs.client;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.hxs.constant.MessageConstant;
+import com.hxs.context.UserContext;
 import com.hxs.exception.RequestFailException;
 import com.hxs.model.entity.ExecuteCourse;
 import com.hxs.model.support.MajorInfoItem;
@@ -53,6 +54,7 @@ public class EduMajorClient {
                 session.checkLogin(responseBody);
                 Document doc = Jsoup.parse(responseBody);
                 Elements elements = doc.select(".form-control-static");
+                log.info("获取专业代码成功 sid: {} code: {}", UserContext.getCurrentId(), elements.get(27).text());
                 return elements.get(27).text();
             }
         } catch (URISyntaxException | IOException e) {

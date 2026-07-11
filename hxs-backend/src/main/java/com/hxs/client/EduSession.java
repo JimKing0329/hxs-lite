@@ -91,8 +91,7 @@ public class EduSession implements AutoCloseable {
      * 检查登录状态
      */
     public void checkLogin(String responseBody) {
-        if (responseBody.contains("用户登录") || responseBody.contains("身份认证")
-                || responseBody.contains("身份")) {
+        if (responseBody.contains("用户登录") || responseBody.contains("身份认证")) {
             throw new NotLoginException(MessageConstant.UNLOGIN_ERROR);
         }
     }
