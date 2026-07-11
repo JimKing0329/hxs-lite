@@ -12,7 +12,7 @@ import java.util.List;
 public interface MajorMapper extends BaseMapper<MajorInfo> {
 
     @Insert("<script>" +
-            "INSERT INTO major_info(grade_id, grade, major_id, major_name, major_direction, " +
+            "INSERT IGNORE INTO major_info(grade_id, grade, major_id, major_name, major_direction, " +
             "plan_id, college_id, major_code) VALUES " +
             "<foreach collection='list' item='item' separator=','>" +
             "(#{item.gradeId}, #{item.grade}, #{item.majorId}, #{item.majorName}, " +
