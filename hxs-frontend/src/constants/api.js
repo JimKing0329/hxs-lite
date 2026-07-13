@@ -1,7 +1,5 @@
-// API 主机地址常量
-export const API_HOST = 'http://localhost:8080';
-// export const API_HOST = 'http://115.190.9.5:8080';
-// export const API_HOST = 'http://115.190.9.5:8084';
+// API 主机地址 — 由 .env.development / .env.production 区分环境
+export const API_HOST = process.env.REACT_APP_API_HOST || 'http://localhost:8080';
 
 
 // API 路径常量

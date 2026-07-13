@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/hsxf?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: hsxf
-    password: sdaZn2DxRpHjWXpE
+    url: jdbc:mysql://mysql:3306/hxs?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: hxs
+    password: XFRBS8iwFL3Rz5Tf
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 logging:
