@@ -12,6 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("EduClassroomClient 测试")
 class EduClassroomClientTest extends HttpMockSupport {
 
+
+
     private static final String CLASSROOM_JSON =
             "{\"items\":[" +
             "{\"cd_id\":\"CR001\",\"cdmc\":\"教二201\",\"xqmc\":\"东校区\",\"cdlbmc\":\"多媒体教室\",\"cdjyz\":\"80\"}," +
