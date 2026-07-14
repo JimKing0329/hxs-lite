@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hxs.mapper.EmptyClassroomMapper">
+
+    <select id="getEmptyClassroom" resultType="com.hxs.model.vo.EmptyClassroomVO">
+        SELECT ec.id,
+               ec.class_id   as classId,
+               ec.class_name as className,
+               ec.campus_name as campusName,
+               ec.class_category as classCategory,
+               ec.building
+        FROM empty_classroom ec
+                 INNER JOIN classroom_availability ca
+                            ON ec.id = ca.classroom_id
+        WHERE ec.week_number = #{week}
+          AND ec.weekday = #{weekday}
+          AND ca.empty_session IN
+        <foreach collection="sessionList" item="session" open="(" separator="," close=")">
+            #{session}
+        </foreach>
+        GROUP BY ec.id
+        HAVING COUNT(DISTINCT ca.empty_session) = #{size}
+    </select>
+
+</mapper>

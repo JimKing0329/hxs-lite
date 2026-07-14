@@ -1,0 +1,53 @@
+# 默认忽略的文件
+.DS_Store
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# 编辑器目录和文件
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# 依赖目录
+node_modules/
+
+# 构建输出目录
+build/
+dist/
+
+# 缓存目录
+.cache/
+
+# 环境变量文件
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# 操作系统文件
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# 测试相关
+coverage/
+.nyc_output/
+
+# 包管理器相关
+yarn.lock
+pnpm-lock.yaml
+
+# 调试文件
+debug/
+*.pid
+*.seed
+/node_modules/

@@ -1,0 +1,99 @@
+.empty-classroom-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-bottom: 60px;
+}
+
+.empty-classroom-container .header-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 0 16px;
+}
+
+.empty-classroom-container h1 {
+  margin: 0;
+  color: white;
+  font-size: 18px;
+}
+
+.query-card {
+  margin: 16px;
+  border-radius: 8px;
+}
+
+.query-form {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-item label {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+  white-space: nowrap;
+}
+
+.result-card {
+  margin: 16px;
+  border-radius: 8px;
+  
+}
+
+.classroom-list {
+  padding: 0 8px;
+}
+
+.classroom-item {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.3s;
+  cursor: pointer;
+}
+
+.classroom-item:last-child {
+  border-bottom: none;
+}
+
+.classroom-item:hover {
+  background-color: #f5f5f5;
+}
+
+.classroom-item:active {
+  background-color: #e6f7ff;
+}
+
+.classroom-name {
+  font-weight: 500;
+  font-size: 14px;
+  color: #1890ff;
+}
+
+.ant-collapse-header {
+  background-color: #fafafa !important;
+  padding: 8px 12px !important;
+  min-height: 36px;
+}
+
+.ant-collapse-content-box {
+  padding: 4px 0 !important;
+}
+
+@media (max-width: 480px) {
+  .query-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .form-item {
+    justify-content: space-between;
+  }
+}

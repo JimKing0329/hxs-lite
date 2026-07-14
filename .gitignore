@@ -1,0 +1,41 @@
+# ============================================
+# 旧版本 - 不上传
+# ============================================
+hxs-old-backend/
+hxs-old-frontend/
+
+# ============================================
+# Java / Maven
+# ============================================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.war
+*.ear
+*.log
+.idea/
+*.iml
+.settings/
+.project
+.classpath
+.vscode/
+.factorypath
+
+# ============================================
+# Node / Frontend
+# ============================================
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.production
+.cache/
+*.tsbuildinfo
+
+# ============================================
+# OS
+# ============================================
+.DS_Store
+Thumbs.db

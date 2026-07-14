@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:mysql://mysql:3306/hxs?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: hxs
+    password: XFRBS8iwFL3Rz5Tf
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+logging:
+  level:
+    com.hxs.mapper: info
+    com.hxs.client: info
+
+wechat:
+  app-id: wx02041c33ff5878ce
+  app-secret: 407597f44deadb738ef6f6e3058c60c8
+
+hsxf:
+  base-url: http://82.156.49.70
+  course-url: http://82.156.49.70:18081
+  admin:
+    sid: ${HSXF_ADMIN_SID:}
+    password: ${HSXF_ADMIN_PWD:}

@@ -1,0 +1,22 @@
+package com.hxs.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.hxs.model.entity.User;
+import com.hxs.model.vo.UserDistributionVO;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
+
+@Mapper
+public interface UserMapper extends BaseMapper<User> {
+
+    @Select("select m.major_code from user s\n" +
+            "        join major_info m on s.major_code = m.major_id\n" +
+            "        where s.sid = #{sid}\n" +
+            "        and m.grade = substr(s.sid, 1, 4)")
+    String queryMajorCodeByMajorId(String sid);
+
+    /** 按学院统计用户分布 */
+    List<UserDistributionVO> selectCountGroupByCollege();
+}

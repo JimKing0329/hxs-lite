@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hxs.mapper.CourseMapper">
+
+    <select id="queryTodayCourse" resultType="com.hxs.model.vo.CourseVO">
+        select course_id  as courseId,
+               title,
+               teacher,
+               campus,
+               weekday,
+               place,
+               start_session as startSession,
+               end_session   as endSession
+        from course
+        where sid = #{sid}
+          and weekday = #{weekday}
+          and week_number = #{weeks}
+        order by start_session
+    </select>
+
+    <select id="queryWeekCourse" resultType="com.hxs.model.vo.CourseVO">
+        select course_id  as courseId,
+               title,
+               teacher,
+               campus,
+               weekday,
+               place,
+               start_session as startSession,
+               end_session   as endSession
+        from course
+        where sid = #{sid}
+          and week_number = #{week}
+        order by weekday, start_session
+    </select>
+
+</mapper>

@@ -1,0 +1,172 @@
+.course-table-layout {
+    min-height: 100vh;
+    background: #f5f7fa;
+}
+
+.course-table-header {
+    background: #001529;
+    position: relative;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-title {
+    color: #fff;
+}
+
+.week-selector-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    gap: 12px;
+}
+
+.week-selector {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+}
+
+.table-scroll-wrapper {
+    overflow-x: auto;
+    padding: 0 4px 16px 4px;
+}
+
+.course-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    font-size: 13px;
+    min-width: 700px;
+    table-layout: fixed;
+}
+
+.course-table th,
+.course-table td {
+    border: 1px solid #e5e5e5;
+    text-align: center;
+    min-width: 44px;
+    width: 44px;
+    padding: 0;
+}
+
+.course-table td {
+    position: relative;
+    vertical-align: top;
+    height: 110px;
+    min-height: 110px;
+    max-height: 110px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.course-table .session-col {
+    min-width: 56px !important;
+    width: 56px !important;
+    max-width: 56px !important;
+    background: #f0f2f5;
+    font-weight: bold;
+    color: #888;
+    font-size: 12px;
+}
+
+.session-idx {
+    font-size: 15px;
+    font-weight: bold;
+    color: #1890ff;
+    margin-top: 2px;
+}
+
+.session-time {
+    font-size: 11px;
+    color: #aaa;
+    margin-bottom: 2px;
+}
+
+.course-block {
+    height: 100%;
+    min-height: unset;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    border-radius: 8px;
+    margin: 2px 2px 4px 2px;
+    padding: 14px 4px 10px 4px;
+    color: #fff;
+    font-size: 13px;
+    word-break: break-all;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.course-title {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.course-place,
+.course-teacher {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+@media (max-width: 700px) {
+    .course-table {
+        min-width: unset;
+        width: 100%;
+        font-size: 12px;
+    }
+
+    .course-table th,
+    .course-table td {
+        min-width: 20px;
+        width: 20px;
+    }
+
+    .course-table .session-col {
+        height: 52px;
+        min-width: 18px !important;
+        width: 18px !important;
+        max-width: 18px !important;
+    }
+
+    .course-table td {
+        height: 45px;
+        min-height: 65px;
+        max-height: 65px;
+    }
+
+    .course-block {
+        height: 100%;
+        min-height: unset;
+        font-size: 12px;
+        margin: 1px 2px 3px 2px;
+        padding: 10px 2px 8px 2px;
+    }
+
+    .course-title {
+        font-size: 13px;
+    }
+
+    .course-place,
+    .course-teacher {
+        font-size: 11px;
+    }
+}

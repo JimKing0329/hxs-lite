@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hxs.mapper.UserMapper">
+
+    <select id="selectCountGroupByCollege" resultType="com.hxs.model.vo.UserDistributionVO">
+        select college_name as college, count(*) as count from user
+        where college_name is not null
+        group by college_name
+        order by count desc
+    </select>
+
+</mapper>
