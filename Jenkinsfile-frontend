@@ -15,6 +15,7 @@ pipeline {
             steps {
                 sh '''
 cd hxs-frontend
+export NODE_OPTIONS="--max-old-space-size=1024"
 npm install
 npm run build
 '''
