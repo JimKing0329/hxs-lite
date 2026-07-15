@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('拉取Gitee源码') {
             steps {
-                git url: 'https://gitee.com/belong_wx/river-lion.git',
+                git url: 'https://gitee.com/belong_wx/hxs-lite.git',
                     branch: 'main',
                     credentialsId: 'gitee-auth'
             }
@@ -24,30 +24,27 @@ mvn clean package -Dmaven.test.skip=true
             steps {
                 sh '''
 cd hxs-backend
-docker build -t river-lion-back:latest .
+docker build -t hxs-lite-back:latest .
 '''
             }
         }
-        stage('远程部署后端容器') {
+        stage('部署后端容器') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'server-root', usernameVariable: 'SSH_USER', passwordVariable: 'SSH_PWD')]) {
-                    sh '''
+                sh '''
 # 停止并删除旧容器
-sshpass -p "$SSH_PWD" ssh -o StrictHostKeyChecking=no $SSH_USER@82.156.49.70 \\
-  "docker stop river-lion-back 2>/dev/null || true; docker rm river-lion-back 2>/dev/null || true"
+docker stop hxs-lite-back 2>/dev/null || true
+docker rm hxs-lite-back 2>/dev/null || true
 
 # 启动新容器
-sshpass -p "$SSH_PWD" ssh -o StrictHostKeyChecking=no $SSH_USER@82.156.49.70 \\
-  "docker run -d \\
-    --name river-lion-back \\
-    -p 127.0.0.1:8082:8080 \\
-    --link mysql57:mysql \\
-    -e SPRING_DATASOURCE_URL='jdbc:mysql://mysql:3306/hxs?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=Asia/Shanghai' \\
-    -e SPRING_DATASOURCE_USERNAME='hxs' \\
-    -e SPRING_DATASOURCE_PASSWORD='XFRBS8iwFL3Rz5Tf' \\
-    river-lion-back:latest"
+docker run -d \\
+  --name hxs-lite-back \\
+  --network hxs-net \\
+  -p 127.0.0.1:8082:8080 \\
+  -e SPRING_DATASOURCE_URL='jdbc:mysql://mysql57:3306/hxs?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=Asia/Shanghai' \\
+  -e SPRING_DATASOURCE_USERNAME='hxs' \\
+  -e SPRING_DATASOURCE_PASSWORD='XFRBS8iwFL3Rz5Tf' \\
+  hxs-lite-back:latest
 '''
-                }
             }
         }
     }

@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('拉取代码') {
             steps {
-                git url: 'https://gitee.com/belong_wx/river-lion.git',
+                git url: 'https://gitee.com/belong_wx/hxs-lite.git',
                     branch: 'main',
                     credentialsId: 'gitee-auth'
             }
@@ -24,26 +24,20 @@ npm run build
             steps {
                 sh '''
 cd hxs-frontend
-docker build -t river-lion-front:latest .
+docker build -t hxs-lite-front:latest .
 '''
             }
         }
         stage('部署前端容器') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'server-root', passwordVariable: 'SSH_PWD', usernameVariable: 'SSH_USER')]) {
-                    sshPublisher(publishers: [sshPublisherDesc(
-                        sshHost: '填写你的服务器公网IP',
-                        sshPort: 22,
-                        sshCredentials: sshCredentials(username: "${SSH_USER}", password: "${SSH_PWD}"),
-                        transfers: [sshTransfer(
-                            postTransfers: [postTransfer(postTransferAction: command('''
-docker stop river-lion-front 2>/dev/null || true
-docker rm river-lion-front 2>/dev/null || true
-docker run -d --name river-lion-front -p 127.0.0.1:8081:80 river-lion-front:latest
-'''))]
-                        )]
-                    )])
-                }
+                sh '''
+# 停止并删除旧容器
+docker stop hxs-lite-front 2>/dev/null || true
+docker rm hxs-lite-front 2>/dev/null || true
+
+# 启动新容器
+docker run -d --name hxs-lite-front -p 127.0.0.1:8081:80 hxs-lite-front:latest
+'''
             }
         }
     }
