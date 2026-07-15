@@ -40,7 +40,7 @@ sshpass -p "$SSH_PWD" ssh -o StrictHostKeyChecking=no $SSH_USER@82.156.49.70 \\
 sshpass -p "$SSH_PWD" ssh -o StrictHostKeyChecking=no $SSH_USER@82.156.49.70 \\
   "docker run -d \\
     --name river-lion-back \\
-    -p 127.0.0.1:8080:8080 \\
+    -p 127.0.0.1:8082:8080 \\
     --link mysql57:mysql \\
     -e SPRING_DATASOURCE_URL='jdbc:mysql://mysql:3306/hxs?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=Asia/Shanghai' \\
     -e SPRING_DATASOURCE_USERNAME='hxs' \\
