@@ -20,7 +20,6 @@ yarn-error.log*
 node_modules/
 
 # 构建输出目录
-build/
 dist/
 
 # 缓存目录

@@ -13,12 +13,7 @@ pipeline {
         }
         stage('前端依赖安装&打包') {
             steps {
-                sh '''
-cd hxs-frontend
-export NODE_OPTIONS="--max-old-space-size=1024"
-npm install
-npm run build
-'''
+                echo '使用本地已构建好的 dist 目录，跳过 npm build'
             }
         }
         stage('构建前端Nginx镜像') {
