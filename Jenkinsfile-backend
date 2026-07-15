@@ -30,26 +30,23 @@ docker build -t river-lion-back:latest .
         }
         stage('远程部署后端容器') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'server-root', passwordVariable: 'SSH_PWD', usernameVariable: 'SSH_USER')]) {
-                    sshPublisher(publishers: [sshPublisherDesc(
-                        sshHost: '填写你的服务器公网IP',
-                        sshPort: 22,
-                        sshCredentials: sshCredentials(username: "${SSH_USER}", password: "${SSH_PWD}"),
-                        transfers: [sshTransfer(
-                            postTransfers: [postTransfer(postTransferAction: command('''
-docker stop river-lion-back 2>/dev/null || true
-docker rm river-lion-back 2>/dev/null || true
-docker run -d \
---name river-lion-back \
--p 127.0.0.1:8080:8080 \
---link mysql57:mysql \
--e SPRING_DATASOURCE_URL="jdbc:mysql://mysql:3306/hxs?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=Asia/Shanghai" \
--e SPRING_DATASOURCE_USERNAME="hxs" \
--e SPRING_DATASOURCE_PASSWORD="XFRBS8iwFL3Rz5Tf" \
-river-lion-back:latest
-'''))]
-                        )]
-                    )])
+                withCredentials([usernamePassword(credentialsId: 'server-root', usernameVariable: 'SSH_USER', passwordVariable: 'SSH_PWD')]) {
+                    sh '''
+# 停止并删除旧容器
+sshpass -p "$SSH_PWD" ssh -o StrictHostKeyChecking=no $SSH_USER@82.156.49.70 \\
+  "docker stop river-lion-back 2>/dev/null || true; docker rm river-lion-back 2>/dev/null || true"
+
+# 启动新容器
+sshpass -p "$SSH_PWD" ssh -o StrictHostKeyChecking=no $SSH_USER@82.156.49.70 \\
+  "docker run -d \\
+    --name river-lion-back \\
+    -p 127.0.0.1:8080:8080 \\
+    --link mysql57:mysql \\
+    -e SPRING_DATASOURCE_URL='jdbc:mysql://mysql:3306/hxs?useUnicode=true&characterEncoding=utf8mb4&serverTimezone=Asia/Shanghai' \\
+    -e SPRING_DATASOURCE_USERNAME='hxs' \\
+    -e SPRING_DATASOURCE_PASSWORD='XFRBS8iwFL3Rz5Tf' \\
+    river-lion-back:latest"
+'''
                 }
             }
         }
