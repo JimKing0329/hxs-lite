@@ -35,8 +35,8 @@ docker build -t hxs-lite-front:latest .
 docker stop hxs-lite-front 2>/dev/null || true
 docker rm hxs-lite-front 2>/dev/null || true
 
-# 启动新容器
-docker run -d --name hxs-lite-front -p 127.0.0.1:8081:80 hxs-lite-front:latest
+# 启动新容器（不对外暴露端口，只通过 Docker 内部网络给 Nginx 访问）
+docker run -d --name hxs-lite-front --network hxs-net hxs-lite-front:latest
 '''
             }
         }
