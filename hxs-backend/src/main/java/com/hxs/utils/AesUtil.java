@@ -12,7 +12,6 @@ import java.util.Base64;
 public final class AesUtil {
 
     private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
-    //TODO 修改为相对路径
     private static final String KEY_PATH = "./secret.key";
     private static volatile byte[] cachedKey;
 

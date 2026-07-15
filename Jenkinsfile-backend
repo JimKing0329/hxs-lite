@@ -40,6 +40,7 @@ docker run -d \\
   --name hxs-lite-back \\
   --network hxs-net \\
   -p 127.0.0.1:8082:8080 \\
+  -v /data/hxs-lite-back/secret/secret.key:/app/secret.key \\
   -e SPRING_DATASOURCE_URL='jdbc:mysql://mysql57:3306/hxs?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai' \\
   -e SPRING_DATASOURCE_USERNAME='hxs' \\
   -e SPRING_DATASOURCE_PASSWORD='XFRBS8iwFL3Rz5Tf' \\
