@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  */
 @Data
 @Component
-@ConfigurationProperties(prefix = "hsxf.admin")
+@ConfigurationProperties(prefix = "hxs.admin")
 public class AdminProperties {
     private String sid;
     private String password;

@@ -16,7 +16,7 @@ public final class JwtUtil {
 
     /**
      * 将配置的密钥字符串通过 SHA-256 哈希转为固定 256 位密钥，
-     * 同时兼容短密钥（如 "hsxf"）和 jjwt 0.12.x 的长度要求。
+     * 同时兼容短密钥（如 "hxs"）和 jjwt 0.12.x 的长度要求。
      */
     private static SecretKey toKey(String secretKey) {
         try {

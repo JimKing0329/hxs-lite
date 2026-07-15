@@ -52,7 +52,7 @@ public class WechatServiceImpl implements WechatService {
 
     private String baseUrl;
 
-    @Value("${hsxf.base-url}")
+    @Value("${hxs.base-url}")
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
     }

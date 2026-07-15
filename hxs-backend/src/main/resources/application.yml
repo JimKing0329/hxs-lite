@@ -19,16 +19,16 @@ mybatis-plus:
   type-aliases-package: com.hxs.model.entity
 
 # JWT 配置
-hsxf:
+hxs:
   jwt:
-    admin-secret-key: hsxf-admin
+    admin-secret-key: ${HXS_JWT_ADMIN_SECRET:hxs-admin}
     admin-ttl: 259200000
     admin-token-name: Authorization
-    user-secret-key: hsxf
+    user-secret-key: ${HXS_JWT_USER_SECRET:hxs}
     user-ttl: 2592000000
     user-token-name: token
 
 # 微信配置（默认值由 profile 文件覆盖）
 wechat:
-  app-id: ${HSXF_WECHAT_APP_ID:}
-  app-secret: ${HSXF_WECHAT_APP_SECRET:}
+  app-id: ${HXS_WECHAT_APP_ID:}
+  app-secret: ${HXS_WECHAT_APP_SECRET:}

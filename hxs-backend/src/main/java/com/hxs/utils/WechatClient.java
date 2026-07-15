@@ -46,12 +46,12 @@ public class WechatClient {
         this.appSecret = appSecret;
     }
 
-    @Value("${hsxf.base-url}")
+    @Value("${hxs.base-url}")
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
     }
 
-    @Value("${hsxf.course-url}")
+    @Value("${hxs.course-url}")
     public void setCourseUrl(String courseUrl) {
         this.courseUrl = courseUrl;
     }
