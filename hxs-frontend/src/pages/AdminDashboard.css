@@ -204,6 +204,8 @@
 .action-icon-green { background: #f6ffed; color: #52c41a; }
 .action-icon-purple { background: #f9f0ff; color: #722ed1; }
 .action-icon-orange { background: #fff7e6; color: #fa8c16; }
+.action-icon-cyan { background: #e6fffb; color: #13c2c2; }
+.action-icon-geekblue { background: #f0f5ff; color: #2f54eb; }
 
 .action-info {
   flex: 1;

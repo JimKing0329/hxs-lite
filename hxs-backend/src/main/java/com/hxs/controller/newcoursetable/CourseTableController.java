@@ -23,19 +23,6 @@ public class CourseTableController {
     private Integer clickCount = 0;
     private final NewCourseTableService newCourseTableService;
 
-    @PutMapping({"/courseTable"})
-    public Result updateClassTable() {
-        log.info("更新所有课程表");
-        this.newCourseTableService.updateCourseTable();
-        return Result.success();
-    }
-
-    @PutMapping({"/classes"})
-    public Result updateClass() {
-        log.info("更新班级信息");
-        this.newCourseTableService.updateClass();
-        return Result.success();
-    }
 
     @GetMapping({"/allClass"})
     public Result<List<ClassVO>> getAllClass() {

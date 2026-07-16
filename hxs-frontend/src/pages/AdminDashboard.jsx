@@ -27,6 +27,8 @@ export default function AdminDashboard() {
   const [wechatMenuModalVisible, setWechatMenuModalVisible] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState('');
   const [termDateType, setTermDateType] = useState('1'); // 1: 开学日期, 2: 课表日期，默认开学日期
+  const [updateClassesLoading, setUpdateClassesLoading] = useState(false);
+  const [updateCourseTableLoading, setUpdateCourseTableLoading] = useState(false);
 
   // 微信素材上传状态（校历/红旗地图/裕华地图）
   const [uploadStates, setUploadStates] = useState({
@@ -230,6 +232,58 @@ export default function AdminDashboard() {
     });
   };
 
+  const handleUpdateClasses = () => {
+    Modal.confirm({
+      title: '确认更新班级信息',
+      content: '确定要更新班级信息吗？此操作可能会覆盖现有数据。',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        setUpdateClassesLoading(true);
+        try {
+          const response = await authFetch(API_PATHS.ADMIN_UPDATE_CLASSES, { method: 'PUT' });
+          const result = await response.json();
+          if (response.ok && result.code === 1) {
+            message.success('班级信息更新成功');
+          } else {
+            message.error(result.msg || '更新班级信息失败');
+          }
+        } catch (error) {
+          console.error('更新班级信息失败:', error);
+          message.error('网络错误，无法更新班级信息');
+        } finally {
+          setUpdateClassesLoading(false);
+        }
+      },
+    });
+  };
+
+  const handleUpdateCourseTable = () => {
+    Modal.confirm({
+      title: '确认更新课程表',
+      content: '确定要更新所有课程表吗？此操作耗时较长，请耐心等待。',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        setUpdateCourseTableLoading(true);
+        try {
+          const response = await authFetch(API_PATHS.ADMIN_UPDATE_COURSE_TABLE, { method: 'PUT' });
+          const result = await response.json();
+          if (response.ok && result.code === 1) {
+            message.success('课程表更新成功');
+          } else {
+            message.error(result.msg || '更新课程表失败');
+          }
+        } catch (error) {
+          console.error('更新课程表失败:', error);
+          message.error('网络错误，无法更新课程表');
+        } finally {
+          setUpdateCourseTableLoading(false);
+        }
+      },
+    });
+  };
+
   const handleUpdateEmptyClassroom = async () => {
     if (!updateWeek || updateWeek <= 0) {
       message.error('请输入有效的周数');
@@ -427,6 +481,38 @@ export default function AdminDashboard() {
                   </div>
                   <div className="action-control">
                     <Button type="primary" onClick={handleUpdateMajorInfoWithConfirm} size="small">
+                      立即更新
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 更新班级信息 */}
+                <div className="action-item">
+                  <div className="action-icon action-icon-cyan">
+                    <TeamOutlined />
+                  </div>
+                  <div className="action-info">
+                    <span className="action-title">更新班级信息</span>
+                    <span className="action-desc">同步最新班级数据</span>
+                  </div>
+                  <div className="action-control">
+                    <Button type="primary" onClick={handleUpdateClasses} loading={updateClassesLoading} size="small">
+                      立即更新
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 更新所有课程表 */}
+                <div className="action-item">
+                  <div className="action-icon action-icon-geekblue">
+                    <CalendarOutlined />
+                  </div>
+                  <div className="action-info">
+                    <span className="action-title">更新所有课程表</span>
+                    <span className="action-desc">刷新全部课程表数据</span>
+                  </div>
+                  <div className="action-control">
+                    <Button type="primary" onClick={handleUpdateCourseTable} loading={updateCourseTableLoading} size="small">
                       立即更新
                     </Button>
                   </div>

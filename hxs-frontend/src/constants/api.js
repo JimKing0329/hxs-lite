@@ -18,6 +18,8 @@ export const API_PATHS = {
   UPDATE_WECHAT_MENU: `${API_HOST}/admin/menu`,
   GET_MEDIA_ID: `${API_HOST}/admin/config/media-id`,
   UPLOAD_MEDIA_ID: `${API_HOST}/admin/config/media-id`,
+  ADMIN_UPDATE_COURSE_TABLE: `${API_HOST}/admin/course-table`,
+  ADMIN_UPDATE_CLASSES: `${API_HOST}/admin/classes`,
   // 用户相关
   LOGIN: `${API_HOST}/user/login`,
   LOGOUT: `${API_HOST}/user/logout`,

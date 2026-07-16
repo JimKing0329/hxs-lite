@@ -38,3 +38,8 @@ dist/
 # ============================================
 .DS_Store
 Thumbs.db
+
+hxs-course-front/
+
+secret.key
+MIGRATION.md
