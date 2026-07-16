@@ -11,11 +11,9 @@ import com.hxs.mapper.UserMapper;
 import com.hxs.model.dto.UserLoginDTO;
 import com.hxs.model.entity.MajorInfo;
 import com.hxs.model.entity.User;
-import com.hxs.model.support.MajorInfoItem;
 import com.hxs.model.vo.UserDistributionVO;
 import com.hxs.properties.AdminProperties;
 import com.hxs.service.admin.AdminService;
-import com.hxs.utils.StringParseUtil;
 import com.hxs.utils.WechatClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -89,7 +87,6 @@ public class AdminServiceImpl implements AdminService {
         List<MajorInfo> majorList = majorClient.getMajorInfo().stream()
                 .filter(item -> item.getGrade() != null && item.getGrade() >= minGrade)
                 .distinct()
-                .map(this::toEntity)
                 .toList();
 
         // 先删后插（空列表时跳过插入，避免 SQL 语法错误）
@@ -101,17 +98,6 @@ public class AdminServiceImpl implements AdminService {
         session.close();
         log.info("专业信息更新成功，共 {} 条", majorList.size());
         return majorList.size();
-    }
-
-    /** MajorInfoItem → MajorInfo Entity */
-    private MajorInfo toEntity(MajorInfoItem item) {
-        MajorInfo entity = new MajorInfo();
-        entity.setGrade(item.getGrade());
-        entity.setMajorId(item.getMajorId());
-        entity.setMajorName(item.getMajorName());
-        entity.setCollegeId(item.getCollegeId());
-        entity.setMajorCode(StringParseUtil.extractParenthesesContent(item.getMajorName()));
-        return entity;
     }
 
     @Override

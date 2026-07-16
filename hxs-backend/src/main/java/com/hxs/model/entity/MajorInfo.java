@@ -15,30 +15,18 @@ import java.io.Serializable;
 @TableName("major_info")
 public class MajorInfo implements Serializable {
 
-    @TableId(type = IdType.AUTO)
-    private Long id;
-
-    @JSONField(name = "njdm_id")
-    private String gradeId;
-
-    @JSONField(name = "nj")
+    @JSONField(name = "njdm")
     private Integer grade;
 
-    @JSONField(name = "zyh_id")
-    private String majorId;
+    @JSONField(name = "jg_id")
+    private String collegeId;
 
     @JSONField(name = "zymc")
     private String majorName;
 
-    @JSONField(name = "zyfxmc")
-    private String majorDirection;
+    @JSONField(name = "zyh")
+    private String majorId;
 
     @JSONField(name = "jxzxjhxx_id")
-    private String planId;
-
-    @JSONField(name = "zsjg_id")
-    private String collegeId;
-
-    /** 专业代码（major_code，用于关联 user） */
     private String majorCode;
 }

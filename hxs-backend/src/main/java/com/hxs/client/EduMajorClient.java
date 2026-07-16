@@ -6,7 +6,7 @@ import com.hxs.constant.MessageConstant;
 import com.hxs.context.UserContext;
 import com.hxs.exception.RequestFailException;
 import com.hxs.model.entity.ExecuteCourse;
-import com.hxs.model.support.MajorInfoItem;
+import com.hxs.model.entity.MajorInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -101,7 +101,7 @@ public class EduMajorClient {
     /**
      * 获取专业信息
      */
-    public List<MajorInfoItem> getMajorInfo() {
+    public List<MajorInfo> getMajorInfo() {
         try {
             URI resolve = new URI(session.getBaseUrl())
                     .resolve("jxzxjhgl/jxzxjhck_cxJxzxjhckIndex.html?doType=query&gnmkdm=N153540");
@@ -121,7 +121,7 @@ public class EduMajorClient {
                 session.checkLogin(responseBody);
 
                 JSONObject root = JSON.parseObject(responseBody);
-                List<MajorInfoItem> items = root.getList("items", MajorInfoItem.class);
+                List<MajorInfo> items = root.getList("items", MajorInfo.class);
                 log.info("获取专业信息成功 {} 条", items.size());
                 return items;
             }

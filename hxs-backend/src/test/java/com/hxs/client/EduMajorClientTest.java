@@ -2,7 +2,7 @@ package com.hxs.client;
 
 import com.hxs.exception.RequestFailException;
 import com.hxs.model.entity.ExecuteCourse;
-import com.hxs.model.support.MajorInfoItem;
+import com.hxs.model.entity.MajorInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -108,12 +108,12 @@ class EduMajorClientTest extends HttpMockSupport {
             EduSession session = spySession(mockHttpClient(200, MAJOR_INFO_JSON));
             EduMajorClient client = new EduMajorClient(session);
 
-            List<MajorInfoItem> result = client.getMajorInfo();
+            List<MajorInfo> result = client.getMajorInfo();
 
             assertNotNull(result);
             assertEquals(1, result.size());
             assertEquals("计算机科学与技术", result.get(0).getMajorName());
-            assertEquals("PLAN001", result.get(0).getPlanId());
+            assertEquals("PLAN001", result.get(0).getMajorCode());
         }
 
         @Test
