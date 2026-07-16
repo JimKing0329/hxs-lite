@@ -25,12 +25,10 @@ dist/
 # 缓存目录
 .cache/
 
-# 环境变量文件
+# 环境变量文件（仅忽略本地覆盖文件）
 .env
 .env.local
-.env.development
 .env.test
-.env.production
 
 # 操作系统文件
 Thumbs.db
