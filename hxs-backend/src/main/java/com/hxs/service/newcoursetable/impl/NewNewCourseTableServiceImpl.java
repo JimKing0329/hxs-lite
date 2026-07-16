@@ -94,9 +94,10 @@ public class NewNewCourseTableServiceImpl implements NewCourseTableService {
             List<JSONObject> rawOther = root.getList("sjkList", JSONObject.class);
             if (rawOther != null) {
                 for (JSONObject raw : rawOther) {
+                    List<String> stringList = StringParseUtil.courseParser(raw.getString("sjkcgs"));
                     otherCourses.add(OtherCourse.builder()
-                            .courseName(raw.getString("kcmc"))
-                            .weeks(raw.getString("zcd"))
+                            .courseName(stringList.get(0))
+                            .weeks(stringList.get(1))
                             .classId(classInfo.getClassId())
                             .build());
                 }
@@ -156,6 +157,8 @@ public class NewNewCourseTableServiceImpl implements NewCourseTableService {
         int term = LocalDate.now().getMonthValue() > 6 ? 1 : 2;
         int year = term == 1 ? currentYear : currentYear - 1;
         term = term * term * 3;
+        //TODO: 暂时硬编码为 2025-1
+        year = 2025;
         return new int[]{year, term};
     }
 }

@@ -56,7 +56,7 @@ docker run -d \\
   -e HXS_WECHAT_APP_ID="$WX_APP_ID" \\
   -e HXS_WECHAT_APP_SECRET="$WX_APP_SECRET" \\
   -e HXS_BASE_URL='http://82.156.49.70' \\
-  -e HXS_COURSE_URL='http://82.156.49.70:18081' \\
+  -e HXS_COURSE_URL='http://82.156.49.70' \\
   -e HXS_ADMIN_SID="$ADMIN_SID" \\
   -e HXS_ADMIN_PWD="$ADMIN_PWD" \\
   -e HXS_JWT_ADMIN_SECRET="$JWT_ADMIN_SECRET" \\

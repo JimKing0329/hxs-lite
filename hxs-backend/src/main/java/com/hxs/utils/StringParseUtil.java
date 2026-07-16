@@ -44,4 +44,42 @@ public final class StringParseUtil {
         return r;
     }
 
+
+    public static List<String> courseParser(String input) {
+        List<String> courseInfo = new ArrayList();
+        String courseName = "";
+        int starIndex = input.indexOf(9734) == -1 ? input.indexOf(9733) : input.indexOf(9734);
+        if (starIndex != -1) {
+            courseName = input.substring(0, starIndex + 1);
+            if (courseName.contains("★")) {
+                courseName = courseName + "理论";
+            } else {
+                courseName = courseName + "实验";
+            }
+        } else {
+            Pattern namePattern = Pattern.compile("^[\\u4e00-\\u9fa5a-zA-Z0-9]+");
+            Matcher nameMatcher = namePattern.matcher(input);
+            if (nameMatcher.find()) {
+                courseName = nameMatcher.group();
+            }
+        }
+
+        String weekInfo = "";
+        Pattern weekPattern = Pattern.compile("\\d+\\s*-\\s*\\d+周$");
+        Matcher weekMatcher = weekPattern.matcher(input);
+        if (weekMatcher.find()) {
+            weekInfo = weekMatcher.group();
+        } else {
+            Pattern fallbackPattern = Pattern.compile("共(\\d+)周");
+            Matcher fallbackMatcher = fallbackPattern.matcher(input);
+            if (fallbackMatcher.find()) {
+                weekInfo = fallbackMatcher.group(1) + "周";
+            }
+        }
+
+        courseInfo.add(courseName);
+        courseInfo.add(weekInfo);
+        return courseInfo;
+    }
+
 }
