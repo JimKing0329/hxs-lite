@@ -1,0 +1,375 @@
+.new-course-layout {
+    min-height: 100vh;
+    background: #f5f7fa;
+}
+
+.new-course-header {
+    background: #001529;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 16px 0;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    line-height: normal;
+}
+
+/* 选择器卡片 */
+.new-course-selector-card {
+    background: #fff;
+    margin: 12px;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.new-course-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.new-course-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.new-course-label {
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+}
+
+.new-course-select {
+    width: 100%;
+}
+
+.new-course-select .ant-select-selector {
+    border-radius: 8px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+}
+
+.new-course-select .ant-select-selection-item {
+    line-height: 40px !important;
+}
+
+.new-course-select .ant-select-selection-placeholder {
+    line-height: 40px !important;
+}
+
+.new-course-query-btn {
+    height: 44px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 8px;
+}
+
+.new-course-content {
+    padding: 0 12px 16px;
+    background: transparent;
+}
+
+.new-course-table-scroll {
+    overflow-x: auto;
+    padding-bottom: 12px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.new-course-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    font-size: 13px;
+    min-width: 600px;
+    table-layout: fixed;
+}
+
+.new-course-table th,
+.new-course-table td {
+    border: 1px solid #e8e8e8;
+    text-align: center;
+    padding: 0;
+}
+
+.new-course-table th {
+    background: #fafafa;
+    font-weight: 600;
+    padding: 10px 0;
+    color: #333;
+}
+
+.new-course-table td {
+    position: relative;
+    vertical-align: top;
+    height: 100px;
+    min-height: 100px;
+    max-height: 100px;
+    overflow: hidden;
+}
+
+.new-course-table .new-course-session-col {
+    width: 50px !important;
+    min-width: 50px !important;
+    max-width: 50px !important;
+    background: #f5f7fa;
+    font-weight: bold;
+    color: #666;
+    font-size: 12px;
+}
+
+.new-course-session-idx {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1890ff;
+    margin-top: 4px;
+}
+
+.new-course-session-time {
+    font-size: 10px;
+    color: #999;
+    margin-bottom: 4px;
+}
+
+.new-course-block {
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 8px 4px;
+    color: #fff;
+    font-size: 12px;
+    word-break: break-all;
+}
+
+.new-course-title {
+    font-weight: 600;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.3;
+}
+
+/* 周次选择器 */
+.new-course-week-selector-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    margin-top: 12px;
+    gap: 16px;
+}
+
+.new-course-week-selector {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 其他课程区域 */
+.new-course-other-section {
+    margin-top: 12px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.new-course-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.new-course-section-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+}
+
+.new-course-section-badge {
+    background: #1890ff;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.new-course-other-list {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.new-course-other-item {
+    padding: 12px 14px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border-left: 3px solid #1890ff;
+}
+
+.new-course-other-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.new-course-other-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.new-course-other-weeks {
+    font-size: 12px;
+    color: #888;
+}
+
+.new-course-other-empty {
+    padding: 24px 16px;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+}
+
+.new-course-empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    background: #fff;
+    border-radius: 12px;
+    margin-top: 12px;
+    color: #999;
+    font-size: 15px;
+}
+
+/* 移动端适配 */
+@media (max-width: 480px) {
+    .new-course-header {
+        font-size: 18px;
+        padding: 14px 0;
+    }
+
+    .new-course-selector-card {
+        margin: 8px;
+        padding: 12px;
+    }
+
+    .new-course-selector-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .new-course-select .ant-select-selector {
+        height: 38px !important;
+        min-height: 38px !important;
+    }
+
+    .new-course-select .ant-select-selection-item,
+    .new-course-select .ant-select-selection-placeholder {
+        line-height: 38px !important;
+    }
+
+    .new-course-query-btn {
+        height: 42px;
+    }
+
+    .new-course-content {
+        padding: 0 8px 12px;
+    }
+
+    .new-course-table {
+        min-width: 550px;
+        font-size: 12px;
+    }
+
+    .new-course-table td {
+        height: 80px;
+        min-height: 80px;
+        max-height: 80px;
+    }
+
+    .new-course-block {
+        padding: 6px 2px;
+    }
+
+    .new-course-title {
+        font-size: 12px;
+    }
+
+    .new-course-week-selector-container {
+        padding: 10px;
+        gap: 12px;
+    }
+
+    .new-course-other-list {
+        padding: 10px 12px;
+    }
+
+    .new-course-other-item {
+        padding: 10px 12px;
+    }
+}
+
+/* 小屏手机 */
+@media (max-width: 360px) {
+    .new-course-selector-grid {
+        gap: 8px;
+    }
+
+    .new-course-label {
+        font-size: 12px;
+    }
+
+    .new-course-table {
+        font-size: 11px;
+    }
+
+    .new-course-table td {
+        height: 70px;
+        min-height: 70px;
+        max-height: 70px;
+    }
+
+    .new-course-title {
+        font-size: 11px;
+    }
+}
+
+/* 平板和大屏 */
+@media (min-width: 768px) {
+    .new-course-selector-card {
+        max-width: 600px;
+        margin: 16px auto;
+    }
+
+    .new-course-content {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 16px 20px;
+    }
+
+    .new-course-selector-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}

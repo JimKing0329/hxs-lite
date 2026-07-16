@@ -15,6 +15,7 @@ import GPACalculatorPage from './pages/GPACalculatorPage';
 import EmptyClassroomPage from './pages/EmptyClassroomPage';
 import FailRateRankPage from './pages/FailRateRankPage';
 import TextbookQueryPage from './pages/TextbookQueryPage';
+import NewCourseTablePage from './pages/NewCourseTablePage';
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
           <PrivateRoute path="/empty-classroom" component={EmptyClassroomPage} />
           <PrivateRoute path="/fail-rate-rank" component={FailRateRankPage} />
           <PrivateRoute path="/textbook-query" component={TextbookQueryPage} />
+          <Route path="/new-course-table" component={NewCourseTablePage} />
         </Switch>
       </Suspense>
     </Router>

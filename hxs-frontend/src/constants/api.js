@@ -58,5 +58,10 @@ export const API_PATHS = {
   //教材查询
   GET_TEXT_BOOK: `${API_HOST}/textbooks`,  // 调用时追加 /{year}/{term}
 
+  // 新课表查询（班级课表，无需登录）
+  NEW_COURSE_TABLE: {
+    ALL_CLASS: `${API_HOST}/newCourseTable/allClass`,
+    COURSE_TABLE: `${API_HOST}/newCourseTable/courseTable`,
+  },
 
 };
