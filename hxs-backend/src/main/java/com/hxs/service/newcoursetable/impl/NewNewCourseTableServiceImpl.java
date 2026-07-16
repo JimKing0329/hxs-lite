@@ -157,8 +157,6 @@ public class NewNewCourseTableServiceImpl implements NewCourseTableService {
         int term = LocalDate.now().getMonthValue() > 6 ? 1 : 2;
         int year = term == 1 ? currentYear : currentYear - 1;
         term = term * term * 3;
-        //TODO: 暂时硬编码为 2025-1
-        year = 2025;
         return new int[]{year, term};
     }
 }
