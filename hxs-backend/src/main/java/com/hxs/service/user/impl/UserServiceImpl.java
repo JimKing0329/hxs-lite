@@ -92,11 +92,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public ExecutePlanVO getExecutePlan() {
         ExecutePlanVO vo = new ExecutePlanVO();
-        //TODO 修改termDate
-        vo.setYear(2025);
-        vo.setTerm(1);
-//        vo.setYear(termDateManager.getYear());
-//        vo.setTerm(termDateManager.getTerm());
+//        vo.setYear(2025);
+//        vo.setTerm(1);
+        vo.setYear(termDateManager.getYear());
+        vo.setTerm(termDateManager.getTerm());
 
         String majorCode = userMapper.queryMajorCodeByMajorId(UserContext.getCurrentId().toString());
         if (majorCode == null) {
