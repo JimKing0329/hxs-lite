@@ -11,7 +11,7 @@ public final class WechatMessageConstant {
             + "\n研究生课表查询<a href=\"http://211.82.255.223\">点这里</a>\n"
             + "\n右上角置顶服务号，查询更便捷！！\n"
             + "\n\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\ud83c\udf39\n"
-            + "本公众号由软件学院同学独立制作，如果您觉得好用就分享给同学吧！！";
+            + "本公众号由软件学院同学独立开发，如果您觉得好用就分享给同学吧！！";
 
     public static final String USER_NOT_EXISTS = "未查询到用户信息，请先登录系统！！\n<a href=\"%s/dashboard\">点我登录系统</a>";
     public static final String FAIL_BIND = "绑定失败,请检查您的key或者绑定格式是否正确！！\n注意：绑定与绑定码之间存在空格！！";

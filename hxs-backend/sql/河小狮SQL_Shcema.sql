@@ -1,3 +1,6 @@
+-- 统一使用 utf8mb4_general_ci，避免不同 MySQL 版本默认 collation 不一致导致 JOIN 报错
+SET NAMES utf8mb4 COLLATE utf8mb4_general_ci;
+
 create table classroom_availability
 (
     id            bigint auto_increment
@@ -250,5 +253,48 @@ create table wechat_article
         primary key,
     url varchar(128) null comment '文章短链接（可选，如自己生成的短链）'
 )
-    comment '公众号文章链接表' collate = utf8mb4_unicode_ci;
+    comment '公众号文章链接表';
+
+create table classes
+(
+    id          bigint auto_increment comment '主键ID'
+        primary key,
+    grade       varchar(10)  null comment '年级代码 (njdm)',
+    class_id    varchar(50)  null comment '班级ID (bh_id)',
+    major_id    varchar(50)  null comment '专业ID (zyh_id)',
+    college     varchar(100) null comment '学院名称 (jgmc)',
+    class_name  varchar(100) null comment '班级名称 (bjmc)',
+    campus_name varchar(50)  null comment '校区名称 (xqmc)',
+    major_name  varchar(100) null comment '专业名称 (zymc)'
+)
+    comment '班级信息表';
+
+create table main_course
+(
+    id            bigint auto_increment comment '主键ID'
+        primary key,
+    course_name   varchar(100) null comment '课程名称',
+    weeks         varchar(50)  null comment '周次',
+    week_day      varchar(20)  null comment '星期',
+    start_session tinyint      null comment '开始节次',
+    end_session   tinyint      null comment '结束节次',
+    class_id      varchar(50)  null comment '班级ID'
+)
+    comment '主修课程表';
+
+create index idx_main_course_class_id
+    on main_course (class_id);
+
+create table other_course
+(
+    id          bigint auto_increment comment '主键ID'
+        primary key,
+    course_name varchar(100) null comment '课程名称',
+    weeks       varchar(50)  null comment '周次',
+    class_id    varchar(50)  null comment '班级ID'
+)
+    comment '其他课程表';
+
+create index idx_other_course_class_id
+    on other_course (class_id);
 

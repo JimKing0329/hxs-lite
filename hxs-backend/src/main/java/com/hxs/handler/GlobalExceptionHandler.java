@@ -4,6 +4,7 @@ import com.hxs.constant.MessageConstant;
 import com.hxs.exception.BaseException;
 import com.hxs.result.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -12,6 +13,11 @@ import java.sql.SQLIntegrityConstraintViolationException;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ClientAbortException.class)
+    public void handleClientAbort(ClientAbortException ex) {
+        log.debug("客户端已断开连接: {}", ex.getMessage());
+    }
 
     @ExceptionHandler(BaseException.class)
     public Result<?> handleBase(BaseException ex) {
