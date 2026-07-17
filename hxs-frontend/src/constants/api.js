@@ -20,6 +20,8 @@ export const API_PATHS = {
   UPLOAD_MEDIA_ID: `${API_HOST}/admin/config/media-id`,
   ADMIN_UPDATE_COURSE_TABLE: `${API_HOST}/admin/course-table`,
   ADMIN_UPDATE_CLASSES: `${API_HOST}/admin/classes`,
+  GET_COURSE_TABLE_TASK_ENABLED: `${API_HOST}/admin/course-table-task/enabled`,
+  UPDATE_COURSE_TABLE_TASK_ENABLED: `${API_HOST}/admin/course-table-task/enabled`,
   // 用户相关
   LOGIN: `${API_HOST}/user/login`,
   LOGOUT: `${API_HOST}/user/logout`,

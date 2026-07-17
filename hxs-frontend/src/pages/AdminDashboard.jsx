@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Layout, Card, Row, Col, Table, Spin, message, Modal, Form, DatePicker, Input, Button, Select } from 'antd';
+import { Layout, Card, Row, Col, Table, Spin, message, Modal, Form, DatePicker, Input, Button, Select, Switch } from 'antd';
 import {
   UserOutlined, LoginOutlined, TeamOutlined, CalendarOutlined,
   SyncOutlined, HomeOutlined, WechatOutlined, LogoutOutlined,
@@ -29,6 +29,8 @@ export default function AdminDashboard() {
   const [termDateType, setTermDateType] = useState('1'); // 1: 开学日期, 2: 课表日期，默认开学日期
   const [updateClassesLoading, setUpdateClassesLoading] = useState(false);
   const [updateCourseTableLoading, setUpdateCourseTableLoading] = useState(false);
+  const [courseTableTaskEnabled, setCourseTableTaskEnabled] = useState(false);
+  const [courseTableTaskSwitchLoading, setCourseTableTaskSwitchLoading] = useState(false);
 
   // 微信素材上传状态（校历/红旗地图/裕华地图）
   const [uploadStates, setUploadStates] = useState({
@@ -118,11 +120,12 @@ export default function AdminDashboard() {
       try {
         setLoading(true);
         // 并行请求三个接口
-        const [distributionRes, userCountRes, loginCountRes, sevenDayLoginCountRes] = await Promise.all([
+        const [distributionRes, userCountRes, loginCountRes, sevenDayLoginCountRes, courseTableTaskEnabledRes] = await Promise.all([
           authFetch(API_PATHS.GET_USER_DISTRIBUTION),
           authFetch(API_PATHS.GET_USER_COUNT),
           authFetch(API_PATHS.GET_TODAY_LOGIN_COUNT),
-          authFetch(API_PATHS.GET_SEVEN_DAY_LOGIN_COUNT)
+          authFetch(API_PATHS.GET_SEVEN_DAY_LOGIN_COUNT),
+          authFetch(API_PATHS.GET_COURSE_TABLE_TASK_ENABLED)
         ]);
 
         // 解析响应数据
@@ -130,6 +133,7 @@ export default function AdminDashboard() {
         const userCountData = await userCountRes.json();
         const loginCountData = await loginCountRes.json();
         const sevenDayLoginCountData = await sevenDayLoginCountRes.json();
+        const courseTableTaskEnabledData = await courseTableTaskEnabledRes.json();
 
         // 处理数据
         if (distributionData.code === 1) {
@@ -154,6 +158,12 @@ export default function AdminDashboard() {
           setSevenDayLoginCount(sevenDayLoginCountData.data || 0);
         } else {
           message.error('获取最近7天登录数失败');
+        }
+
+        if (courseTableTaskEnabledData.code === 1) {
+          setCourseTableTaskEnabled(courseTableTaskEnabledData.data || false);
+        } else {
+          message.error('获取课表定时任务状态失败');
         }
       } catch (error) {
         console.error('获取统计数据失败:', error);
@@ -378,6 +388,27 @@ export default function AdminDashboard() {
     window.location.href = '/admin/login';
   };
 
+  const handleCourseTableTaskToggle = async (checked) => {
+    setCourseTableTaskSwitchLoading(true);
+    try {
+      const response = await authFetch(`${API_PATHS.UPDATE_COURSE_TABLE_TASK_ENABLED}?enabled=${checked}`, {
+        method: 'PUT',
+      });
+      const result = await response.json();
+      if (response.ok && result.code === 1) {
+        setCourseTableTaskEnabled(checked);
+        message.success(checked ? '课表定时任务已启用' : '课表定时任务已关闭');
+      } else {
+        message.error(result.msg || '更新状态失败');
+      }
+    } catch (error) {
+      console.error('更新课表定时任务状态失败:', error);
+      message.error('网络错误，无法更新状态');
+    } finally {
+      setCourseTableTaskSwitchLoading(false);
+    }
+  };
+
   // 表格列定义
   const columns = [
     {
@@ -515,6 +546,26 @@ export default function AdminDashboard() {
                     <Button type="primary" onClick={handleUpdateCourseTable} loading={updateCourseTableLoading} size="small">
                       立即更新
                     </Button>
+                  </div>
+                </div>
+
+                {/* 课表定时任务开关 */}
+                <div className="action-item">
+                  <div className="action-icon action-icon-orange">
+                    <SyncOutlined />
+                  </div>
+                  <div className="action-info">
+                    <span className="action-title">课表定时任务</span>
+                    <span className="action-desc">每小时自动更新课表数据</span>
+                  </div>
+                  <div className="action-control">
+                    <Switch
+                      checked={courseTableTaskEnabled}
+                      onChange={handleCourseTableTaskToggle}
+                      loading={courseTableTaskSwitchLoading}
+                      checkedChildren="启用"
+                      unCheckedChildren="关闭"
+                    />
                   </div>
                 </div>
 
