@@ -1,6 +1,7 @@
 package com.hxs.service.user.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hxs.annotation.RetryOnSessionExpired;
 import com.hxs.client.EduCourseClient;
 import com.hxs.client.EduSession;
 import com.hxs.client.EduSessionManager;
@@ -41,6 +42,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
+    @RetryOnSessionExpired
     public void updateCourseTable() {
         String sid = UserContext.getCurrentId().toString();
         int year = termSystemDate.getYear();

@@ -1,6 +1,7 @@
 package com.hxs.service.user.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hxs.annotation.RetryOnSessionExpired;
 import com.hxs.client.EduSession;
 import com.hxs.client.EduSessionManager;
 import com.hxs.client.EduStudyClient;
@@ -27,6 +28,7 @@ public class StudyServiceImpl implements StudyService {
     private final StudySituationMapper studySituationMapper;
 
     @Override
+    @RetryOnSessionExpired
     public StudySituationVO getStudySituation() {
         Long userId = UserContext.getCurrentId();
         // 优先从本地库查询，避免每次请求教务系统
@@ -41,6 +43,7 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
+    @RetryOnSessionExpired
     public StudySituationVO updateStudySituation() {
         return fetchAndSave();
     }

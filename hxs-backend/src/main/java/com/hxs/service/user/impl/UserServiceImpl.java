@@ -1,6 +1,7 @@
 package com.hxs.service.user.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hxs.annotation.RetryOnSessionExpired;
 import com.hxs.client.*;
 import com.hxs.component.SystemDate;
 import com.hxs.constant.MessageConstant;
@@ -94,6 +95,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @RetryOnSessionExpired
     public ExecutePlanVO getExecutePlan() {
         ExecutePlanVO vo = new ExecutePlanVO();
 //        vo.setYear(2025);
@@ -139,6 +141,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @RetryOnSessionExpired
     public void updateMajorCode() {
         Long sid = UserContext.getCurrentId();
         log.info("更新专业代码 userId={}", sid);

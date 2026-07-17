@@ -1,6 +1,7 @@
 package com.hxs.service.user.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hxs.annotation.RetryOnSessionExpired;
 import com.hxs.client.EduExamClient;
 import com.hxs.client.EduSession;
 import com.hxs.client.EduSessionManager;
@@ -77,6 +78,7 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     @Override
+    @RetryOnSessionExpired
     public void updateScores() {
         log.info("刷新成绩 userId={}", UserContext.getCurrentId());
         String sid = UserContext.getCurrentId().toString();
@@ -116,6 +118,7 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     @Override
+    @RetryOnSessionExpired
     public ScoreDetailVO getScoreDetail(ScoreDetailQueryDTO queryDTO) {
         log.info("查询成绩详情 userId={} course={}", UserContext.getCurrentId(), queryDTO.getCourseName());
         String sid = UserContext.getCurrentId().toString();

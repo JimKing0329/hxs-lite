@@ -12,7 +12,7 @@ public final class MessageConstant {
     public static final String SYSTEM_ERROR = "教务系统出错，稍后再试！";
     public static final String REQUEST_ERROR = "请求出错，稍后再试！";
     public static final String MAJOR_CODE_NULL = "专业代码为空，请更新专业信息！";
-    public static final String SCORE_DETAIL_NULL = "该课程无详细成绩！";
+    public static final String PASSWORD_EXPIRED = "请重新登录！";
     public static final String GET_EXECUTE_PLAN_ERROR = "获取执行计划失败！请联系开发者";
     public static final String GET_EMPTY_CLASSROOM_ERROR = "获取专业信息失败！请联系开发者";
     public static final String PASSWORD_ENCRYPT_ERROR = "密码加密失败";

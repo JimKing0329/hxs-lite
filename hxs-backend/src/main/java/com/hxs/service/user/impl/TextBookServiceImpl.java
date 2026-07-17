@@ -1,5 +1,6 @@
 package com.hxs.service.user.impl;
 
+import com.hxs.annotation.RetryOnSessionExpired;
 import com.hxs.client.EduSession;
 import com.hxs.client.EduSessionManager;
 import com.hxs.client.EduTextbookClient;
@@ -23,6 +24,7 @@ public class TextBookServiceImpl implements TextBookService {
     private final EduSessionManager sessionManager;
 
     @Override
+    @RetryOnSessionExpired
     public List<TextBookItem> getTextbooks(String year, String term) {
         // 教务系统学期代码：第1学期→"3"，第2学期→"12"
         String eduTerm = "1".equals(term) ? "3" : "12";

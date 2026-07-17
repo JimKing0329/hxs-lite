@@ -1,5 +1,6 @@
 package com.hxs.service.user.impl;
 
+import com.hxs.annotation.RetryOnSessionExpired;
 import com.hxs.client.EduClassroomClient;
 import com.hxs.client.EduLoginClient;
 import com.hxs.client.EduSession;
@@ -39,6 +40,7 @@ public class EmptyClassroomServiceImpl implements EmptyClassroomService {
 
     @Override
     @Transactional
+    @RetryOnSessionExpired
     public void updateEmptyClassRoom(Integer week) {
         long startTime = System.currentTimeMillis();
         int year = termSystemDate.getYear();

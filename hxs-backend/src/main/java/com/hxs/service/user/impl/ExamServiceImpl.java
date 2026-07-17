@@ -1,5 +1,6 @@
 package com.hxs.service.user.impl;
 
+import com.hxs.annotation.RetryOnSessionExpired;
 import com.hxs.client.EduExamClient;
 import com.hxs.client.EduSession;
 import com.hxs.client.EduSessionManager;
@@ -25,11 +26,13 @@ public class ExamServiceImpl implements ExamService {
     private final EduSessionManager sessionManager;
 
     @Override
+    @RetryOnSessionExpired
     public List<ExamInfoVO> getExamSchedule(Integer year, Integer term) {
         return fetchExamSchedule(year, term);
     }
 
     @Override
+    @RetryOnSessionExpired
     public List<ExamInfoVO> updateExamSchedule(Integer year, Integer term) {
         return fetchExamSchedule(year, term);
     }
