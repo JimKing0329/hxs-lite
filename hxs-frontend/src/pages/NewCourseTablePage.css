@@ -373,3 +373,42 @@
         grid-template-columns: repeat(4, 1fr);
     }
 }
+
+/* 水印 */
+.new-course-watermark {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.new-course-watermark::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background-image: repeating-linear-gradient(
+        -30deg,
+        transparent,
+        transparent 80px,
+        transparent 80px,
+        transparent 160px
+    );
+}
+
+.new-course-watermark-item {
+    position: absolute;
+    font-size: 19px;
+    color: rgba(0, 0, 0, 0.22);
+    white-space: nowrap;
+    user-select: none;
+    transform: rotate(-30deg);
+    font-weight: 400;
+    letter-spacing: 1px;
+}

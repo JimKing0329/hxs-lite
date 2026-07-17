@@ -294,8 +294,38 @@ export default function NewCourseTablePage() {
         return Array.from(allWeeks).sort((a, b) => a - b);
     }, [courseData]);
 
+    // 生成水印网格
+    const watermarkItems = useMemo(() => {
+        const items = [];
+        const rows = 12;
+        const cols = 6;
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                items.push({
+                    id: `${r}-${c}`,
+                    top: `${r * 120 + 20}px`,
+                    left: `${c * 200 + (r % 2 === 0 ? 0 : 100)}px`,
+                });
+            }
+        }
+        return items;
+    }, []);
+
     return (
         <Layout className="new-course-layout">
+            {/* 水印 */}
+            <div className="new-course-watermark">
+                {watermarkItems.map(item => (
+                    <span
+                        key={item.id}
+                        className="new-course-watermark-item"
+                        style={{ top: item.top, left: item.left }}
+                    >
+                        公众号:河小狮lite
+                    </span>
+                ))}
+            </div>
+
             <Header className="new-course-header">
                 <h2 style={{ margin: 0, color: '#fff' }}>班级课表查询</h2>
             </Header>
