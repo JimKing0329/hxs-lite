@@ -151,7 +151,7 @@ export default function MobileLogin() {
           </Typography.Text>
           <br/><br/>
           <Typography.Text type="secondary">
-            ❗ 2025级新同学如果登录失败，可<a href="http://jwgl.hebtu.edu.cn/xtgl/login_slogin.html">点击进入河北师大教务管理系统</a>修改密码后重新尝试登录（默认密码为身份证后六或八位）
+            ❗ 新同学如果登录失败，可<a href="http://jwgl.hebtu.edu.cn/xtgl/login_slogin.html">点击进入河北师大教务管理系统</a>修改密码后重新尝试登录（默认密码为身份证后六或八位）
           </Typography.Text>
         </div>
 
