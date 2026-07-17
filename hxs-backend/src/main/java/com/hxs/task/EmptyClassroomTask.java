@@ -1,6 +1,6 @@
 package com.hxs.task;
 
-import com.hxs.component.DateManager;
+import com.hxs.component.SystemDate;
 import com.hxs.service.user.EmptyClassroomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ import java.time.temporal.ChronoUnit;
 public class EmptyClassroomTask {
 
     private final EmptyClassroomService emptyClassroomService;
-    private final DateManager dateManager;
+    private final SystemDate systemDate;
 
     /**
      * 每周日 03:00 执行，更新空教室信息并清理历史数据
@@ -30,7 +30,7 @@ public class EmptyClassroomTask {
         log.info("定时任务开始：更新空教室信息");
 
         LocalDate now = LocalDate.now();
-        LocalDate termStartDate = dateManager.getTermStartDate();
+        LocalDate termStartDate = systemDate.getTermStartDate();
         int week = (int) ChronoUnit.WEEKS.between(termStartDate, now) + 2;
 
         emptyClassroomService.updateEmptyClassRoom(week);

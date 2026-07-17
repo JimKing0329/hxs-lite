@@ -1,6 +1,6 @@
 package com.hxs.controller.user;
 
-import com.hxs.component.DateManager;
+import com.hxs.component.SystemDate;
 import com.hxs.context.UserContext;
 import com.hxs.model.vo.ExamInfoVO;
 import com.hxs.result.Result;
@@ -33,14 +33,14 @@ import java.util.List;
 public class ExamController {
 
     private final ExamService examService;
-    private final DateManager termDateManager;
+    private final SystemDate termSystemDate;
 
     /** 查询考试安排 */
     @GetMapping
     public Result<List<ExamInfoVO>> getExamSchedule(@RequestParam(required = false) Integer year,
                                                      @RequestParam(required = false) Integer term) {
-        year = (year != null) ? year : termDateManager.getYear();
-        term = (term != null) ? term : termDateManager.getTerm();
+        year = (year != null) ? year : termSystemDate.getYear();
+        term = (term != null) ? term : termSystemDate.getTerm();
         log.info("查询考试安排 userId={} year={} term={}", UserContext.getCurrentId(), year, term);
         List<ExamInfoVO> exams = examService.getExamSchedule(year, term);
         return Result.success(exams);
@@ -50,8 +50,8 @@ public class ExamController {
     @PutMapping
     public Result<List<ExamInfoVO>> updateExamSchedule(@RequestParam(required = false) Integer year,
                                                         @RequestParam(required = false) Integer term) {
-        year = (year != null) ? year : termDateManager.getYear();
-        term = (term != null) ? term : termDateManager.getTerm();
+        year = (year != null) ? year : termSystemDate.getYear();
+        term = (term != null) ? term : termSystemDate.getTerm();
         log.info("刷新考试安排 userId={} year={} term={}", UserContext.getCurrentId(), year, term);
         List<ExamInfoVO> exams = examService.updateExamSchedule(year, term);
         return Result.success(exams);

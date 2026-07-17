@@ -1,6 +1,6 @@
 package com.hxs.controller.user;
 
-import com.hxs.component.DateManager;
+import com.hxs.component.SystemDate;
 import com.hxs.model.vo.EmptyClassroomVO;
 import com.hxs.result.Result;
 import com.hxs.service.user.EmptyClassroomService;
@@ -32,7 +32,7 @@ import java.util.List;
 public class EmptyClassroomController {
 
     private final EmptyClassroomService emptyClassroomService;
-    private final DateManager termDateManager;
+    private final SystemDate termSystemDate;
 
     /** 查询空教室 */
     @GetMapping
@@ -41,7 +41,7 @@ public class EmptyClassroomController {
             @RequestParam(required = false, defaultValue = "1") Integer startSession,
             @RequestParam(required = false, defaultValue = "13") Integer endSession) {
 
-        LocalDate termStartDate = termDateManager.getTermStartDate();
+        LocalDate termStartDate = termSystemDate.getTermStartDate();
         LocalDate now = LocalDate.now();
         int week = (int) ChronoUnit.WEEKS.between(termStartDate, now) + 1;
         log.info("查询空教室 week={} weekday={} session=[{},{}]", week, weekday, startSession, endSession);

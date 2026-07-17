@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hxs.client.EduCourseClient;
 import com.hxs.client.EduSession;
 import com.hxs.client.EduSessionManager;
-import com.hxs.component.DateManager;
+import com.hxs.component.SystemDate;
 import com.hxs.context.UserContext;
 import com.hxs.mapper.CourseMapper;
 import com.hxs.mapper.UserMapper;
@@ -18,10 +18,10 @@ import com.hxs.utils.StringParseUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,15 +36,15 @@ public class CourseServiceImpl implements CourseService {
     private final EduSessionManager sessionManager;
     private final CourseMapper courseMapper;
     private final UserMapper userMapper;
-    @Qualifier("courseTableDate")
-    private final DateManager termDateManager;
+    @Resource(name = "courseTableDate")
+    private final SystemDate termSystemDate;
 
     @Override
     @Transactional
     public void updateCourseTable() {
         String sid = UserContext.getCurrentId().toString();
-        int year = termDateManager.getYear();
-        int term = termDateManager.getTerm();
+        int year = termSystemDate.getYear();
+        int term = termSystemDate.getTerm();
         term = term * term * 3;
         log.info("刷新课表开始 userId={} year={} term={}", sid, year, term);
 

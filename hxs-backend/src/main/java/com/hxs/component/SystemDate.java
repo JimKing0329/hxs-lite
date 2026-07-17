@@ -11,7 +11,7 @@ import java.time.LocalDate;
  */
 @Data
 @Slf4j
-public class DateManager {
+public class SystemDate {
     /** 学年 */
     private Integer year;
     /** 学期 */

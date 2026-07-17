@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout, Card, Row, Col, Table, Spin, message, Modal, Form, DatePicker, Input, Button, Select, Switch } from 'antd';
 import {
   UserOutlined, LoginOutlined, TeamOutlined, CalendarOutlined,
   SyncOutlined, HomeOutlined, WechatOutlined, LogoutOutlined,
-  DashboardOutlined, PictureOutlined
+  DashboardOutlined, LinkOutlined, BookOutlined
 } from '@ant-design/icons';
 import { API_PATHS } from '../constants/api';
 import { authFetch } from '../utils/request';
@@ -24,87 +24,91 @@ export default function AdminDashboard() {
   const [form] = Form.useForm();
   const [updateWeek, setUpdateWeek] = useState('');
   const [updateWeekLoading, setUpdateWeekLoading] = useState(false);
-  const [wechatMenuModalVisible, setWechatMenuModalVisible] = useState(false);
-  const [selectedMenu, setSelectedMenu] = useState('');
   const [termDateType, setTermDateType] = useState('1'); // 1: 开学日期, 2: 课表日期，默认开学日期
   const [updateClassesLoading, setUpdateClassesLoading] = useState(false);
   const [updateCourseTableLoading, setUpdateCourseTableLoading] = useState(false);
   const [courseTableTaskEnabled, setCourseTableTaskEnabled] = useState(false);
   const [courseTableTaskSwitchLoading, setCourseTableTaskSwitchLoading] = useState(false);
 
-  // 微信素材上传状态（校历/红旗地图/裕华地图）
-  const [uploadStates, setUploadStates] = useState({
-    calender: { uploading: false, preview: '' },
-    map_hq:   { uploading: false, preview: '' },
-    map_yh:   { uploading: false, preview: '' },
-  });
-  const uploadRefs = {
-    calender: useRef(null),
-    map_hq:   useRef(null),
-    map_yh:   useRef(null),
-  };
+  // 微信菜单状态 & URL 配置
+  const [wechatMenuState, setWechatMenuState] = useState('');
+  const [menuStateLoading, setMenuStateLoading] = useState(false);
+  const [menuUrls, setMenuUrls] = useState({ calender: '', map_hq: '', map_yh: '' });
+  const [menuUrlSaving, setMenuUrlSaving] = useState({});
 
-  // 素材类型配置
-  const mediaUploadTypes = [
-    { type: 'calender', title: '更新校历图片', desc: '上传新校历图片到微信公众号', iconColor: 'blue' },
-    { type: 'map_hq',  title: '更新红旗校区地图', desc: '上传红旗校区地图图片', iconColor: 'purple' },
-    { type: 'map_yh',  title: '更新裕华校区地图', desc: '上传裕华校区地图图片', iconColor: 'green' },
+  // 菜单 URL 配置项
+  const menuUrlTypes = [
+    { type: 'calender', title: '校历链接', desc: '微信菜单-校历页面 URL' },
+    { type: 'map_hq',  title: '红旗校区地图链接', desc: '微信菜单-红旗地图 URL' },
+    { type: 'map_yh',  title: '裕华校区地图链接', desc: '微信菜单-裕华地图 URL' },
   ];
 
-  const handleMediaUpload = async (type, e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-    if (!allowedTypes.includes(file.type)) {
-      message.error('仅支持 jpg/png 格式的图片');
-      e.target.value = '';
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      message.error('图片大小不能超过 10MB');
-      e.target.value = '';
-      return;
-    }
-
-    // 预览
-    const reader = new FileReader();
-    reader.onload = (ev) => setUploadStates(prev => ({
-      ...prev,
-      [type]: { ...prev[type], preview: ev.target.result },
-    }));
-    reader.readAsDataURL(file);
-
-    // 上传
-    setUploadStates(prev => ({ ...prev, [type]: { ...prev[type], uploading: true } }));
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await authFetch(`${API_PATHS.UPLOAD_MEDIA_ID}?type=${type}`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await response.json();
-      if (response.ok && result.code === 1) {
-        message.success('上传成功');
-      } else {
-        message.error(result.msg || '上传失败');
-        setUploadStates(prev => ({ ...prev, [type]: { ...prev[type], preview: '' } }));
+  // 获取菜单 URL
+  const fetchMenuUrls = async () => {
+    for (const { type } of menuUrlTypes) {
+      try {
+        const res = await authFetch(`${API_PATHS.GET_MENU_URL}?type=${type}`);
+        const result = await res.json();
+        if (result.code === 1) {
+          setMenuUrls(prev => ({ ...prev, [type]: result.data || '' }));
+        }
+      } catch (e) {
+        console.error(`获取菜单URL失败 type=${type}:`, e);
       }
-    } catch (error) {
-      console.error('上传素材失败:', error);
-      message.error('网络错误，上传失败');
-      setUploadStates(prev => ({ ...prev, [type]: { ...prev[type], preview: '' } }));
-    } finally {
-      setUploadStates(prev => ({ ...prev, [type]: { ...prev[type], uploading: false } }));
-      e.target.value = '';
     }
   };
 
-  const triggerMediaUpload = (type) => {
-    uploadRefs[type]?.current?.click();
+  // 更新菜单 URL
+  const handleMenuUrlUpdate = async (type) => {
+    setMenuUrlSaving(prev => ({ ...prev, [type]: true }));
+    try {
+      const res = await authFetch(
+        `${API_PATHS.UPDATE_MENU_URL}?type=${type}&url=${encodeURIComponent(menuUrls[type])}`,
+        { method: 'PUT' }
+      );
+      const result = await res.json();
+      if (result.code === 1) {
+        message.success('链接更新成功');
+      } else {
+        message.error(result.msg || '更新失败');
+      }
+    } catch (e) {
+      console.error('更新菜单URL失败:', e);
+      message.error('网络错误');
+    } finally {
+      setMenuUrlSaving(prev => ({ ...prev, [type]: false }));
+    }
+  };
+
+  // 更新微信菜单状态（自动推送菜单）
+  const handleMenuStateChange = (newState) => {
+    Modal.confirm({
+      title: '确认切换菜单',
+      content: `确定要将微信菜单切换为「${newState}」吗？切换后将自动推送至微信。`,
+      okText: '确认切换',
+      cancelText: '取消',
+      onOk: async () => {
+        setMenuStateLoading(true);
+        try {
+          const res = await authFetch(
+            `${API_PATHS.UPDATE_WECHAT_MENU_STATE}?state=${encodeURIComponent(newState)}`,
+            { method: 'PUT' }
+          );
+          const result = await res.json();
+          if (result.code === 1) {
+            setWechatMenuState(newState);
+            message.success(`菜单已切换为「${newState}」并推送至微信`);
+          } else {
+            message.error(result.msg || '更新失败');
+          }
+        } catch (e) {
+          console.error('更新菜单状态失败:', e);
+          message.error('网络错误');
+        } finally {
+          setMenuStateLoading(false);
+        }
+      },
+    });
   };
 
   useEffect(() => {
@@ -120,12 +124,13 @@ export default function AdminDashboard() {
       try {
         setLoading(true);
         // 并行请求三个接口
-        const [distributionRes, userCountRes, loginCountRes, sevenDayLoginCountRes, courseTableTaskEnabledRes] = await Promise.all([
+        const [distributionRes, userCountRes, loginCountRes, sevenDayLoginCountRes, courseTableTaskEnabledRes, menuStateRes] = await Promise.all([
           authFetch(API_PATHS.GET_USER_DISTRIBUTION),
           authFetch(API_PATHS.GET_USER_COUNT),
           authFetch(API_PATHS.GET_TODAY_LOGIN_COUNT),
           authFetch(API_PATHS.GET_SEVEN_DAY_LOGIN_COUNT),
-          authFetch(API_PATHS.GET_COURSE_TABLE_TASK_ENABLED)
+          authFetch(API_PATHS.GET_COURSE_TABLE_TASK_ENABLED),
+          authFetch(API_PATHS.GET_WECHAT_MENU_STATE)
         ]);
 
         // 解析响应数据
@@ -134,6 +139,7 @@ export default function AdminDashboard() {
         const loginCountData = await loginCountRes.json();
         const sevenDayLoginCountData = await sevenDayLoginCountRes.json();
         const courseTableTaskEnabledData = await courseTableTaskEnabledRes.json();
+        const menuStateData = await menuStateRes.json();
 
         // 处理数据
         if (distributionData.code === 1) {
@@ -165,6 +171,10 @@ export default function AdminDashboard() {
         } else {
           message.error('获取课表定时任务状态失败');
         }
+
+        if (menuStateData.code === 1) {
+          setWechatMenuState(menuStateData.data || '开学');
+        }
       } catch (error) {
         console.error('获取统计数据失败:', error);
         message.error('网络错误，无法获取数据');
@@ -174,6 +184,7 @@ export default function AdminDashboard() {
     };
 
     fetchAllData();
+    fetchMenuUrls();
   }, []);
 
   const handleOpenModal = async (dateType = '1') => {
@@ -349,40 +360,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleOpenWechatMenuModal = () => {
-    setWechatMenuModalVisible(true);
-  };
-
-  const handleWechatMenuCancel = () => {
-    setWechatMenuModalVisible(false);
-    setSelectedMenu('');
-  };
-
-  const handleWechatMenuSubmit = async () => {
-    if (!selectedMenu) {
-      message.error('请选择菜单类型');
-      return;
-    }
-
-    try {
-      const response = await authFetch(`${API_PATHS.UPDATE_WECHAT_MENU}?type=${selectedMenu}`, {
-        method: 'PUT',
-      });
-
-      const result = await response.json();
-      if (response.ok && result.code === 1) {
-        message.success('微信公众号菜单更新成功');
-        setWechatMenuModalVisible(false);
-        setSelectedMenu('');
-      } else {
-        message.error(result.msg || '更新微信公众号菜单失败');
-      }
-    } catch (error) {
-      console.error('更新微信公众号菜单失败:', error);
-      message.error('网络错误，无法更新微信公众号菜单');
-    }
-  };
-
   const handleLogout = () => {
     localStorage.removeItem('Authorization');
     window.location.href = '/admin/login';
@@ -483,175 +460,198 @@ export default function AdminDashboard() {
 
           {/* 操作面板区域 */}
           <div className="action-section">
-            <Card className="action-panel" title="系统操作">
-              <div className="action-list">
-                {/* 修改开学日期 */}
-                <div className="action-item">
-                  <div className="action-icon action-icon-blue">
-                    <CalendarOutlined />
-                  </div>
-                  <div className="action-info">
-                    <span className="action-title">修改开学日期</span>
-                    <span className="action-desc">设置新学期开学时间</span>
-                  </div>
-                  <div className="action-control">
-                    <Button type="primary" onClick={() => handleOpenModal(termDateType)} size="small">
-                      去设置
-                    </Button>
-                  </div>
-                </div>
-
-                {/* 更新专业信息 */}
-                <div className="action-item">
-                  <div className="action-icon action-icon-green">
-                    <SyncOutlined />
-                  </div>
-                  <div className="action-info">
-                    <span className="action-title">更新专业信息</span>
-                    <span className="action-desc">同步最新专业数据</span>
-                  </div>
-                  <div className="action-control">
-                    <Button type="primary" onClick={handleUpdateMajorInfoWithConfirm} size="small">
-                      立即更新
-                    </Button>
-                  </div>
-                </div>
-
-                {/* 更新班级信息 */}
-                <div className="action-item">
-                  <div className="action-icon action-icon-cyan">
-                    <TeamOutlined />
-                  </div>
-                  <div className="action-info">
-                    <span className="action-title">更新班级信息</span>
-                    <span className="action-desc">同步最新班级数据</span>
-                  </div>
-                  <div className="action-control">
-                    <Button type="primary" onClick={handleUpdateClasses} loading={updateClassesLoading} size="small">
-                      立即更新
-                    </Button>
-                  </div>
-                </div>
-
-                {/* 更新所有课程表 */}
-                <div className="action-item">
-                  <div className="action-icon action-icon-geekblue">
-                    <CalendarOutlined />
-                  </div>
-                  <div className="action-info">
-                    <span className="action-title">更新所有课程表</span>
-                    <span className="action-desc">刷新全部课程表数据</span>
-                  </div>
-                  <div className="action-control">
-                    <Button type="primary" onClick={handleUpdateCourseTable} loading={updateCourseTableLoading} size="small">
-                      立即更新
-                    </Button>
-                  </div>
-                </div>
-
-                {/* 课表定时任务开关 */}
-                <div className="action-item">
-                  <div className="action-icon action-icon-orange">
-                    <SyncOutlined />
-                  </div>
-                  <div className="action-info">
-                    <span className="action-title">课表定时任务</span>
-                    <span className="action-desc">每小时自动更新课表数据</span>
-                  </div>
-                  <div className="action-control">
-                    <Switch
-                      checked={courseTableTaskEnabled}
-                      onChange={handleCourseTableTaskToggle}
-                      loading={courseTableTaskSwitchLoading}
-                      checkedChildren="启用"
-                      unCheckedChildren="关闭"
-                    />
-                  </div>
-                </div>
-
-                {/* 更新空教室 */}
-                <div className="action-item" style={{ flexWrap: 'wrap' }}>
-                  <div className="action-icon action-icon-purple">
-                    <HomeOutlined />
-                  </div>
-                  <div className="action-info">
-                    <span className="action-title">更新空教室</span>
-                    <span className="action-desc">按周次刷新空教室信息</span>
-                  </div>
-                  <div className="action-control">
-                    <div className="week-input-group">
-                      <Input
-                        type="number"
-                        placeholder="第几周"
-                        value={updateWeek}
-                        onChange={(e) => setUpdateWeek(e.target.value)}
-                        min="1"
-                        size="small"
-                      />
-                      <Button
-                        type="primary"
-                        onClick={handleUpdateEmptyClassroom}
-                        loading={updateWeekLoading}
-                        size="small"
-                      >
-                        更新
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 切换微信公众号菜单 */}
-                <div className="action-item">
-                  <div className="action-icon action-icon-orange">
-                    <WechatOutlined />
-                  </div>
-                  <div className="action-info">
-                    <span className="action-title">切换微信公众号菜单</span>
-                    <span className="action-desc">管理公众号底部菜单</span>
-                  </div>
-                  <div className="action-control">
-                    <Button type="primary" onClick={handleOpenWechatMenuModal} size="small">
-                      去切换
-                    </Button>
-                  </div>
-                </div>
-
-                {/* 微信素材上传（校历/红旗地图/裕华地图） */}
-                {mediaUploadTypes.map(({ type, title, desc, iconColor }) => (
-                  <div className="action-item" key={type} style={{ flexWrap: 'wrap' }}>
-                    <div className={`action-icon action-icon-${iconColor}`}>
-                      <PictureOutlined />
-                    </div>
-                    <div className="action-info">
-                      <span className="action-title">{title}</span>
-                      <span className="action-desc">{desc}</span>
-                    </div>
-                    <div className="action-control">
-                      <div className="calender-upload-group">
-                        {uploadStates[type].preview && (
-                          <img src={uploadStates[type].preview} alt="预览" className="calender-preview" />
-                        )}
-                        <input
-                          ref={uploadRefs[type]}
-                          type="file"
-                          accept="image/jpeg,image/jpg,image/png"
-                          onChange={(e) => handleMediaUpload(type, e)}
-                          style={{ display: 'none' }}
-                        />
-                        <Button
-                          type="primary"
-                          onClick={() => triggerMediaUpload(type)}
-                          loading={uploadStates[type].uploading}
-                          size="small"
-                        >
-                          {uploadStates[type].preview ? '重新上传' : '选择图片'}
+            <Row gutter={[16, 16]}>
+              {/* 📅 学期管理 */}
+              <Col xs={24} lg={12}>
+                <Card className="action-panel" title={<span><CalendarOutlined style={{ marginRight: 8 }} />学期管理</span>}>
+                  <div className="action-list">
+                    <div className="action-item">
+                      <div className="action-icon action-icon-blue">
+                        <CalendarOutlined />
+                      </div>
+                      <div className="action-info">
+                        <span className="action-title">修改开学日期</span>
+                        <span className="action-desc">设置新学期开学时间</span>
+                      </div>
+                      <div className="action-control">
+                        <Button type="primary" onClick={() => handleOpenModal(termDateType)} size="small">
+                          去设置
                         </Button>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </Card>
+                </Card>
+              </Col>
+
+              {/* 📚 教务数据 */}
+              <Col xs={24} lg={12}>
+                <Card className="action-panel" title={<span><BookOutlined style={{ marginRight: 8 }} />教务数据</span>}>
+                  <div className="action-list">
+                    <div className="action-item">
+                      <div className="action-icon action-icon-green">
+                        <SyncOutlined />
+                      </div>
+                      <div className="action-info">
+                        <span className="action-title">更新专业信息</span>
+                        <span className="action-desc">同步最新专业数据</span>
+                      </div>
+                      <div className="action-control">
+                        <Button type="primary" onClick={handleUpdateMajorInfoWithConfirm} size="small">
+                          立即更新
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="action-item">
+                      <div className="action-icon action-icon-cyan">
+                        <TeamOutlined />
+                      </div>
+                      <div className="action-info">
+                        <span className="action-title">更新班级信息</span>
+                        <span className="action-desc">同步最新班级数据</span>
+                      </div>
+                      <div className="action-control">
+                        <Button type="primary" onClick={handleUpdateClasses} loading={updateClassesLoading} size="small">
+                          立即更新
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="action-item">
+                      <div className="action-icon action-icon-geekblue">
+                        <CalendarOutlined />
+                      </div>
+                      <div className="action-info">
+                        <span className="action-title">更新新学期课程表</span>
+                        <span className="action-desc">刷新全部课程表数据</span>
+                      </div>
+                      <div className="action-control">
+                        <Button type="primary" onClick={handleUpdateCourseTable} loading={updateCourseTableLoading} size="small">
+                          立即更新
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="action-item">
+                      <div className="action-icon action-icon-orange">
+                        <SyncOutlined />
+                      </div>
+                      <div className="action-info">
+                        <span className="action-title">新学期课表课表定时任务</span>
+                        <span className="action-desc">每小时自动更新课表数据</span>
+                      </div>
+                      <div className="action-control">
+                        <Switch
+                          checked={courseTableTaskEnabled}
+                          onChange={handleCourseTableTaskToggle}
+                          loading={courseTableTaskSwitchLoading}
+                          checkedChildren="启用"
+                          unCheckedChildren="关闭"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+
+              {/* 🏫 教室管理 */}
+              <Col xs={24} lg={12}>
+                <Card className="action-panel" title={<span><HomeOutlined style={{ marginRight: 8 }} />教室管理</span>}>
+                  <div className="action-list">
+                    <div className="action-item" style={{ flexWrap: 'wrap' }}>
+                      <div className="action-icon action-icon-purple">
+                        <HomeOutlined />
+                      </div>
+                      <div className="action-info">
+                        <span className="action-title">更新空教室</span>
+                        <span className="action-desc">按周次刷新空教室信息</span>
+                      </div>
+                      <div className="action-control">
+                        <div className="week-input-group">
+                          <Input
+                            type="number"
+                            placeholder="第几周"
+                            value={updateWeek}
+                            onChange={(e) => setUpdateWeek(e.target.value)}
+                            min="1"
+                            size="small"
+                          />
+                          <Button
+                            type="primary"
+                            onClick={handleUpdateEmptyClassroom}
+                            loading={updateWeekLoading}
+                            size="small"
+                          >
+                            更新
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+
+              {/* 💬 微信管理 */}
+              <Col xs={24} lg={12}>
+                <Card className="action-panel" title={<span><WechatOutlined style={{ marginRight: 8 }} />微信管理</span>}>
+                  <div className="action-list">
+                    {/* 菜单状态切换 */}
+                    <div className="action-item">
+                      <div className="action-icon action-icon-orange">
+                        <WechatOutlined />
+                      </div>
+                      <div className="action-info">
+                        <span className="action-title">当前菜单状态</span>
+                        <span className="action-desc">切换后自动推送至微信</span>
+                      </div>
+                      <div className="action-control">
+                        <Select
+                          value={wechatMenuState}
+                          onChange={handleMenuStateChange}
+                          loading={menuStateLoading}
+                          size="small"
+                          style={{ width: 100 }}
+                        >
+                          <Select.Option value="开学">开学</Select.Option>
+                          <Select.Option value="假期">假期</Select.Option>
+                          <Select.Option value="迎新">迎新</Select.Option>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* 菜单链接配置 */}
+                    {menuUrlTypes.map(({ type, title, desc }) => (
+                      <div className="action-item" key={type}>
+                        <div className="action-icon action-icon-blue">
+                          <LinkOutlined />
+                        </div>
+                        <div className="action-info" style={{ flex: 1 }}>
+                          <span className="action-title">{title}</span>
+                          <span className="action-desc">{desc}</span>
+                          <Input
+                            size="small"
+                            placeholder="请输入链接 URL"
+                            value={menuUrls[type]}
+                            onChange={(e) => setMenuUrls(prev => ({ ...prev, [type]: e.target.value }))}
+                            style={{ marginTop: 4 }}
+                          />
+                        </div>
+                        <div className="action-control">
+                          <Button
+                            type="primary"
+                            onClick={() => handleMenuUrlUpdate(type)}
+                            loading={menuUrlSaving[type]}
+                            size="small"
+                          >
+                            保存
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </Col>
+            </Row>
           </div>
 
           {/* 用户分布表格 */}
@@ -725,34 +725,6 @@ export default function AdminDashboard() {
                 rules={[{ required: true, message: '请输入备注' }]}
               >
                 <Input.TextArea rows={4} placeholder="请输入备注信息" />
-              </Form.Item>
-            </Form>
-          </Modal>
-          <Modal
-            title="切换微信公众号菜单"
-            visible={wechatMenuModalVisible}
-            onCancel={handleWechatMenuCancel}
-            footer={[
-              <Button key="cancel" onClick={handleWechatMenuCancel}>取消</Button>,
-              <Button key="submit" type="primary" onClick={handleWechatMenuSubmit}>
-                确定
-              </Button>
-            ]}
-          >
-            <Form layout="vertical">
-              <Form.Item
-                label="请选择菜单类型"
-                rules={[{ required: true, message: '请选择菜单类型' }]}
-              >
-                <Select
-                  placeholder="请选择菜单类型"
-                  value={selectedMenu}
-                  onChange={(value) => setSelectedMenu(value)}
-                >
-                  <Select.Option value="开学">开学</Select.Option>
-                  <Select.Option value="假期">假期</Select.Option>
-                  <Select.Option value="迎新">迎新</Select.Option>
-                </Select>
               </Form.Item>
             </Form>
           </Modal>

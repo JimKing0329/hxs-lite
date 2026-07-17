@@ -16,7 +16,7 @@ wechat:
 
 hxs:
   base-url: http://82.156.49.70
-  course-url: http://82.156.49.70:18081
+  course-url: http://82.156.49.70/new-course-table
   admin:
     sid: 2023015529
     password: Wangxin050329.

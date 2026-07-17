@@ -6,10 +6,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-public class HsxfApplication {
+public class HxsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(HsxfApplication.class, args);
+        SpringApplication.run(HxsApplication.class, args);
     }
 
 }

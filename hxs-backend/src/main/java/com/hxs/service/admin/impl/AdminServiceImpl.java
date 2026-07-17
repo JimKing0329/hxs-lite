@@ -104,9 +104,9 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void updateMenu(String type) {
-        log.info("管理员更新微信菜单 type={}", type);
-        wechatClient.updateMenu(type);
-        log.info("微信菜单更新完成 type={}", type);
+    public void updateMenu() {
+        log.info("管理员更新微信菜单");
+        wechatClient.updateMenu();
+        log.info("微信菜单更新完成");
     }
 }

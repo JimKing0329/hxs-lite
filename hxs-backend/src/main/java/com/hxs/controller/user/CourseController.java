@@ -1,6 +1,6 @@
 package com.hxs.controller.user;
 
-import com.hxs.component.DateManager;
+import com.hxs.component.SystemDate;
 import com.hxs.context.UserContext;
 import com.hxs.model.vo.CourseVO;
 import com.hxs.model.vo.WeekCourseVO;
@@ -42,13 +42,13 @@ public class CourseController {
 
     private final CourseService courseService;
     @Resource(name = "courseTableDate")
-    private DateManager termDateManager;
+    private SystemDate termSystemDate;
 
     /** 今日课表 */
     @GetMapping("/today")
     public Result<List<CourseVO>> getTodayCourse() {
         LocalDate now = LocalDate.now();
-        LocalDate termStartDate = termDateManager.getTermStartDate();
+        LocalDate termStartDate = termSystemDate.getTermStartDate();
         int weekday = now.getDayOfWeek().getValue();
         now = now.minusDays(weekday - 1);
         long weeks = ChronoUnit.WEEKS.between(termStartDate, now) + 1;
@@ -61,7 +61,7 @@ public class CourseController {
     @GetMapping("/tomorrow")
     public Result<List<CourseVO>> getTomorrowCourse() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        LocalDate termStartDate = termDateManager.getTermStartDate();
+        LocalDate termStartDate = termSystemDate.getTermStartDate();
         int weekday = tomorrow.getDayOfWeek().getValue();
         tomorrow = tomorrow.minusDays(weekday - 1);
         long weeks = ChronoUnit.WEEKS.between(termStartDate, tomorrow) + 1;
@@ -74,7 +74,7 @@ public class CourseController {
     @GetMapping("/week")
     public Result<WeekCourseVO> getWeekCourse(@RequestParam("week") long week) {
         LocalDate now = LocalDate.now();
-        LocalDate termStartDate = termDateManager.getTermStartDate();
+        LocalDate termStartDate = termSystemDate.getTermStartDate();
         long currentWeek = ChronoUnit.WEEKS.between(termStartDate, now) + 1;
         week = week > 0 ? week : currentWeek;
         if (week <= 0) {

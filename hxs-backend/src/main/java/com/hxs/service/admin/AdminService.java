@@ -45,8 +45,7 @@ public interface AdminService {
     Integer updateMajorInfo();
 
     /**
-     * 更新微信公众号菜单
-     * @param type 菜单类型（开学/假期/迎新）
+     * 更新微信公众号菜单（从数据库读取菜单状态）
      */
-    void updateMenu(String type);
+    void updateMenu();
 }

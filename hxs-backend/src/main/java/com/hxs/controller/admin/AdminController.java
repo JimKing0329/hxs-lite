@@ -1,13 +1,12 @@
 package com.hxs.controller.admin;
 
-import com.hxs.component.DateManager;
+import com.hxs.component.SystemDate;
 import com.hxs.constant.JwtClaimsConstant;
 import com.hxs.mapper.SystemConfigMapper;
 import com.hxs.mapper.SystemDateMapper;
 import com.hxs.model.dto.TermStartDateUpdateDTO;
 import com.hxs.model.dto.UserLoginDTO;
 import com.hxs.model.entity.SystemConfig;
-import com.hxs.model.entity.SystemDate;
 import com.hxs.model.entity.User;
 import com.hxs.model.vo.UserDistributionVO;
 import com.hxs.model.vo.UserLoginVO;
@@ -21,9 +20,7 @@ import com.hxs.utils.WechatClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +67,7 @@ public class AdminController {
     private final JwtProperties jwtProperties;
     private final SystemDateMapper systemDateMapper;
     private final SystemConfigMapper systemConfigMapper;
-    private final DateManager termDateManager;
+    private final SystemDate termSystemDate;
     private final EmptyClassroomService emptyClassroomService;
     private final ConfigFactory configFactory;
     private final WechatClient wechatClient;
@@ -124,12 +121,12 @@ public class AdminController {
 
         LocalDate date = LocalDate.parse(dto.getDate());
         // 更新内存中的 DateManager
-        termDateManager.setTermStartDate(date);
-        termDateManager.setYear(dto.getYear());
-        termDateManager.setTerm(dto.getTerm());
+        termSystemDate.setTermStartDate(date);
+        termSystemDate.setYear(dto.getYear());
+        termSystemDate.setTerm(dto.getTerm());
 
         // 同步更新数据库
-        systemDateMapper.updateById(SystemDate.builder()
+        systemDateMapper.updateById(com.hxs.model.entity.SystemDate.builder()
                 .id(dto.getId().intValue())
                 .termStartDate(date)
                 .remark(dto.getRemark())
@@ -142,7 +139,7 @@ public class AdminController {
 
     /** 查询学期日期 */
     @GetMapping("/term-date/{id}")
-    public Result<SystemDate> getTermDate(@PathVariable Long id) {
+    public Result<com.hxs.model.entity.SystemDate> getTermDate(@PathVariable Long id) {
         log.info("管理员查询学期日期 id={}", id);
         return Result.success(systemDateMapper.selectById(id));
     }
@@ -154,11 +151,11 @@ public class AdminController {
         return Result.success(adminService.updateMajorInfo());
     }
 
-    /** 更新微信菜单 */
+    /** 更新微信菜单（从数据库读取菜单状态） */
     @PutMapping("/menu")
-    public Result<Void> updateMenu(@RequestParam String type) {
-        log.info("管理员更新微信菜单 type={}", type);
-        adminService.updateMenu(type);
+    public Result<Void> updateMenu() {
+        log.info("管理员更新微信菜单");
+        adminService.updateMenu();
         return Result.success();
     }
 
@@ -170,74 +167,77 @@ public class AdminController {
         return Result.success();
     }
 
-    /** 微信图片素材类型 */
-    private static final Map<String, String> MEDIA_TYPE_KEY_MAP = Map.of(
-            "calender", "calender_media_id",
-            "map_hq", "school_map_hq_media_id",
-            "map_yh", "school_map_yh_media_id"
+    /** 微信菜单 URL 配置键映射 */
+    private static final Map<String, String> MENU_URL_KEY_MAP = Map.of(
+            "calender", "wechat_menu_calender_url",
+            "map_hq", "wechat_menu_map_hq_url",
+            "map_yh", "wechat_menu_map_yh_url"
     );
 
-    /** 获取微信素材 mediaId */
-    @GetMapping("/config/media-id")
-    public Result<String> getMediaId(@RequestParam String type) {
-        String configKey = MEDIA_TYPE_KEY_MAP.get(type);
+    /** 获取微信菜单 URL */
+    @GetMapping("/config/menu-url")
+    public Result<String> getMenuUrl(@RequestParam String type) {
+        String configKey = MENU_URL_KEY_MAP.get(type);
         if (configKey == null) {
             return Result.error("不支持的类型: " + type);
         }
-        log.info("管理员获取素材 mediaId type={}", type);
+        log.info("管理员获取菜单 URL type={}", type);
         return Result.success(configFactory.get(configKey));
     }
 
-    /** 上传微信图片素材（校历/地图），后端上传到微信并更新 mediaId */
-    @PostMapping("/config/media-id")
-    public Result<String> uploadMediaId(@RequestParam String type, @RequestParam("file") MultipartFile file) {
-        String configKey = MEDIA_TYPE_KEY_MAP.get(type);
+    /** 更新微信菜单 URL */
+    @PutMapping("/config/menu-url")
+    public Result<Void> updateMenuUrl(@RequestParam String type, @RequestParam String url) {
+        String configKey = MENU_URL_KEY_MAP.get(type);
         if (configKey == null) {
             return Result.error("不支持的类型: " + type);
         }
-        log.info("管理员上传素材 type={}, name={}, size={}", type, file.getOriginalFilename(), file.getSize());
+        log.info("管理员更新菜单 URL type={} url={}", type, url);
 
-        // 校验文件
-        if (file.isEmpty()) {
-            return Result.error("文件不能为空");
+        SystemConfig existing = systemConfigMapper.selectById(configKey);
+        if (existing != null) {
+            existing.setConfigValue(url);
+            systemConfigMapper.updateById(existing);
+        } else {
+            SystemConfig config = new SystemConfig();
+            config.setConfigKey(configKey);
+            config.setConfigValue(url);
+            config.setRemark("微信菜单链接");
+            systemConfigMapper.insert(config);
         }
-        String originalName = file.getOriginalFilename();
-        if (originalName == null || (!originalName.endsWith(".jpg") && !originalName.endsWith(".png")
-                && !originalName.endsWith(".jpeg"))) {
-            return Result.error("仅支持 jpg/png/jpeg 格式的图片");
+        configFactory.refresh();
+        adminService.updateMenu(); // 更新菜单
+        return Result.success();
+    }
+
+    /** 获取当前微信菜单状态 */
+    @GetMapping("/config/wechat-menu-state")
+    public Result<String> getWechatMenuState() {
+        String state = configFactory.get("wechat_menu_state");
+        log.info("管理员查询微信菜单状态 state={}", state);
+        return Result.success(state != null ? state : "开学");
+    }
+
+    /** 更新微信菜单状态并推送菜单 */
+    @PutMapping("/config/wechat-menu-state")
+    public Result<Void> updateWechatMenuState(@RequestParam String state) {
+        log.info("管理员更新微信菜单状态 state={}", state);
+
+        SystemConfig existing = systemConfigMapper.selectById("wechat_menu_state");
+        if (existing != null) {
+            existing.setConfigValue(state);
+            systemConfigMapper.updateById(existing);
+        } else {
+            SystemConfig config = new SystemConfig();
+            config.setConfigKey("wechat_menu_state");
+            config.setConfigValue(state);
+            config.setRemark("当前微信菜单状态");
+            systemConfigMapper.insert(config);
         }
-        if (file.getSize() > 10 * 1024 * 1024) {
-            return Result.error("图片大小不能超过 10MB（微信临时素材限制）");
-        }
+        configFactory.refresh();
 
-        try {
-            // 上传到微信
-            String mediaId = wechatClient.uploadMedia(file.getBytes(), originalName);
-
-            // 更新数据库（存在则更新，不存在则插入）
-            SystemConfig existing = systemConfigMapper.selectById(configKey);
-            if (existing != null) {
-                existing.setConfigValue(mediaId);
-                systemConfigMapper.updateById(existing);
-            } else {
-                SystemConfig config = new SystemConfig();
-                config.setConfigKey(configKey);
-                config.setConfigValue(mediaId);
-                config.setRemark("微信公众号素材 mediaId");
-                systemConfigMapper.insert(config);
-            }
-
-            // 刷新内存缓存
-            configFactory.refresh();
-
-            log.info("素材 mediaId 更新成功 type={}, mediaId={}", type, mediaId);
-            return Result.success(mediaId);
-        } catch (IOException e) {
-            log.error("读取上传文件失败", e);
-            return Result.error("读取文件失败");
-        } catch (RuntimeException e) {
-            log.error("上传微信素材失败", e);
-            return Result.error(e.getMessage());
-        }
+        // 推送菜单到微信
+        adminService.updateMenu();
+        return Result.success();
     }
 }

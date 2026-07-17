@@ -6,9 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -30,6 +28,7 @@ public class WechatClient {
     private String appSecret;
     private String baseUrl;
     private String courseUrl;
+    private ConfigFactory configFactory;
 
     /** 缓存的 access_token + 过期时间 */
     private volatile String cachedToken;
@@ -54,6 +53,11 @@ public class WechatClient {
     @Value("${hxs.course-url}")
     public void setCourseUrl(String courseUrl) {
         this.courseUrl = courseUrl;
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public void setConfigFactory(ConfigFactory configFactory) {
+        this.configFactory = configFactory;
     }
 
     /**
@@ -96,55 +100,20 @@ public class WechatClient {
     }
 
     /**
-     * 上传临时素材到微信服务器（图片）
-     * @param fileBytes 文件字节数组
-     * @param fileName  文件名（如 calendar.jpg）
-     * @return 微信返回的 media_id
+     * 更新微信公众号菜单 — 从数据库读取菜单状态和 URL 配置
      */
-    public String uploadMedia(byte[] fileBytes, String fileName) {
-        String accessToken = getAccessToken();
-        String url = String.format(
-                "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=image",
-                accessToken);
-
-        log.info("上传微信临时素材: fileName={}", fileName);
-
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPost httpPost = new HttpPost(url);
-
-            // 构造 multipart/form-data
-            org.apache.http.HttpEntity multipartEntity = MultipartEntityBuilder.create()
-                    .addBinaryBody("media", fileBytes, ContentType.APPLICATION_OCTET_STREAM, fileName)
-                    .build();
-            httpPost.setEntity(multipartEntity);
-
-            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
-                String body = EntityUtils.toString(response.getEntity());
-                JSONObject json = JSON.parseObject(body);
-                String mediaId = json.getString("media_id");
-                if (mediaId == null) {
-                    log.error("上传微信素材失败: {}", body);
-                    throw new RuntimeException("上传微信素材失败: " + json.getString("errmsg"));
-                }
-                log.info("微信素材上传成功, mediaId={}", mediaId);
-                return mediaId;
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("上传微信素材异常", e);
+    public void updateMenu() {
+        String type = configFactory.get("wechat_menu_state");
+        if (type == null) {
+            type = "开学";
         }
-    }
 
-    /**
-     * 更新微信公众号菜单
-     * @param type 菜单类型：开学 / 假期 / 迎新
-     */
-    public void updateMenu(String type) {
         String accessToken = getAccessToken();
         String url = String.format(
                 "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=%s", accessToken);
 
         String menuJson = buildMenuJson(type);
-        log.info("更新微信菜单 type={}", type);
+        log.info("更新微信菜单 state={}", type);
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(url);
@@ -160,6 +129,11 @@ public class WechatClient {
     }
 
     private String buildMenuJson(String type) {
+        // 从数据库读取菜单 URL 配置
+        String calenderUrl = configFactory.get("wechat_menu_calender_url");
+        String mapYhUrl = configFactory.get("wechat_menu_map_yh_url");
+        String mapHqUrl = configFactory.get("wechat_menu_map_hq_url");
+
         SubMenu menu1 = new SubMenu("教务工具");
         menu1.subButton = new ArrayList<>();
         menu1.subButton.add(new ViewButton("教务查询", baseUrl + "/dashboard"));
@@ -168,9 +142,9 @@ public class WechatClient {
 
         SubMenu menu2 = new SubMenu("校历/地图");
         menu2.subButton = new ArrayList<>();
-        menu2.subButton.add(new ClickButton("校历", "getCalender"));
-        menu2.subButton.add(new ClickButton("地图(裕华)", "getMapYH"));
-        menu2.subButton.add(new ClickButton("地图(红旗)", "getMapHQ"));
+        menu2.subButton.add(new ViewButton("校历", calenderUrl != null ? calenderUrl : ""));
+        menu2.subButton.add(new ViewButton("地图(裕华)", mapYhUrl != null ? mapYhUrl : ""));
+        menu2.subButton.add(new ViewButton("地图(红旗)", mapHqUrl != null ? mapHqUrl : ""));
 
 
         List<MenuItem> buttons = new ArrayList<>();
@@ -191,9 +165,10 @@ public class WechatClient {
             menu3.subButton.add(new ClickButton("更新成绩", "updateGrade"));
             buttons.add(menu3);
         } else if ("迎新".equals(type)) {
-            SubMenu menu3 = new SubMenu("新生查询");
+            SubMenu menu3 = new SubMenu("快捷查询");
             menu3.subButton = new ArrayList<>();
             menu3.subButton.add(new ViewButton("新学期课表", courseUrl));
+            menu3.subButton.add(new ClickButton("更新成绩", "queryGrade"));
             buttons.add(menu3);
         }
 

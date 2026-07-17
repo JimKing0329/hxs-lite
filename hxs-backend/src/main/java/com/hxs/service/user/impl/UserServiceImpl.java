@@ -2,7 +2,7 @@ package com.hxs.service.user.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hxs.client.*;
-import com.hxs.component.DateManager;
+import com.hxs.component.SystemDate;
 import com.hxs.constant.MessageConstant;
 import com.hxs.context.UserContext;
 import com.hxs.exception.MessageEmptyException;
@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
     private final EduSessionManager sessionManager;
     private final UserMapper userMapper;
     private final ExecuteCourseMapper executeCourseMapper;
-    private final DateManager termDateManager;
+    private final SystemDate termSystemDate;
 
     @Override
     public User login(UserLoginDTO dto) {
@@ -98,8 +98,8 @@ public class UserServiceImpl implements UserService {
         ExecutePlanVO vo = new ExecutePlanVO();
 //        vo.setYear(2025);
 //        vo.setTerm(1);
-        vo.setYear(termDateManager.getYear());
-        vo.setTerm(termDateManager.getTerm());
+        vo.setYear(termSystemDate.getYear());
+        vo.setTerm(termSystemDate.getTerm());
 
         String majorCode = userMapper.queryMajorCodeByMajorId(UserContext.getCurrentId().toString());
         if (majorCode == null) {

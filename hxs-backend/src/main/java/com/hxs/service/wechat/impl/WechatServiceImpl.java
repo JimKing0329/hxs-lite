@@ -3,7 +3,7 @@ package com.hxs.service.wechat.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hxs.client.EduLoginClient;
 import com.hxs.client.EduSession;
-import com.hxs.component.DateManager;
+import com.hxs.component.SystemDate;
 import com.hxs.constant.CampusConstant;
 import com.hxs.constant.WechatMessageConstant;
 import com.hxs.mapper.ScoreMapper;
@@ -19,7 +19,6 @@ import com.hxs.service.user.ScoreService;
 import com.hxs.service.wechat.WechatService;
 import com.hxs.utils.AesUtil;
 import com.hxs.utils.ArticleFactory;
-import com.hxs.utils.ConfigFactory;
 import com.thoughtworks.xstream.XStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,9 +45,8 @@ public class WechatServiceImpl implements WechatService {
     private final ScoreMapper scoreMapper;
     private final ScoreService scoreService;
     private final EmptyClassroomService emptyClassroomService;
-    private final DateManager dateManager;
+    private final SystemDate systemDate;
     private final ArticleFactory articleFactory;
-    private final ConfigFactory configFactory;
 
     private String baseUrl;
 
@@ -100,29 +98,14 @@ public class WechatServiceImpl implements WechatService {
     private String handleClickEvent(Map<String, String> messageMap) {
         String eventKey = messageMap.get("EventKey");
         log.info("处理微信点击事件 eventKey={}", eventKey);
-        switch (eventKey) {
-            case "getCalender":
-                String mediaId = configFactory.get("calender_media_id");
-                return imageReply(messageMap, mediaId != null ? mediaId : "");
-            case "getMapYH":
-                String yhMediaId = configFactory.get("school_map_yh_media_id");
-                return imageReply(messageMap, yhMediaId != null ? yhMediaId : "");
-            case "getMapHQ":
-                String hqMediaId = configFactory.get("school_map_hq_media_id");
-                return imageReply(messageMap, hqMediaId != null ? hqMediaId : "");
-            case "queryCourseTable":
-                return sendCourseTable(messageMap);
-            case "queryGrade":
-                return sendScores(messageMap);
-            case "queryEmptyClassroomYH":
-                return sendEmptyClassroom(messageMap, CampusConstant.YUHUA);
-            case "queryEmptyClassroomHQ":
-                return sendEmptyClassroom(messageMap, CampusConstant.HONGQI);
-            case "updateGrade":
-                return updateAndSendGrade(messageMap);
-            default:
-                return textReply(messageMap, "hello world");
-        }
+        return switch (eventKey) {
+            case "queryCourseTable" -> sendCourseTable(messageMap);
+            case "queryGrade" -> sendScores(messageMap);
+            case "queryEmptyClassroomYH" -> sendEmptyClassroom(messageMap, CampusConstant.YUHUA);
+            case "queryEmptyClassroomHQ" -> sendEmptyClassroom(messageMap, CampusConstant.HONGQI);
+            case "updateGrade" -> updateAndSendGrade(messageMap);
+            default -> textReply(messageMap, "hello world");
+        };
     }
 
     // ────────────── 绑定 ──────────────
@@ -173,7 +156,7 @@ public class WechatServiceImpl implements WechatService {
         log.info("微信查询课表 sid={}", user.getSid());
 
         LocalDate now = LocalDate.now();
-        LocalDate termStartDate = dateManager.getTermStartDate();
+        LocalDate termStartDate = systemDate.getTermStartDate();
 
         // 今日课表
         long week = weekOf(now, termStartDate);
@@ -227,8 +210,8 @@ public class WechatServiceImpl implements WechatService {
         }
         log.info("微信查询成绩 sid={}", user.getSid());
 
-        int year = dateManager.getYear();
-        int term = dateManager.getTerm();
+        int year = systemDate.getYear();
+        int term = systemDate.getTerm();
 
         List<Score> scores = scoreMapper.selectList(
                 new QueryWrapper<Score>().eq("sid", user.getSid())
@@ -275,7 +258,7 @@ public class WechatServiceImpl implements WechatService {
     private String sendEmptyClassroom(Map<String, String> messageMap, String campus) {
         log.info("微信查询空教室 campus={}", campus);
         LocalDate now = LocalDate.now();
-        int week = (int) ChronoUnit.WEEKS.between(dateManager.getTermStartDate(), now) + 1;
+        int week = (int) ChronoUnit.WEEKS.between(systemDate.getTermStartDate(), now) + 1;
         int weekday = now.getDayOfWeek().getValue();
 
         List<EmptyClassroomVO> classrooms = emptyClassroomService
@@ -319,22 +302,6 @@ public class WechatServiceImpl implements WechatService {
         XStream xStream = new XStream();
         xStream.processAnnotations(WechatMessage.class);
         return xStream.toXML(reply);
-    }
-
-    /** 图片回复 */
-    public String imageReply(Map<String, String> messageMap, String mediaId) {
-        return String.format(
-                "<xml>\n" +
-                "  <ToUserName><![CDATA[%s]]></ToUserName>\n" +
-                "  <FromUserName><![CDATA[%s]]></FromUserName>\n" +
-                "  <CreateTime>%s</CreateTime>\n" +
-                "  <MsgType><![CDATA[image]]></MsgType>\n" +
-                "  <Image>\n" +
-                "    <MediaId><![CDATA[%s]]></MediaId>\n" +
-                "  </Image>\n" +
-                "</xml>",
-                messageMap.get("FromUserName"), messageMap.get("ToUserName"),
-                System.currentTimeMillis() / 1000, mediaId);
     }
 
     /** 计算教学周（从第一周开始） */

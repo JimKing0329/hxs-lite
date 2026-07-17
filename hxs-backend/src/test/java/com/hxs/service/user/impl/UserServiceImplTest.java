@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hxs.client.EduClient;
 import com.hxs.client.EduSession;
 import com.hxs.client.EduSessionManager;
-import com.hxs.component.DateManager;
+import com.hxs.component.SystemDate;
 import com.hxs.context.UserContext;
 import com.hxs.mapper.ExecuteCourseMapper;
 import com.hxs.mapper.UserMapper;
@@ -27,7 +27,7 @@ class UserServiceImplTest {
 
     private UserMapper userMapper;
     private ExecuteCourseMapper executeCourseMapper;
-    private DateManager termDateManager;
+    private SystemDate termSystemDate;
     private EduClient eduClient;
     private EduSessionManager sessionManager;
     private UserServiceImpl userService;
@@ -36,10 +36,10 @@ class UserServiceImplTest {
     void setUp() {
         userMapper = mock(UserMapper.class);
         executeCourseMapper = mock(ExecuteCourseMapper.class);
-        termDateManager = mock(DateManager.class);
+        termSystemDate = mock(SystemDate.class);
         eduClient = mock(EduClient.class);
         sessionManager = mock(EduSessionManager.class);
-        userService = new UserServiceImpl(eduClient, sessionManager, userMapper, executeCourseMapper, termDateManager);
+        userService = new UserServiceImpl(eduClient, sessionManager, userMapper, executeCourseMapper, termSystemDate);
     }
 
     @AfterEach
@@ -145,8 +145,8 @@ class UserServiceImplTest {
         @DisplayName("缓存已存在时直接返回")
         void shouldReturnFromCache() {
             UserContext.setCurrentId(2023015529L);
-            when(termDateManager.getYear()).thenReturn(2024);
-            when(termDateManager.getTerm()).thenReturn(3);
+            when(termSystemDate.getYear()).thenReturn(2024);
+            when(termSystemDate.getTerm()).thenReturn(3);
             when(userMapper.queryMajorCodeByMajorId("2023015529")).thenReturn("080901");
 
             ExecuteCourse item = new ExecuteCourse();

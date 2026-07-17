@@ -1,6 +1,6 @@
 package com.hxs.crontask;
 
-import com.hxs.component.DateManager;
+import com.hxs.component.SystemDate;
 import com.hxs.service.user.EmptyClassroomService;
 import com.hxs.task.EmptyClassroomTask;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ public class TaskTest {
     private EmptyClassroomService emptyClassroomService;
 
     @Mock
-    private DateManager dateManager;
+    private SystemDate systemDate;
 
     @InjectMocks
     private EmptyClassroomTask emptyClassroomTask;
@@ -33,7 +33,7 @@ public class TaskTest {
     void testUpdateEmptyClassroom() {
         // Arrange: term started 3 weeks ago → week should be 3 + 2 = 5
         LocalDate termStart = LocalDate.now().minusWeeks(3);
-        when(dateManager.getTermStartDate()).thenReturn(termStart);
+        when(systemDate.getTermStartDate()).thenReturn(termStart);
 
         // Act
         emptyClassroomTask.updateEmptyClassroom();

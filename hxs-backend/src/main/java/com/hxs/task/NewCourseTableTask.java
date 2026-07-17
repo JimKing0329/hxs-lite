@@ -31,11 +31,7 @@ public class NewCourseTableTask {
     @PostConstruct
     public void init() {
         SystemConfig config = systemConfigMapper.selectById(CONFIG_KEY);
-        if (config != null && "true".equalsIgnoreCase(config.getConfigValue())) {
-            enabled = true;
-        } else {
-            enabled = false;
-        }
+        enabled = config != null && "true".equalsIgnoreCase(config.getConfigValue());
         log.info("课表定时任务初始化完成，enabled={}", enabled);
     }
 

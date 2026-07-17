@@ -3,7 +3,7 @@ package com.hxs.service.user.impl;
 import com.hxs.client.EduClassroomClient;
 import com.hxs.client.EduLoginClient;
 import com.hxs.client.EduSession;
-import com.hxs.component.DateManager;
+import com.hxs.component.SystemDate;
 import com.hxs.mapper.EmptyClassroomMapper;
 import com.hxs.model.entity.EmptyClassroom;
 import com.hxs.model.support.EmptyClassRoomItem;
@@ -24,7 +24,7 @@ import java.util.List;
 public class EmptyClassroomServiceImpl implements EmptyClassroomService {
 
     private final EmptyClassroomMapper emptyClassroomMapper;
-    private final DateManager termDateManager;
+    private final SystemDate termSystemDate;
     private final AdminProperties adminProperties;
 
     @Override
@@ -41,8 +41,8 @@ public class EmptyClassroomServiceImpl implements EmptyClassroomService {
     @Transactional
     public void updateEmptyClassRoom(Integer week) {
         long startTime = System.currentTimeMillis();
-        int year = termDateManager.getYear();
-        int term = termDateManager.getTerm();
+        int year = termSystemDate.getYear();
+        int term = termSystemDate.getTerm();
         int encodedTerm = term * term * 3;
         log.info("管理员更新空教室: {}学年第{}学期 第{}周", year, term, week);
 

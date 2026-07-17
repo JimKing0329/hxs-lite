@@ -1,8 +1,7 @@
 package com.hxs.config;
 
-import com.hxs.component.DateManager;
+import com.hxs.component.SystemDate;
 import com.hxs.mapper.SystemDateMapper;
-import com.hxs.model.entity.SystemDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -27,9 +26,9 @@ public class DateFactory {
      */
     @Primary
     @Bean("termStartDate")
-    public DateManager termDateManager() {
-        SystemDate systemDate = systemDateMapper.selectById(1);
-        DateManager manager = new DateManager();
+    public SystemDate termDateManager() {
+        com.hxs.model.entity.SystemDate systemDate = systemDateMapper.selectById(1);
+        SystemDate manager = new SystemDate();
         if (systemDate != null) {
             BeanUtils.copyProperties(systemDate, manager);
             log.info("学期日期初始化成功: year={}, term={}, termStartDate={}",
@@ -41,9 +40,9 @@ public class DateFactory {
     }
 
     @Bean("courseTableDate")
-    public DateManager courseDate() {
-        SystemDate systemDate = systemDateMapper.selectById(2);
-        DateManager manager = new DateManager();
+    public SystemDate courseDate() {
+        com.hxs.model.entity.SystemDate systemDate = systemDateMapper.selectById(2);
+        SystemDate manager = new SystemDate();
         if (systemDate != null) {
             BeanUtils.copyProperties(systemDate, manager);
             log.info("课程表日期: year={}, term={}, termStartDate={}",
