@@ -62,6 +62,16 @@
     line-height: 40px !important;
 }
 
+/* 下拉选项文字不截断 */
+.new-course-select .ant-select-item-option-content {
+    white-space: nowrap;
+}
+
+/* 防止下拉框滚动穿透到背景页面 */
+.ant-select-dropdown {
+    overscroll-behavior: contain;
+}
+
 .new-course-query-btn {
     height: 44px;
     font-size: 16px;
@@ -88,7 +98,6 @@
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     font-size: 13px;
-    min-width: 600px;
     table-layout: fixed;
 }
 
@@ -116,9 +125,9 @@
 }
 
 .new-course-table .new-course-session-col {
-    width: 50px !important;
-    min-width: 50px !important;
-    max-width: 50px !important;
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
     background: #f5f7fa;
     font-weight: bold;
     color: #666;
@@ -299,8 +308,22 @@
     }
 
     .new-course-table {
-        min-width: 550px;
-        font-size: 12px;
+        font-size: 11px;
+    }
+
+    .new-course-table .new-course-session-col {
+        width: 32px !important;
+        min-width: 32px !important;
+        max-width: 32px !important;
+        font-size: 11px;
+    }
+
+    .new-course-session-idx {
+        font-size: 13px;
+    }
+
+    .new-course-session-time {
+        font-size: 9px;
     }
 
     .new-course-table td {
@@ -310,11 +333,12 @@
     }
 
     .new-course-block {
-        padding: 6px 2px;
+        padding: 4px 2px;
     }
 
     .new-course-title {
-        font-size: 12px;
+        font-size: 11px;
+        line-height: 1.2;
     }
 
     .new-course-week-selector-container {
@@ -342,7 +366,22 @@
     }
 
     .new-course-table {
-        font-size: 11px;
+        font-size: 10px;
+    }
+
+    .new-course-table .new-course-session-col {
+        width: 28px !important;
+        min-width: 28px !important;
+        max-width: 28px !important;
+        font-size: 10px;
+    }
+
+    .new-course-session-idx {
+        font-size: 12px;
+    }
+
+    .new-course-session-time {
+        font-size: 8px;
     }
 
     .new-course-table td {
@@ -351,8 +390,49 @@
         max-height: 70px;
     }
 
+    .new-course-block {
+        padding: 2px 1px;
+    }
+
     .new-course-title {
+        font-size: 10px;
+        line-height: 1.2;
+    }
+}
+
+/* 超小屏手机 */
+@media (max-width: 320px) {
+    .new-course-table {
+        font-size: 9px;
+    }
+
+    .new-course-table th {
+        padding: 6px 0;
+        font-size: 10px;
+    }
+
+    .new-course-table .new-course-session-col {
+        width: 24px !important;
+        min-width: 24px !important;
+        max-width: 24px !important;
+    }
+
+    .new-course-session-idx {
         font-size: 11px;
+    }
+
+    .new-course-session-time {
+        display: none;
+    }
+
+    .new-course-table td {
+        height: 60px;
+        min-height: 60px;
+        max-height: 60px;
+    }
+
+    .new-course-title {
+        font-size: 9px;
     }
 }
 

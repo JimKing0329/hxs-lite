@@ -94,7 +94,7 @@ export default function NewCourseTablePage() {
                 const response = await axios.get(API_PATHS.NEW_COURSE_TABLE.ALL_CLASS);
                 if (response.data.code === 1) {
                     setAllClasses(response.data.data);
-                    const uniqueGrades = [...new Set(response.data.data.map(item => item.grade))];
+                    const uniqueGrades = [...new Set(response.data.data.map(item => item.grade))].sort((a, b) => b - a);
                     setGrades(uniqueGrades);
                 } else {
                     message.error('获取班级数据失败');
@@ -385,8 +385,9 @@ export default function NewCourseTablePage() {
                             className="new-course-select"
                             size="middle"
                             disabled={!selectedMajor}
+                            dropdownMatchSelectWidth={false}
                         >
-                            {classes.map(c => <Option key={c.classId} value={c.classId}>{c.className}</Option>)}
+                            {classes.map(c => <Option key={c.classId} value={c.classId}>{c.className}{c.campusName ? `（${c.campusName}）` : ''}</Option>)}
                         </Select>
                     </div>
                 </div>
