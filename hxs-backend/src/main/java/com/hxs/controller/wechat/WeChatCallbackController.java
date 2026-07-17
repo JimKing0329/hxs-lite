@@ -36,6 +36,7 @@ public class WeChatCallbackController {
     /** 微信公众号接入验证 */
     @GetMapping("/callback")
     public String check(String signature, String timestamp, String nonce, String echostr) {
+        log.info("微信接入验证 signature={} timestamp={} nonce={}", signature, timestamp, nonce);
         return echostr;
     }
 

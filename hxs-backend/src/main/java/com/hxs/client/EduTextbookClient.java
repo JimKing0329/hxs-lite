@@ -62,7 +62,7 @@ public class EduTextbookClient {
                         .filter(item -> !StringUtil.isBlank(item.getCourseName())
                                 && !"无教材".equals(item.getBookName()))
                         .toList();
-                log.debug("获取教材成功 {} 条", books.size());
+                log.info("获取教材成功 {} 条", books.size());
                 return books;
             }
         } catch (URISyntaxException | IOException e) {

@@ -105,6 +105,7 @@ public class EduExamClient {
                 if (items.isEmpty()) {
                     throw new MessageEmptyException(MessageConstant.MESSAGE_EMPTY_ERROR);
                 }
+                log.info("获取考试安排成功 {} 条", items.size());
                 return items;
             }
         } catch (URISyntaxException | IOException e) {
@@ -143,6 +144,7 @@ public class EduExamClient {
                 scoreDetails.forEach(item ->
                         item.setScoreRatio(StringParseUtil.extractParenthesesContent(item.getScoreColumn()))
                 );
+                log.info("获取成绩详情成功 course={} {} 条", courseName, scoreDetails.size());
                 return new ScoreDetailVO(courseName, scoreDetails);
             }
         } catch (URISyntaxException | IOException e) {

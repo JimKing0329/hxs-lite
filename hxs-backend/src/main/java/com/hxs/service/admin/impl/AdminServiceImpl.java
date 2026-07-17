@@ -39,14 +39,17 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public User login(UserLoginDTO dto) {
+        log.info("管理员校验登录 empId={}", dto.getSid());
         User user = userMapper.selectOne(new QueryWrapper<User>()
                 .eq("sid", dto.getSid())
                 .eq("password", dto.getPassword()));
         if (user == null) {
+            log.warn("管理员登录失败，用户名或密码错误 empId={}", dto.getSid());
             throw new LoginFailException(MessageConstant.USERNAME_OR_PASSWORD_ERROR);
         }
         user.setLastLogin(LocalDateTime.now());
         userMapper.updateById(user);
+        log.info("管理员登录成功 empId={}", dto.getSid());
         return user;
     }
 
@@ -102,6 +105,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void updateMenu(String type) {
+        log.info("管理员更新微信菜单 type={}", type);
         wechatClient.updateMenu(type);
+        log.info("微信菜单更新完成 type={}", type);
     }
 }

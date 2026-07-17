@@ -31,7 +31,7 @@ public class AuthController {
     /** POST /user/login */
     @PostMapping("/login")
     public Result<UserLoginVO> login(@RequestBody UserLoginDTO dto) {
-        log.info("用户登录: {}", dto.getSid());
+        log.info("用户登录开始 sid={}", dto.getSid());
         User user = userService.login(dto);
 
         Map<String, Object> claims = new HashMap<>();
@@ -41,13 +41,15 @@ public class AuthController {
 
         String token = JwtUtil.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getUserTtl(), claims);
 
+        log.info("用户登录成功 sid={}", dto.getSid());
         return Result.success(UserLoginVO.builder().token(token).build());
     }
 
     /** POST /user/logout */
     @PostMapping("/logout")
     public Result<?> logout() {
-        log.info("用户注销: {}", UserContext.getCurrentId());
+        Long userId = UserContext.getCurrentId();
+        log.info("用户注销 userId={}", userId);
         UserContext.removeCurrentId();
         return Result.success();
     }

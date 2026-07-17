@@ -84,7 +84,7 @@ public class AdminController {
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.EMP_ID, user.getSid());
         String token = JwtUtil.createJWT(jwtProperties.getAdminSecretKey(), jwtProperties.getAdminTtl(), claims);
-        log.info("管理员登录成功: {}, token={}", user.getSid(), token);
+        log.info("管理员登录成功: empId={}", user.getSid());
 
         return Result.success(UserLoginVO.builder().token(token).build());
     }

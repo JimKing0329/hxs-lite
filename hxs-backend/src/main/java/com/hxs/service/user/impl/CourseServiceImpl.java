@@ -42,15 +42,15 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional
     public void updateCourseTable() {
+        String sid = UserContext.getCurrentId().toString();
         int year = termDateManager.getYear();
         int term = termDateManager.getTerm();
         term = term * term * 3;
+        log.info("刷新课表开始 userId={} year={} term={}", sid, year, term);
 
         EduSession session = sessionManager.getOrCreateSession();
         EduCourseClient courseClient = new EduCourseClient(session);
         List<CourseTableItem> courseTable = courseClient.getCourseTable(year, term);
-
-        String sid = UserContext.getCurrentId().toString();
 
         // 先删除该学生原有课程表
         courseMapper.delete(new QueryWrapper<Course>().eq("sid", sid));
@@ -75,7 +75,7 @@ public class CourseServiceImpl implements CourseService {
         }
 
         courseMapper.insertBatch(allCourse);
-        log.info("更新课程表成功，共 {} 条记录", allCourse.size());
+        log.info("刷新课表完成 userId={} 共 {} 条记录", sid, allCourse.size());
     }
 
     @Override

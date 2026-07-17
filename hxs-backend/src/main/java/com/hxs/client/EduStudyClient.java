@@ -69,6 +69,7 @@ public class EduStudyClient {
                 situation.setOutPlanPassCourse(outPlanCourseNumbers.get(0));
                 situation.setOutPlanFailCourse(outPlanCourseNumbers.get(1));
 
+                log.info("获取学习情况成功 gpa={}", gpa);
                 return situation;
             }
         } catch (URISyntaxException | IOException e) {

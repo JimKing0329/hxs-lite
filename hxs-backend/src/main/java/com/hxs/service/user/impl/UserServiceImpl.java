@@ -39,6 +39,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User login(UserLoginDTO dto) {
         long start = System.currentTimeMillis();
+        log.info("用户登录开始 sid={}", dto.getSid());
 
         // 1. 登录获取已认证的 EduSession（复用登录时的 HttpClient 连接）
         EduSession loginSession = eduClient.login(dto.getSid(), dto.getPassword());
@@ -52,14 +53,17 @@ public class UserServiceImpl implements UserService {
         boolean exist = info != null;
 
         if (!exist) {
+            log.info("新用户首次登录，拉取学生信息 sid={}", dto.getSid());
             info = userClient.getStudentInfo().getData();
             info.setMajorCode(StringParseUtil.extractParenthesesContent(majorClient.getMajorCode()));
+        } else {
+            log.info("老用户登录 sid={}", dto.getSid());
         }
 
         try {
             info.setPassword(AesUtil.encrypt(dto.getPassword()));
         } catch (Exception e) {
-            log.error("密码加密失败", e);
+            log.error("密码加密失败 sid={}", dto.getSid(), e);
             throw new RuntimeException(MessageConstant.PASSWORD_ENCRYPT_ERROR, e);
         }
 
@@ -80,7 +84,7 @@ public class UserServiceImpl implements UserService {
         // 关闭 session（不再需要）
         loginSession.close();
 
-        log.info("登录耗时 {} ms", System.currentTimeMillis() - start);
+        log.info("登录完成 sid={} 耗时 {}ms", dto.getSid(), System.currentTimeMillis() - start);
         return info;
     }
 
@@ -126,20 +130,26 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void unbind() {
-        User user = userMapper.selectById(UserContext.getCurrentId());
+        Long sid = UserContext.getCurrentId();
+        log.info("解除微信绑定 userId={}", sid);
+        User user = userMapper.selectById(sid);
         user.setOpenId("");
         userMapper.updateById(user);
+        log.info("微信解绑成功 userId={}", sid);
     }
 
     @Override
     public void updateMajorCode() {
+        Long sid = UserContext.getCurrentId();
+        log.info("更新专业代码 userId={}", sid);
         EduSession session = sessionManager.getOrCreateSession();
         EduMajorClient majorClient = new EduMajorClient(session);
         String major = majorClient.getMajorCode();
         String code = StringParseUtil.extractParenthesesContent(major);
         User user = User.builder()
-                .majorCode(code).sid(UserContext.getCurrentId().toString()).build();
+                .majorCode(code).sid(sid.toString()).build();
         userMapper.updateById(user);
+        log.info("专业代码更新成功 userId={} majorCode={}", sid, code);
     }
 
 }

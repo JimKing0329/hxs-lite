@@ -60,6 +60,8 @@ public class WechatServiceImpl implements WechatService {
     @Override
     public String checkAndReply(Map<String, String> messageMap) {
         String msgType = messageMap.get("MsgType");
+        String fromUser = messageMap.get("FromUserName");
+        log.info("处理微信消息 msgType={} fromUser={}", msgType, fromUser);
         if ("text".equals(msgType)) {
             return handleTextMessage(messageMap);
         } else if ("event".equals(msgType)) {
@@ -72,6 +74,7 @@ public class WechatServiceImpl implements WechatService {
 
     private String handleTextMessage(Map<String, String> messageMap) {
         String content = messageMap.get("Content");
+        log.info("收到微信文本消息 content={}", content);
         if (content.startsWith("绑定")) {
             return handleBindingKey(content, messageMap);
         } else if (content.contains("课表")) {
@@ -96,6 +99,7 @@ public class WechatServiceImpl implements WechatService {
 
     private String handleClickEvent(Map<String, String> messageMap) {
         String eventKey = messageMap.get("EventKey");
+        log.info("处理微信点击事件 eventKey={}", eventKey);
         switch (eventKey) {
             case "getCalender":
                 String mediaId = configFactory.get("calender_media_id");
@@ -150,6 +154,7 @@ public class WechatServiceImpl implements WechatService {
             // 绑定 openId
             user.setOpenId(messageMap.get("FromUserName"));
             userMapper.updateById(user);
+            log.info("微信绑定成功 openId={} sid={}", user.getOpenId(), user.getSid());
             return textReply(messageMap, WechatMessageConstant.SUCCESS_BIND);
         } catch (Exception e) {
             log.error("绑定失败", e);
@@ -165,6 +170,7 @@ public class WechatServiceImpl implements WechatService {
         if (user == null) {
             return textReply(messageMap, WechatMessageConstant.USER_NOT_BIND);
         }
+        log.info("微信查询课表 sid={}", user.getSid());
 
         LocalDate now = LocalDate.now();
         LocalDate termStartDate = dateManager.getTermStartDate();
@@ -219,6 +225,7 @@ public class WechatServiceImpl implements WechatService {
         if (user == null) {
             return textReply(messageMap, WechatMessageConstant.USER_NOT_BIND);
         }
+        log.info("微信查询成绩 sid={}", user.getSid());
 
         int year = dateManager.getYear();
         int term = dateManager.getTerm();
@@ -245,6 +252,7 @@ public class WechatServiceImpl implements WechatService {
         if (user == null) {
             return textReply(messageMap, WechatMessageConstant.USER_NOT_BIND);
         }
+        log.info("微信刷新成绩 sid={}", user.getSid());
 
         try {
             // 登录教务系统验证
@@ -265,6 +273,7 @@ public class WechatServiceImpl implements WechatService {
     // ────────────── 空教室 ──────────────
 
     private String sendEmptyClassroom(Map<String, String> messageMap, String campus) {
+        log.info("微信查询空教室 campus={}", campus);
         LocalDate now = LocalDate.now();
         int week = (int) ChronoUnit.WEEKS.between(dateManager.getTermStartDate(), now) + 1;
         int weekday = now.getDayOfWeek().getValue();

@@ -2,6 +2,7 @@ package com.hxs.client;
 
 import com.hxs.constant.MessageConstant;
 import com.hxs.exception.NotLoginException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  * 教务系统用户会话封装
  * 每个用户一个独立实例，不可变且线程安全
  */
+@Slf4j
 public class EduSession implements AutoCloseable {
 
     private static final int CONNECT_TIMEOUT = 15_000;
@@ -92,6 +94,7 @@ public class EduSession implements AutoCloseable {
      */
     public void checkLogin(String responseBody) {
         if (responseBody.contains("用户登录") || responseBody.contains("身份认证")) {
+            log.warn("教务 Session 已失效，需要重新登录");
             throw new NotLoginException(MessageConstant.UNLOGIN_ERROR);
         }
     }
@@ -99,9 +102,10 @@ public class EduSession implements AutoCloseable {
     @Override
     public void close() {
         try {
+            log.debug("关闭教务 HTTP 连接");
             httpClient.close();
-        } catch (IOException ignored) {
-            // 静默关闭
+        } catch (IOException e) {
+            log.warn("关闭教务 HTTP 连接异常: {}", e.getMessage());
         }
     }
 }

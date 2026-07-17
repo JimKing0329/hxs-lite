@@ -15,7 +15,10 @@ public class EduClientImpl implements EduClient {
 
     @Override
     public EduSession login(String sid, String password) {
-        return EduLoginClient.login(sid, password);
+        log.info("发起教务系统登录 sid={}", sid);
+        EduSession session = EduLoginClient.login(sid, password);
+        log.info("教务系统登录成功 sid={}", sid);
+        return session;
     }
 
 }

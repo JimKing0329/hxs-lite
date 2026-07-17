@@ -59,7 +59,7 @@ public class EduClassroomClient {
                 String responseBody = EntityUtils.toString(response.getEntity());
                 JSONObject root = JSON.parseObject(responseBody);
                 List<EmptyClassRoomItem> list = root.getList("items", EmptyClassRoomItem.class);
-                log.debug("获取空教室成功 {} 条", list.size());
+                log.info("获取空教室成功 {} 条", list.size());
                 return list;
             }
         } catch (URISyntaxException | IOException e) {

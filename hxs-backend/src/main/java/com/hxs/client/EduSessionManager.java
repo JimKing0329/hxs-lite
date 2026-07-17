@@ -47,6 +47,8 @@ public class EduSessionManager {
         String token = extractToken(request);
 
         Claims claims = JwtUtil.parseJWT(jwtProperties.getUserSecretKey(), token);
+        String userId = claims.get(JwtClaimsConstant.USER_ID).toString();
+        log.info("为用户创建教务 Session userId={}", userId);
 
         // 2. 为该用户创建独立的 EduSession
         Map<String, String> cookies = new HashMap<>();

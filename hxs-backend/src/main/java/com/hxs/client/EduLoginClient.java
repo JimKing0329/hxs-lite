@@ -43,6 +43,7 @@ public class EduLoginClient {
      * 登录并返回已认证的 EduSession（复用登录时的 HttpClient，避免重建连接）
      */
     public static EduSession login(String sid, String password) {
+        log.info("教务系统登录开始 sid={}", sid);
         String keyUrl;
         String loginUrl;
         try {
@@ -118,7 +119,7 @@ public class EduLoginClient {
                         cookieStore.getCookies().forEach(c ->
                                 cookies.put(c.getName(), c.getValue()));
 
-                        log.info("登录成功，返回已认证 EduSession");
+                        log.info("教务系统登录成功 sid={}", sid);
                         return new EduSession(httpClient, cookies, BASE_URL);
                     }
                 }

@@ -54,7 +54,7 @@ public class EduUserClient {
                 return Result.success(data);
             }
         } catch (URISyntaxException | IOException e) {
-            log.info("获取学生信息失败 {}", e.getMessage());
+            log.error("获取学生信息失败: {}", e.getMessage(), e);
             throw new RequestFailException(MessageConstant.REQUEST_ERROR);
         }
     }
