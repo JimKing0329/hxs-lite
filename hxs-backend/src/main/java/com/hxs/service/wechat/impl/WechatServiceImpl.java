@@ -290,7 +290,7 @@ public class WechatServiceImpl implements WechatService {
         String articleUrl = articleFactory.getArticle();
         String fullContent = content;
         if (articleUrl != null && !articleUrl.isEmpty()) {
-            fullContent = content + "\n\n<a href=\"" + articleUrl + "\">点击文章底部广告支持作者\uD83D\uDC97</a>";
+            fullContent = content + "\n\n<a href=\"" + articleUrl + "\">支持作者\uD83D\uDC97</a>";
         }
         WechatMessage reply = WechatMessage.builder()
                 .toUserName(messageMap.get("FromUserName"))
