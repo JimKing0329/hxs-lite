@@ -95,7 +95,6 @@ public class EduNewCourseTableClient {
                 session.checkLogin(responseBody);
 
                 JSONObject root = JSON.parseObject(responseBody);
-                log.info("获取班级课表成功");
                 return root;
             }
         } catch (URISyntaxException | IOException e) {

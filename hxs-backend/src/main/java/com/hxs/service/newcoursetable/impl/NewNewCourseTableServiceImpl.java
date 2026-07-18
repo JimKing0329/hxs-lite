@@ -75,6 +75,7 @@ public class NewNewCourseTableServiceImpl implements NewCourseTableService {
 
             // kbList → MainCourse
             List<JSONObject> rawMain = root.getList("kbList", JSONObject.class);
+            log.info("更新课程班级 {}，课程数 {}", classInfo.getClassName(), rawMain != null ? rawMain.size() : 0);
             if (rawMain != null) {
                 for (JSONObject raw : rawMain) {
                     List<Integer> sessions = StringParseUtil.parseSessionList(raw.getString("jc"));
@@ -92,6 +93,7 @@ public class NewNewCourseTableServiceImpl implements NewCourseTableService {
 
             // sjkList → OtherCourse
             List<JSONObject> rawOther = root.getList("sjkList", JSONObject.class);
+            log.info("更新其他课程班级 {}，课程数 {}", classInfo.getClassName(), rawOther != null ? rawOther.size() : 0);
             if (rawOther != null) {
                 for (JSONObject raw : rawOther) {
                     List<String> stringList = StringParseUtil.courseParser(raw.getString("sjkcgs"));
