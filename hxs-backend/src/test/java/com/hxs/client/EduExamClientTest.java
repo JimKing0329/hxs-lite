@@ -2,7 +2,7 @@ package com.hxs.client;
 
 import com.hxs.exception.RequestFailException;
 import com.hxs.model.entity.Score;
-import com.hxs.model.support.ExamScheduleItem;
+import com.hxs.model.entity.ExamInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -87,12 +87,12 @@ class EduExamClientTest extends HttpMockSupport {
             EduSession session = spySession(mockHttpClient(200, EXAM_JSON));
             EduExamClient client = new EduExamClient(session);
 
-            List<ExamScheduleItem> result = client.getExamSchedule(2024, 3);
+            List<ExamInfo> result = client.getExamSchedule(2024, 3);
 
             assertNotNull(result);
             assertEquals(1, result.size());
-            assertEquals("数据结构", result.get(0).getCourseName());
-            assertEquals("闭卷", result.get(0).getExamForm());
+            assertEquals("数据结构", result.get(0).getTitle());
+            assertEquals("闭卷", result.get(0).getExamMethod());
         }
 
         @Test

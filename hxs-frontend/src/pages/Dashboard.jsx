@@ -146,7 +146,7 @@ export default function Dashboard() {
 
     const fetchExams = async () => {
       try {
-        const response = await authFetch(`${API_PATHS.EXAM.LIST}?year=2024&term=3`);
+        const response = await authFetch(API_PATHS.EXAM.LIST);
         const result = await response.json();
         if (result.code === 1) {
           // 适配新的字段名
@@ -471,7 +471,7 @@ export default function Dashboard() {
                   onClick={async () => {
                     try {
                       setUpdateExamLoading(true);
-                      const response = await authFetch(`${API_PATHS.EXAM.REFRESH}?year=2024&term=3`, {
+                      const response = await authFetch(API_PATHS.EXAM.REFRESH, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' }
                       });
@@ -479,7 +479,7 @@ export default function Dashboard() {
                       if (result.code === 1) {
                         message.success('考试信息更新成功');
                         // 更新后重新获取考试信息
-                        const examsRes = await authFetch(`${API_PATHS.EXAM.LIST}?year=2024&term=3`);
+                        const examsRes = await authFetch(API_PATHS.EXAM.LIST);
                         const examsData = await examsRes.json();
                         if (examsData.code === 1) {
                           setExams(examsData.data.map(item => ({

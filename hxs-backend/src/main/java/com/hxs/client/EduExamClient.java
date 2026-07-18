@@ -5,7 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.hxs.constant.MessageConstant;
 import com.hxs.exception.MessageEmptyException;
 import com.hxs.exception.RequestFailException;
-import com.hxs.model.support.ExamScheduleItem;
+import com.hxs.model.entity.ExamInfo;
 import com.hxs.model.support.ScoreDetail;
 import com.hxs.model.entity.Score;
 import com.hxs.utils.StringParseUtil;
@@ -74,7 +74,7 @@ public class EduExamClient {
     /**
      * 获取考试安排
      */
-    public List<ExamScheduleItem> getExamSchedule(Integer year, Integer term) {
+    public List<ExamInfo> getExamSchedule(Integer year, Integer term) {
         try {
             URI resolve = new URI(session.getBaseUrl())
                     .resolve("kwgl/kscx_cxXsksxxIndex.html?doType=query&gnmkdm=N358105");
@@ -86,7 +86,7 @@ public class EduExamClient {
             formData.add(new BasicNameValuePair("xqm", term.toString()));
             formData.add(new BasicNameValuePair("_search", "false"));
             formData.add(new BasicNameValuePair("nd", Long.toString(System.currentTimeMillis())));
-            formData.add(new BasicNameValuePair("queryModel.showCount", "100"));
+            formData.add(new BasicNameValuePair("queryModel.showCount", "200"));
             formData.add(new BasicNameValuePair("queryModel.currentPage", "1"));
             formData.add(new BasicNameValuePair("queryModel.sortName", ""));
             formData.add(new BasicNameValuePair("queryModel.sortOrder", "asc"));
@@ -101,7 +101,7 @@ public class EduExamClient {
                 session.checkLogin(responseBody);
 
                 JSONObject root = JSON.parseObject(responseBody);
-                List<ExamScheduleItem> items = root.getList("items", ExamScheduleItem.class);
+                List<ExamInfo> items = root.getList("items", ExamInfo.class);
                 if (items.isEmpty()) {
                     throw new MessageEmptyException(MessageConstant.MESSAGE_EMPTY_ERROR);
                 }

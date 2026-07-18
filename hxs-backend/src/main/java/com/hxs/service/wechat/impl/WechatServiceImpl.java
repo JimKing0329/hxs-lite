@@ -6,8 +6,10 @@ import com.hxs.client.EduSession;
 import com.hxs.component.SystemDate;
 import com.hxs.constant.CampusConstant;
 import com.hxs.constant.WechatMessageConstant;
+import com.hxs.mapper.ExamInfoMapper;
 import com.hxs.mapper.ScoreMapper;
 import com.hxs.mapper.UserMapper;
+import com.hxs.model.entity.ExamInfo;
 import com.hxs.model.entity.Score;
 import com.hxs.model.entity.User;
 import com.hxs.model.third.WechatMessage;
@@ -15,6 +17,7 @@ import com.hxs.model.vo.CourseVO;
 import com.hxs.model.vo.EmptyClassroomVO;
 import com.hxs.service.user.CourseService;
 import com.hxs.service.user.EmptyClassroomService;
+import com.hxs.service.user.ExamService;
 import com.hxs.service.user.ScoreService;
 import com.hxs.service.wechat.WechatService;
 import com.hxs.utils.AesUtil;
@@ -43,7 +46,9 @@ public class WechatServiceImpl implements WechatService {
     private final UserMapper userMapper;
     private final CourseService courseService;
     private final ScoreMapper scoreMapper;
+    private final ExamInfoMapper examInfoMapper;
     private final ScoreService scoreService;
+    private final ExamService examService;
     private final EmptyClassroomService emptyClassroomService;
     private final SystemDate systemDate;
     private final ArticleFactory articleFactory;
@@ -100,7 +105,7 @@ public class WechatServiceImpl implements WechatService {
         log.info("处理微信点击事件 eventKey={}", eventKey);
         return switch (eventKey) {
             case "queryCourseTable" -> sendCourseTable(messageMap);
-            case "queryGrade" -> sendScores(messageMap);
+            case "queryExamInfo" -> sendExamInfo(messageMap);
             case "queryEmptyClassroomYH" -> sendEmptyClassroom(messageMap, CampusConstant.YUHUA);
             case "queryEmptyClassroomHQ" -> sendEmptyClassroom(messageMap, CampusConstant.HONGQI);
             case "updateGrade" -> updateAndSendGrade(messageMap);
@@ -251,6 +256,62 @@ public class WechatServiceImpl implements WechatService {
             log.error("更新成绩失败", e);
             return textReply(messageMap, WechatMessageConstant.UPDATE_GRADE_FAIL);
         }
+    }
+
+    // ────────────── 考试安排 ──────────────
+
+    private String sendExamInfo(Map<String, String> messageMap) {
+        User user = userMapper.selectOne(
+                new QueryWrapper<User>().eq("open_id", messageMap.get("FromUserName")));
+        if (user == null) {
+            return textReply(messageMap, WechatMessageConstant.USER_NOT_BIND);
+        }
+        log.info("微信查询考试安排 sid={}", user.getSid());
+
+        try {
+            // 登录教务系统验证
+            String password = AesUtil.decrypt(user.getPassword());
+            EduSession session = EduLoginClient.login(user.getSid(), password);
+            session.close();
+
+            // 更新考试安排
+            examService.updateExamSchedule(systemDate.getYear(), systemDate.getTerm());
+        } catch (Exception e) {
+            log.error("更新考试安排失败", e);
+            return textReply(messageMap, "更新考试安排失败，请稍后再试");
+        }
+
+        // 从数据库查询
+        List<ExamInfo> exams = examInfoMapper.selectList(
+                new QueryWrapper<ExamInfo>().eq("sid", user.getSid())
+                        .eq("year", systemDate.getYear())
+                        .eq("term", systemDate.getTerm()));
+
+        int year = systemDate.getYear();
+        int term = systemDate.getTerm();
+
+        StringBuilder reply = new StringBuilder();
+        reply.append("===").append(year).append("学年第").append(term).append("学期考试安排===\n\n");
+        if (exams.isEmpty()) {
+            reply.append("暂无考试安排\n");
+        }
+        for (ExamInfo exam : exams) {
+            reply.append(exam.getTitle()).append("\n");
+            if (exam.getTime() != null && !exam.getTime().isEmpty()) {
+                reply.append("时间：").append(exam.getTime()).append("\n");
+            }
+            if (exam.getLocation() != null && !exam.getLocation().isEmpty()) {
+                reply.append("地点：").append(exam.getLocation()).append("\n");
+            }
+            if (exam.getCampus() != null && !exam.getCampus().isEmpty()) {
+                reply.append("校区：").append(exam.getCampus()).append("\n");
+            }
+            if (exam.getSeat() != null && !exam.getSeat().isEmpty()) {
+                reply.append("座号：").append(exam.getSeat()).append("\n");
+            }
+            reply.append("\n");
+        }
+        return textReply(messageMap, reply.toString());
     }
 
     // ────────────── 空教室 ──────────────
