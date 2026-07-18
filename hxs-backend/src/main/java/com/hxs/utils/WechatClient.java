@@ -155,7 +155,7 @@ public class WechatClient {
             SubMenu menu3 = new SubMenu("快捷查询");
             menu3.subButton = new ArrayList<>();
             menu3.subButton.add(new ClickButton("查询课表", "queryCourseTable"));
-            menu3.subButton.add(new ClickButton("更新成绩", "queryGrade"));
+            menu3.subButton.add(new ClickButton("更新成绩", "updateGrade"));
             menu3.subButton.add(new ClickButton("考试安排", "queryExamInfo"));
             menu3.subButton.add(new ClickButton("空教室(红旗)", "queryEmptyClassroomHQ"));
             menu3.subButton.add(new ClickButton("空教室(裕华)", "queryEmptyClassroomYH"));
@@ -169,7 +169,7 @@ public class WechatClient {
             SubMenu menu3 = new SubMenu("快捷查询");
             menu3.subButton = new ArrayList<>();
             menu3.subButton.add(new ViewButton("新学期课表", courseUrl));
-            menu3.subButton.add(new ClickButton("更新成绩", "queryGrade"));
+            menu3.subButton.add(new ClickButton("更新成绩", "updateGrade"));
             buttons.add(menu3);
         }
 

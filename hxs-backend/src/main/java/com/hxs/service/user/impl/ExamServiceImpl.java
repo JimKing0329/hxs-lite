@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hxs.annotation.RetryOnSessionExpired;
 import com.hxs.client.EduExamClient;
 import com.hxs.client.EduSession;
-import com.hxs.client.EduSessionManager;
 import com.hxs.component.SystemDate;
-import com.hxs.context.UserContext;
 import com.hxs.mapper.ExamInfoMapper;
 import com.hxs.model.entity.ExamInfo;
 import com.hxs.model.vo.ExamInfoVO;
@@ -27,14 +25,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ExamServiceImpl implements ExamService {
 
-    private final EduSessionManager sessionManager;
     private final ExamInfoMapper examInfoMapper;
     private final SystemDate termSystemDate;
 
     @Override
-    public List<ExamInfoVO> getExamSchedule(Integer year, Integer term) {
-        log.info("查询考试安排 userId={} year={} term={}", UserContext.getCurrentId(), year, term);
-        String sid = UserContext.getCurrentId().toString();
+    public List<ExamInfoVO> getExamSchedule(String sid, Integer year, Integer term) {
+        log.info("查询考试安排 userId={} year={} term={}", sid, year, term);
 
         // 从数据库查询
         QueryWrapper<ExamInfo> wrapper = new QueryWrapper<>();
@@ -49,12 +45,10 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     @RetryOnSessionExpired
-    public List<ExamInfoVO> updateExamSchedule(Integer year, Integer term) {
-        log.info("刷新考试安排 userId={} year={} term={}", UserContext.getCurrentId(), year, term);
-        String sid = UserContext.getCurrentId().toString();
+    public List<ExamInfoVO> updateExamSchedule(String sid, Integer year, Integer term, EduSession session) {
+        log.info("刷新考试安排 userId={} year={} term={}", sid, year, term);
 
         Integer paramTerm = term * term * 3;
-        EduSession session = sessionManager.getOrCreateSession();
         EduExamClient examClient = new EduExamClient(session);
 
         List<ExamInfo> items = examClient.getExamSchedule(year, paramTerm);

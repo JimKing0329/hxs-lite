@@ -6,6 +6,7 @@ import com.hxs.client.EduSession;
 import com.hxs.component.SystemDate;
 import com.hxs.constant.CampusConstant;
 import com.hxs.constant.WechatMessageConstant;
+import com.hxs.exception.MessageEmptyException;
 import com.hxs.mapper.ExamInfoMapper;
 import com.hxs.mapper.ScoreMapper;
 import com.hxs.mapper.UserMapper;
@@ -83,7 +84,7 @@ public class WechatServiceImpl implements WechatService {
         } else if (content.contains("课表")) {
             return sendCourseTable(messageMap);
         } else if (content.contains("成绩")) {
-            return updateAndSendGrade(messageMap);
+            return updateAndSendScore(messageMap);
         }
         return "";
     }
@@ -105,10 +106,10 @@ public class WechatServiceImpl implements WechatService {
         log.info("处理微信点击事件 eventKey={}", eventKey);
         return switch (eventKey) {
             case "queryCourseTable" -> sendCourseTable(messageMap);
-            case "queryExamInfo" -> sendExamInfo(messageMap);
+            case "queryExamInfo" -> updateAndSendExamInfo(messageMap);
             case "queryEmptyClassroomYH" -> sendEmptyClassroom(messageMap, CampusConstant.YUHUA);
             case "queryEmptyClassroomHQ" -> sendEmptyClassroom(messageMap, CampusConstant.HONGQI);
-            case "updateGrade" -> updateAndSendGrade(messageMap);
+            case "updateGrade" -> updateAndSendScore(messageMap);
             default -> textReply(messageMap, "hello world");
         };
     }
@@ -234,7 +235,7 @@ public class WechatServiceImpl implements WechatService {
         return textReply(messageMap, reply.toString());
     }
 
-    private String updateAndSendGrade(Map<String, String> messageMap) {
+    private String updateAndSendScore(Map<String, String> messageMap) {
         User user = userMapper.selectOne(
                 new QueryWrapper<User>().eq("open_id", messageMap.get("FromUserName")));
         if (user == null) {
@@ -246,10 +247,10 @@ public class WechatServiceImpl implements WechatService {
             // 登录教务系统验证
             String password = AesUtil.decrypt(user.getPassword());
             EduSession session = EduLoginClient.login(user.getSid(), password);
-            session.close();
 
-            // 更新成绩
-            scoreService.updateScores();
+            // 更新成绩（传入 session）
+            scoreService.updateScores(user.getSid(), session);
+            session.close();
 
             return sendScores(messageMap);
         } catch (Exception e) {
@@ -260,7 +261,8 @@ public class WechatServiceImpl implements WechatService {
 
     // ────────────── 考试安排 ──────────────
 
-    private String sendExamInfo(Map<String, String> messageMap) {
+    private String updateAndSendExamInfo(Map<String, String> messageMap) {
+
         User user = userMapper.selectOne(
                 new QueryWrapper<User>().eq("open_id", messageMap.get("FromUserName")));
         if (user == null) {
@@ -272,13 +274,16 @@ public class WechatServiceImpl implements WechatService {
             // 登录教务系统验证
             String password = AesUtil.decrypt(user.getPassword());
             EduSession session = EduLoginClient.login(user.getSid(), password);
-            session.close();
 
-            // 更新考试安排
-            examService.updateExamSchedule(systemDate.getYear(), systemDate.getTerm());
-        } catch (Exception e) {
+            // 更新考试安排（传入 session）
+            examService.updateExamSchedule(user.getSid(), systemDate.getYear(), systemDate.getTerm(), session);
+            session.close();
+        } catch (MessageEmptyException e) {
             log.error("更新考试安排失败", e);
-            return textReply(messageMap, "更新考试安排失败，请稍后再试");
+            return textReply(messageMap, "当前无考试安排！");
+        }catch (Exception e) {
+            log.error("更新考试安排失败", e);
+            return textReply(messageMap, "更新考试安排失败!");
         }
 
         // 从数据库查询

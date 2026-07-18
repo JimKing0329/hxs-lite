@@ -1,5 +1,6 @@
 package com.hxs.service.user;
 
+import com.hxs.client.EduSession;
 import com.hxs.model.dto.ScoreDetailQueryDTO;
 import com.hxs.model.vo.*;
 
@@ -21,8 +22,11 @@ public interface ScoreService {
 
     /**
      * 刷新成绩（从教务系统拉取并持久化到数据库）
+     *
+     * @param sid 学生学号
+     * @param session 教务系统会话
      */
-    void updateScores();
+    void updateScores(String sid, EduSession session);
 
     /**
      * 获取分项成绩详情

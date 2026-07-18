@@ -7,7 +7,7 @@ public final class MessageConstant {
     public static final String UNKNOWN_ERROR = "未知错误！";
     public static final String TIMEOUT_ERROR = "请求超时！";
     public static final String UNLOGIN_ERROR = "用户未登录！";
-    public static final String MESSAGE_EMPTY_ERROR = "信息为空，请重试！";
+    public static final String MESSAGE_EMPTY_ERROR = "当前查询的数据为空，可能是教务系统尚未更新！";
     public static final String ALREADY_EXISTS = "已存在";
     public static final String SYSTEM_ERROR = "教务系统出错，稍后再试！";
     public static final String REQUEST_ERROR = "请求出错，稍后再试！";

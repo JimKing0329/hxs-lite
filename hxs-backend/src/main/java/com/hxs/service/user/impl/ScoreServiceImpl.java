@@ -78,11 +78,9 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
     @RetryOnSessionExpired
-    public void updateScores() {
-        log.info("刷新成绩 userId={}", UserContext.getCurrentId());
-        String sid = UserContext.getCurrentId().toString();
+    public void updateScores(String sid, EduSession session) {
+        log.info("刷新成绩 userId={}", sid);
 
-        EduSession session = sessionManager.getOrCreateSession();
         EduExamClient examClient = new EduExamClient(session);
 
         List<Score> scores = examClient.getStudentScore();

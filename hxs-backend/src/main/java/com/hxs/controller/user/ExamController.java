@@ -1,5 +1,6 @@
 package com.hxs.controller.user;
 
+import com.hxs.client.EduSessionManager;
 import com.hxs.component.SystemDate;
 import com.hxs.context.UserContext;
 import com.hxs.model.vo.ExamInfoVO;
@@ -34,6 +35,7 @@ public class ExamController {
 
     private final ExamService examService;
     private final SystemDate termSystemDate;
+    private final EduSessionManager sessionManager;
 
     /** 查询考试安排 */
     @GetMapping
@@ -41,8 +43,9 @@ public class ExamController {
                                                      @RequestParam(required = false) Integer term) {
         year = (year != null) ? year : termSystemDate.getYear();
         term = (term != null) ? term : termSystemDate.getTerm();
-        log.info("查询考试安排 userId={} year={} term={}", UserContext.getCurrentId(), year, term);
-        List<ExamInfoVO> exams = examService.getExamSchedule(year, term);
+        String sid = UserContext.getCurrentId().toString();
+        log.info("查询考试安排 userId={} year={} term={}", sid, year, term);
+        List<ExamInfoVO> exams = examService.getExamSchedule(sid, year, term);
         return Result.success(exams);
     }
 
@@ -52,8 +55,9 @@ public class ExamController {
                                                         @RequestParam(required = false) Integer term) {
         year = (year != null) ? year : termSystemDate.getYear();
         term = (term != null) ? term : termSystemDate.getTerm();
-        log.info("刷新考试安排 userId={} year={} term={}", UserContext.getCurrentId(), year, term);
-        List<ExamInfoVO> exams = examService.updateExamSchedule(year, term);
+        String sid = UserContext.getCurrentId().toString();
+        log.info("刷新考试安排 userId={} year={} term={}", sid, year, term);
+        List<ExamInfoVO> exams = examService.updateExamSchedule(sid, year, term, sessionManager.getOrCreateSession());
         return Result.success(exams);
     }
 }

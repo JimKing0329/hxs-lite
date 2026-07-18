@@ -1,5 +1,6 @@
 package com.hxs.controller.user;
 
+import com.hxs.client.EduSessionManager;
 import com.hxs.context.UserContext;
 import com.hxs.model.dto.ScoreDetailQueryDTO;
 import com.hxs.model.vo.*;
@@ -41,6 +42,7 @@ import java.util.List;
 public class ScoreController {
 
     private final ScoreService scoreService;
+    private final EduSessionManager sessionManager;
 
     /** 查询成绩列表 */
     @GetMapping
@@ -55,7 +57,7 @@ public class ScoreController {
     @PutMapping
     public Result<Void> updateScores() {
         log.info("刷新成绩 userId={}", UserContext.getCurrentId());
-        scoreService.updateScores();
+        scoreService.updateScores(UserContext.getCurrentId().toString(), sessionManager.getOrCreateSession());
         return Result.success();
     }
 
