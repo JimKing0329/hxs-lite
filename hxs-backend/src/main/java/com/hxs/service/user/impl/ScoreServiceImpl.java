@@ -95,7 +95,8 @@ public class ScoreServiceImpl implements ScoreService {
         scoreMapper.deleteBySid(sid);
 
         // 设置 sid 并持久化
-        scores.forEach(score -> score.setSid(sid));
+        scores.forEach(score -> {score.setSid(sid);
+            score.setTerm((score.getTerm() == 3 ? 1 : score.getTerm() == 12 ? 2 : 3));});
         scoreMapper.insertBatch(scores);
         log.info("成绩表更新成功 userId={} count={}", sid, scores.size());
     }
