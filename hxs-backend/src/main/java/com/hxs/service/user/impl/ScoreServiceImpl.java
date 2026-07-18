@@ -15,7 +15,6 @@ import com.hxs.model.dto.ScoreDetailQueryDTO;
 import com.hxs.model.entity.Score;
 import com.hxs.model.entity.ScoreDetail;
 import com.hxs.model.entity.User;
-import com.hxs.model.support.ScoreItem;
 import com.hxs.model.vo.*;
 import com.hxs.service.user.ScoreService;
 import lombok.RequiredArgsConstructor;
@@ -86,7 +85,7 @@ public class ScoreServiceImpl implements ScoreService {
         EduSession session = sessionManager.getOrCreateSession();
         EduExamClient examClient = new EduExamClient(session);
 
-        List<ScoreItem> scores = examClient.getStudentScore();
+        List<Score> scores = examClient.getStudentScore();
         if (scores.isEmpty()) {
             log.info("未查询到成绩 userId={}", sid);
             return;
@@ -95,26 +94,10 @@ public class ScoreServiceImpl implements ScoreService {
         // 清除旧数据
         scoreMapper.deleteBySid(sid);
 
-        // 转换为实体并持久化
-        List<Score> entities = scores.stream().map(item -> {
-            Score entity = new Score();
-            entity.setSid(sid);
-            entity.setCourseName(item.getCourseName());
-            entity.setGrade(item.getScore());
-            entity.setGradePoint(item.getGradePoint());
-            entity.setCredit(item.getCredit());
-            entity.setClassId(item.getClassId());
-            entity.setCollegeName(item.getCollegeName());
-
-            // 解析学年/学期
-            entity.setYear(extractYear(item.getYearName()));
-            entity.setTerm(extractTerm(item.getTermName()));
-
-            return entity;
-        }).collect(Collectors.toList());
-
-        scoreMapper.insertBatch(entities);
-        log.info("成绩表更新成功 userId={} count={}", sid, entities.size());
+        // 设置 sid 并持久化
+        scores.forEach(score -> score.setSid(sid));
+        scoreMapper.insertBatch(scores);
+        log.info("成绩表更新成功 userId={} count={}", sid, scores.size());
     }
 
     @Override

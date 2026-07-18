@@ -7,7 +7,7 @@ import com.hxs.exception.MessageEmptyException;
 import com.hxs.exception.RequestFailException;
 import com.hxs.model.support.ExamScheduleItem;
 import com.hxs.model.support.ScoreDetail;
-import com.hxs.model.support.ScoreItem;
+import com.hxs.model.entity.Score;
 import com.hxs.utils.StringParseUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -38,7 +38,7 @@ public class EduExamClient {
     /**
      * 获取学生成绩
      */
-    public List<ScoreItem> getStudentScore() {
+    public List<Score> getStudentScore() {
         try {
             URI scoreURL = new URI(session.getBaseUrl())
                     .resolve("/cjcx/cjcx_cxXsgrcj.html?doType=query&gnmkdm=N305005");
@@ -61,7 +61,7 @@ public class EduExamClient {
                 session.checkLogin(responseBody);
 
                 JSONObject root = JSON.parseObject(responseBody);
-                List<ScoreItem> items = root.getList("items", ScoreItem.class);
+                List<Score> items = root.getList("items", Score.class);
                 log.info("成绩获取成功 {} 条", items.size());
                 return items;
             }

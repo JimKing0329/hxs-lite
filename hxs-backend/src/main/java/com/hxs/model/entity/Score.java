@@ -1,16 +1,14 @@
 package com.hxs.model.entity;
 
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * 成绩实体 — 映射 score 表
- *
- * <p>字段与 score 表严格一一对应</p>
  */
 @Data
 @TableName("score")
@@ -19,45 +17,42 @@ public class Score implements Serializable {
     @TableId
     private Long id;
 
-    /** 学生ID */
     private String sid;
 
-    /** 成绩等级（如 A/B/C） */
+    @JSONField(name = "cj")
     private String grade;
 
-    /** 绩点（如 3.5/4.0） */
-    private String gradePoint;
-
-    /** 课程类别名称 */
-    private String categoryName;
-
-    /** 学院名称 */
-    private String collegeName;
-
-    /** 教师姓名 */
-    private String teacherName;
-
-    /** 班级ID */
-    private String classId;
-
-    /** 专业名称 */
-    private String major;
-
-    /** 创建时间 */
-    private LocalDateTime createdTime;
-
-    /** 课程名 */
+    @JSONField(name = "kcmc")
     private String courseName;
 
-    /** 学年 */
+    @JSONField(name = "jd")
+    private String gradePoint;
+
+    @JSONField(name = "kclbmc")
+    private String categoryName;
+
+    @JSONField(name = "kkbmmc")
+    private String collegeName;
+
+    @JSONField(name = "jsxm")
+    private String teacherName;
+
+    //教学班编号
+    @JSONField(name = "jxb_id")
+    private String classId;
+
+    @JSONField(name = "kcbj")
+    private String major;
+
+    @JSONField(name = "xnm")
     private Integer year;
 
-    /** 学期 */
+    @JSONField(name = "xqm")
     private Integer term;
 
-    /** 学分 */
+    @JSONField(name = "xf")
     private String credit;
 
-    /** 课程性质 */
+    @JSONField(name = "kcxzmc")
     private String courseType;
 }

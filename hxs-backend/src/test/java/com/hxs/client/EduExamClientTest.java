@@ -1,8 +1,8 @@
 package com.hxs.client;
 
 import com.hxs.exception.RequestFailException;
+import com.hxs.model.entity.Score;
 import com.hxs.model.support.ExamScheduleItem;
-import com.hxs.model.support.ScoreItem;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,16 +16,18 @@ class EduExamClientTest extends HttpMockSupport {
 
     private static final String SCORE_JSON =
             "{\"items\":[{" +
-            "\"xnmmc\":\"2024-2025\"," +
-            "\"xqmmc\":\"1\"," +
+            "\"xnm\":2024," +
+            "\"xqm\":1," +
             "\"kcmc\":\"高等数学\"," +
             "\"xf\":\"5.0\"," +
             "\"cj\":\"85\"," +
             "\"jd\":\"3.5\"," +
-            "\"kcbj\":\"\"," +
-            "\"ksxz\":\"正常\"," +
+            "\"kclbmc\":\"必修课\"," +
             "\"kkbmmc\":\"数学学院\"," +
-            "\"jxb_id\":\"MATH101-001\"" +
+            "\"jsxm\":\"张老师\"," +
+            "\"jxb_id\":\"MATH101-001\"," +
+            "\"kcbj\":\"0\"," +
+            "\"kcxzmc\":\"必修\"" +
             "}]}";
 
     private static final String EXAM_JSON =
@@ -57,12 +59,12 @@ class EduExamClientTest extends HttpMockSupport {
             EduSession session = spySession(mockHttpClient(200, SCORE_JSON));
             EduExamClient client = new EduExamClient(session);
 
-            List<ScoreItem> result = client.getStudentScore();
+            List<Score> result = client.getStudentScore();
 
             assertNotNull(result);
             assertEquals(1, result.size());
             assertEquals("高等数学", result.get(0).getCourseName());
-            assertEquals("85", result.get(0).getScore());
+            assertEquals("85", result.get(0).getGrade());
         }
 
         @Test
