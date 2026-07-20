@@ -12,6 +12,7 @@ import com.hxs.service.user.ExamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import javax.annotation.Resource;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +27,8 @@ import java.util.stream.Collectors;
 public class ExamServiceImpl implements ExamService {
 
     private final ExamInfoMapper examInfoMapper;
-    private final SystemDate termSystemDate;
+    @Resource(name = "termStartDate")
+    private SystemDate termSystemDate;
 
     @Override
     public List<ExamInfoVO> getExamSchedule(String sid, Integer year, Integer term) {

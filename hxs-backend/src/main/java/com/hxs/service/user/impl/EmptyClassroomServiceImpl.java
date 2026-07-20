@@ -14,6 +14,7 @@ import com.hxs.service.user.EmptyClassroomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import javax.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -25,7 +26,8 @@ import java.util.List;
 public class EmptyClassroomServiceImpl implements EmptyClassroomService {
 
     private final EmptyClassroomMapper emptyClassroomMapper;
-    private final SystemDate termSystemDate;
+    @Resource(name = "termStartDate")
+    private SystemDate termSystemDate;
     private final AdminProperties adminProperties;
 
     @Override

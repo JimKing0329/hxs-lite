@@ -9,6 +9,7 @@ import com.hxs.service.user.ExamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import javax.annotation.Resource;
 
 import java.util.List;
 
@@ -34,7 +35,8 @@ import java.util.List;
 public class ExamController {
 
     private final ExamService examService;
-    private final SystemDate termSystemDate;
+    @Resource(name = "termStartDate")
+    private SystemDate termSystemDate;
     private final EduSessionManager sessionManager;
 
     /** 查询考试安排 */

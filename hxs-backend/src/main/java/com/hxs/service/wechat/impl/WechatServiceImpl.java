@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -51,7 +52,10 @@ public class WechatServiceImpl implements WechatService {
     private final ScoreService scoreService;
     private final ExamService examService;
     private final EmptyClassroomService emptyClassroomService;
-    private final SystemDate systemDate;
+    @Resource(name = "termStartDate")
+    private final SystemDate termStartDate;
+    @Resource(name = "courseTableDate")
+    private final SystemDate courseTableDate;
     private final ArticleFactory articleFactory;
 
     private String baseUrl;
@@ -162,7 +166,7 @@ public class WechatServiceImpl implements WechatService {
         log.info("微信查询课表 sid={}", user.getSid());
 
         LocalDate now = LocalDate.now();
-        LocalDate termStartDate = systemDate.getTermStartDate();
+        LocalDate termStartDate = courseTableDate.getTermStartDate();
 
         // 今日课表
         long week = weekOf(now, termStartDate);
@@ -216,8 +220,8 @@ public class WechatServiceImpl implements WechatService {
         }
         log.info("微信查询成绩 sid={}", user.getSid());
 
-        int year = systemDate.getYear();
-        int term = systemDate.getTerm();
+        int year = termStartDate.getYear();
+        int term = termStartDate.getTerm();
 
         List<Score> scores = scoreMapper.selectList(
                 new QueryWrapper<Score>().eq("sid", user.getSid())
@@ -276,7 +280,7 @@ public class WechatServiceImpl implements WechatService {
             EduSession session = EduLoginClient.login(user.getSid(), password);
 
             // 更新考试安排（传入 session）
-            examService.updateExamSchedule(user.getSid(), systemDate.getYear(), systemDate.getTerm(), session);
+            examService.updateExamSchedule(user.getSid(), termStartDate.getYear(), termStartDate.getTerm(), session);
             session.close();
         } catch (MessageEmptyException e) {
             log.error("更新考试安排失败", e);
@@ -289,11 +293,11 @@ public class WechatServiceImpl implements WechatService {
         // 从数据库查询
         List<ExamInfo> exams = examInfoMapper.selectList(
                 new QueryWrapper<ExamInfo>().eq("sid", user.getSid())
-                        .eq("year", systemDate.getYear())
-                        .eq("term", systemDate.getTerm()));
+                        .eq("year", termStartDate.getYear())
+                        .eq("term", termStartDate.getTerm()));
 
-        int year = systemDate.getYear();
-        int term = systemDate.getTerm();
+        int year = termStartDate.getYear();
+        int term = termStartDate.getTerm();
 
         StringBuilder reply = new StringBuilder();
         reply.append("===").append(year).append("学年第").append(term).append("学期考试安排===\n\n");
@@ -324,7 +328,7 @@ public class WechatServiceImpl implements WechatService {
     private String sendEmptyClassroom(Map<String, String> messageMap, String campus) {
         log.info("微信查询空教室 campus={}", campus);
         LocalDate now = LocalDate.now();
-        int week = (int) ChronoUnit.WEEKS.between(systemDate.getTermStartDate(), now) + 1;
+        int week = (int) ChronoUnit.WEEKS.between(termStartDate.getTermStartDate(), now) + 1;
         int weekday = now.getDayOfWeek().getValue();
 
         List<EmptyClassroomVO> classrooms = emptyClassroomService

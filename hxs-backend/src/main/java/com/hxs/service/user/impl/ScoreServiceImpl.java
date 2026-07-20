@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +39,7 @@ public class ScoreServiceImpl implements ScoreService {
     private final ScoreMapper scoreMapper;
     private final ScoreDetailMapper scoreDetailMapper;
     private final UserMapper userMapper;
+    @Resource(name = "termStartDate")
     private final SystemDate termSystemDate;
 
     @Override

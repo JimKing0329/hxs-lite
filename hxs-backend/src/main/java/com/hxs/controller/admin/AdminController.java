@@ -12,6 +12,7 @@ import com.hxs.model.vo.UserDistributionVO;
 import com.hxs.model.vo.UserLoginVO;
 import com.hxs.properties.JwtProperties;
 import com.hxs.result.Result;
+import javax.annotation.Resource;
 import com.hxs.service.admin.AdminService;
 import com.hxs.service.user.EmptyClassroomService;
 import com.hxs.utils.ConfigFactory;
@@ -67,7 +68,10 @@ public class AdminController {
     private final JwtProperties jwtProperties;
     private final SystemDateMapper systemDateMapper;
     private final SystemConfigMapper systemConfigMapper;
-    private final SystemDate termSystemDate;
+    @Resource(name = "termStartDate")
+    private SystemDate termStartDate;
+    @Resource(name = "courseTableDate")
+    private SystemDate courseTableDate;
     private final EmptyClassroomService emptyClassroomService;
     private final ConfigFactory configFactory;
     private final WechatClient wechatClient;
@@ -120,10 +124,11 @@ public class AdminController {
         log.info("管理员更新学期日期: year={}, term={}, date={}", dto.getYear(), dto.getTerm(), dto.getDate());
 
         LocalDate date = LocalDate.parse(dto.getDate());
-        // 更新内存中的 DateManager
-        termSystemDate.setTermStartDate(date);
-        termSystemDate.setYear(dto.getYear());
-        termSystemDate.setTerm(dto.getTerm());
+        // 根据 id 选择对应的内存 bean：id=1 → termStartDate，id=2 → courseTableDate
+        SystemDate target = dto.getId() == 2L ? courseTableDate : termStartDate;
+        target.setTermStartDate(date);
+        target.setYear(dto.getYear());
+        target.setTerm(dto.getTerm());
 
         // 同步更新数据库
         systemDateMapper.updateById(com.hxs.model.entity.SystemDate.builder()

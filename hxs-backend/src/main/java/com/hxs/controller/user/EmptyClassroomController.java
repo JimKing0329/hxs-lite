@@ -7,6 +7,7 @@ import com.hxs.service.user.EmptyClassroomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import javax.annotation.Resource;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -32,7 +33,8 @@ import java.util.List;
 public class EmptyClassroomController {
 
     private final EmptyClassroomService emptyClassroomService;
-    private final SystemDate termSystemDate;
+    @Resource(name = "termStartDate")
+    private SystemDate termSystemDate;
 
     /** 查询空教室 */
     @GetMapping

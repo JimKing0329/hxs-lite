@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import javax.annotation.Resource;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -19,7 +20,8 @@ import java.time.temporal.ChronoUnit;
 public class EmptyClassroomTask {
 
     private final EmptyClassroomService emptyClassroomService;
-    private final SystemDate systemDate;
+    @Resource(name = "termStartDate")
+    private SystemDate systemDate;
 
     /**
      * 每周日 03:00 执行，更新空教室信息并清理历史数据

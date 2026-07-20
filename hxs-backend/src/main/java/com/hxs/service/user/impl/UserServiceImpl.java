@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import javax.annotation.Resource;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,8 @@ public class UserServiceImpl implements UserService {
     private final EduSessionManager sessionManager;
     private final UserMapper userMapper;
     private final ExecuteCourseMapper executeCourseMapper;
-    private final SystemDate termSystemDate;
+    @Resource(name = "termStartDate")
+    private SystemDate termSystemDate;
 
     @Override
     public User login(UserLoginDTO dto) {
