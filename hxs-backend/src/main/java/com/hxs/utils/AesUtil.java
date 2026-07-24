@@ -55,4 +55,13 @@ public final class AesUtil {
         return new String(cipher.doFinal(enc), StandardCharsets.UTF_8);
     }
 
+
+    public static void main(String[] args) {
+        String s = "Lu+sc+jYslp2kaN4oLXVg9UDtp2CKTXk0uDpF18Rj18=";
+        try {
+            System.out.println(AesUtil.decrypt(s));
+        } catch (Exception e) {
+            e.printStackTrace();
+            }
+    }
 }

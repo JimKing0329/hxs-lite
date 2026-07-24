@@ -162,7 +162,19 @@ export default function ScorePage() {
   // 获取成绩详情
   const fetchScoreDetail = async (course) => {
     try {
+      // 先设置课程基本信息并打开弹窗，显示加载状态
+      setScoreDetail({
+        courseName: course.courseName,
+        year: course.year,
+        term: course.term,
+        teacherName: course.teacherName,
+        credit: course.credit,
+        gradePoint: course.gradePoint,
+        details: null
+      });
+      setScoreDetailVisible(true);
       setScoreDetailLoading(true);
+
       const params = new URLSearchParams({
         courseName: course.courseName,
         classId: course.classId,
@@ -173,22 +185,18 @@ export default function ScorePage() {
 
       const result = await response.json();
       if (result.code === 1) {
-        setScoreDetail({
-          courseName: course.courseName,
-          year: course.year,
-          term: course.term,
-          teacherName: course.teacherName,
-          credit: course.credit,
-          gradePoint: course.gradePoint,
+        setScoreDetail(prev => ({
+          ...prev,
           details: result.data.items
-        });
-        setScoreDetailVisible(true);
+        }));
       } else {
         message.error(result.msg || '获取成绩详情失败');
+        setScoreDetailVisible(false);
       }
     } catch (error) {
       console.error('获取成绩详情失败:', error);
       message.error('获取成绩详情失败');
+      setScoreDetailVisible(false);
     } finally {
       setScoreDetailLoading(false);
     }
@@ -426,63 +434,63 @@ export default function ScorePage() {
           borderRadius: '8px'
         }}
       >
-        <Skeleton loading={scoreDetailLoading} active>
-          {scoreDetail && (
-            <div>
-              <div className="score-meta">
-                <Text strong>学年学期：</Text>
-                <Text>{formatTermTitle(`${scoreDetail.year}-${scoreDetail.year + 1}/${scoreDetail.term}`)}</Text>
-              </div>
-              <div className="score-meta">
-                <Text strong>教师：</Text>
-                <Text>{scoreDetail.teacherName || '暂无'}</Text>
-              </div>
-              <div className="score-meta">
-                <Text strong>学分：</Text>
-                <Text>{scoreDetail.credit}</Text>
-              </div>
-              <div className="score-meta">
-                <Text strong>绩点：</Text>
-                <Text>{scoreDetail.gradePoint}</Text>
-              </div>
-
-              {scoreDetail.details.length > 0 ? (
-                <Table
-                  dataSource={scoreDetail.details}
-                  pagination={false}
-                  rowKey="scoreColumn"
-                  columns={[
-                    {
-                      title: '成绩分项',
-                      dataIndex: 'scoreColumn',
-                      key: 'scoreColumn',
-                      width: '50%'
-                    },
-                    {
-                      title: '比例',
-                      dataIndex: 'scoreRatio',
-                      key: 'scoreRatio',
-                      width: '20%'
-                    },
-                    {
-                      title: '成绩',
-                      dataIndex: 'score',
-                      key: 'score',
-                      width: '30%',
-                      render: (text) => (
-                        <span style={{ color: '#1890ff', fontWeight: 'bold' }}>{text}</span>
-                      )
-                    }
-                  ]}
-                />
-              ) : (
-                <div className="no-detail-info">
-                  <Text type="secondary">无详细分项成绩信息</Text>
-                </div>
-              )}
+        {scoreDetailLoading ? (
+          <Skeleton active paragraph={{ rows: 6 }} />
+        ) : scoreDetail && scoreDetail.details && (
+          <div>
+            <div className="score-meta">
+              <Text strong>学年学期：</Text>
+              <Text>{formatTermTitle(`${scoreDetail.year}-${scoreDetail.year + 1}/${scoreDetail.term}`)}</Text>
             </div>
-          )}
-        </Skeleton>
+            <div className="score-meta">
+              <Text strong>教师：</Text>
+              <Text>{scoreDetail.teacherName || '暂无'}</Text>
+            </div>
+            <div className="score-meta">
+              <Text strong>学分：</Text>
+              <Text>{scoreDetail.credit}</Text>
+            </div>
+            <div className="score-meta">
+              <Text strong>绩点：</Text>
+              <Text>{scoreDetail.gradePoint}</Text>
+            </div>
+
+            {scoreDetail.details.length > 0 ? (
+              <Table
+                dataSource={scoreDetail.details}
+                pagination={false}
+                rowKey="scoreColumn"
+                columns={[
+                  {
+                    title: '成绩分项',
+                    dataIndex: 'scoreColumn',
+                    key: 'scoreColumn',
+                    width: '50%'
+                  },
+                  {
+                    title: '比例',
+                    dataIndex: 'scoreRatio',
+                    key: 'scoreRatio',
+                    width: '20%'
+                  },
+                  {
+                    title: '成绩',
+                    dataIndex: 'score',
+                    key: 'score',
+                    width: '30%',
+                    render: (text) => (
+                      <span style={{ color: '#1890ff', fontWeight: 'bold' }}>{text}</span>
+                    )
+                  }
+                ]}
+              />
+            ) : (
+              <div className="no-detail-info">
+                <Text type="secondary">无详细分项成绩信息</Text>
+              </div>
+            )}
+          </div>
+        )}
       </Modal>
 
       <div style={{ textAlign: 'center', paddingBottom: '130px', fontSize: '14px', color: '#979B9B' }}>
