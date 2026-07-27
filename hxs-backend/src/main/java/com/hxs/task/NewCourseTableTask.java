@@ -57,9 +57,9 @@ public class NewCourseTableTask {
         log.info("课表定时任务状态更新为：enabled={}", enabled);
     }
     /**
-     * 定时更新课表，每小时一次
+     * 定时更新课表，每12小时一次
      */
-    @Scheduled(cron = "0 0 * * * ?")
+    @Scheduled(cron = "0 0 */12 * * ?")
     public void updateCourseTable() {
         if (!enabled) {
             return;

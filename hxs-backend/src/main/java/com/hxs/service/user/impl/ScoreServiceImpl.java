@@ -107,6 +107,29 @@ public class ScoreServiceImpl implements ScoreService {
         log.info("查询成绩详情 userId={} course={}", UserContext.getCurrentId(), queryDTO.getCourseName());
         String sid = UserContext.getCurrentId().toString();
 
+        // 优先从本地数据库查询
+        List<ScoreDetail> localDetails = scoreDetailMapper.selectByCondition(
+                sid, queryDTO.getCourseName(), queryDTO.getClassId(),
+                queryDTO.getYear(), queryDTO.getTerm());
+
+        if (localDetails != null && !localDetails.isEmpty()) {
+            log.info("从本地缓存获取成绩详情 userId={} course={} count={}", sid, queryDTO.getCourseName(), localDetails.size());
+            // 转换为 VO 返回
+            List<ScoreDetailItemVO> items = localDetails.stream().map(entity -> ScoreDetailItemVO.builder()
+                    .scoreColumn(entity.getScoreColumn())
+                    .scoreRatio(entity.getScoreRatio())
+                    .score(entity.getScore())
+                    .build()
+            ).collect(Collectors.toList());
+
+            return ScoreDetailVO.builder()
+                    .courseName(queryDTO.getCourseName())
+                    .items(items)
+                    .build();
+        }
+
+        // 本地没有数据，查询教务系统
+        log.info("本地无缓存，从教务系统获取成绩详情 userId={} course={}", sid, queryDTO.getCourseName());
         EduSession session = sessionManager.getOrCreateSession();
         EduExamClient examClient = new EduExamClient(session);
 

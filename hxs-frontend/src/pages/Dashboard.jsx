@@ -75,34 +75,44 @@ export default function Dashboard() {
 
   // 获取分项成绩详情
   const fetchScoreDetail = async (courseName, classId, year, term) => {
+    // 先设置课程基本信息并打开弹窗，显示加载状态
+    const courseInfo = grades.find(g =>
+      g.course === courseName &&
+      g.classId === classId &&
+      g.year === year &&
+      g.term === term
+    );
+
+    setScoreDetail({
+      courseName: courseName,
+      teacherName: courseInfo?.teacherName,
+      credit: courseInfo?.credit,
+      gradePoint: courseInfo?.gradePoint,
+      scoreDetails: null
+    });
+    setScoreDetailVisible(true);
+    setScoreDetailLoading(true);
+
+    // 等待弹窗渲染完成
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     try {
-      setScoreDetailLoading(true);
       const params = new URLSearchParams({ courseName, classId, year, term });
       const response = await authFetch(`${API_PATHS.SCORE.DETAIL}?${params}`);
       const result = await response.json();
       if (result.code === 1) {
-        // 从成绩列表中获取教师、学分和绩点信息
-        const courseInfo = grades.find(g =>
-          g.course === courseName &&
-          g.classId === classId &&
-          g.year === year &&
-          g.term === term
-        );
-
-        setScoreDetail({
-          ...result.data,
-          scoreDetails: result.data.items, // 兼容旧的字段名
-          teacherName: courseInfo?.teacherName,
-          credit: courseInfo?.credit,
-          gradePoint: courseInfo?.gradePoint
-        });
-        setScoreDetailVisible(true);
+        setScoreDetail(prev => ({
+          ...prev,
+          scoreDetails: result.data.items
+        }));
       } else {
         message.error(result.msg || '获取成绩详情失败');
+        setScoreDetailVisible(false);
       }
     } catch (error) {
       console.error('获取成绩详情失败:', error);
       message.error('获取成绩详情失败');
+      setScoreDetailVisible(false);
     } finally {
       setScoreDetailLoading(false);
     }
@@ -543,18 +553,29 @@ export default function Dashboard() {
         onCancel={() => setScoreDetailVisible(false)}
         footer={null}
         width={600}
+        className="score-detail-modal"
         maskStyle={{
           backdropFilter: 'blur(8px)',
           backgroundColor: 'rgba(0, 0, 0, 0.45)'
         }}
         bodyStyle={{
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          borderRadius: '8px'
+          borderRadius: '8px',
+          minHeight: '200px'
         }}
       >
-        <Skeleton loading={scoreDetailLoading} active>
-          {scoreDetail && (
-            <div>
+        <Spin
+          spinning={scoreDetailLoading}
+          tip="加载中..."
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '150px'
+          }}
+        >
+          {scoreDetail && scoreDetail.scoreDetails && (
+            <div className="score-detail-content">
               <div style={{ marginBottom: 16 }}>
                 <div>
                   <Typography.Text strong>教师: </Typography.Text>
@@ -601,7 +622,7 @@ export default function Dashboard() {
               />
             </div>
           )}
-        </Skeleton>
+        </Spin>
       </Modal>
 
       <BottomNav />

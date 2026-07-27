@@ -11,11 +11,10 @@ public final class WechatMessageConstant {
             常见问题解答请看<a href="https://mp.weixin.qq.com/s/_VNcQx3YpF_NSKZUqwuYvg">精选推文</a>
             
             研究生课表查询<a href="http://211.82.255.223">点这里</a>
-            
+            新生课表查询请点击右下角快捷查询 - 新学期课表
             右上角置顶服务号，查询更便捷！！
             
             本公众号由软件学院同学独立开发，如果您觉得好用就分享给同学吧！！
-           
             """;
 
     public static final String USER_NOT_EXISTS = "未查询到用户信息，请先登录系统！！\n<a href=\"%s/dashboard\">点我登录系统</a>";

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Card, List, Skeleton, Typography, Modal, Divider, Collapse, message, Tag, Table, Button, Tooltip } from 'antd';
+import { Layout, Card, List, Skeleton, Typography, Modal, Divider, Collapse, message, Tag, Table, Button, Tooltip, Spin } from 'antd';
 import { ArrowLeftOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import { API_PATHS } from '../constants/api';
@@ -161,20 +161,23 @@ export default function ScorePage() {
 
   // 获取成绩详情
   const fetchScoreDetail = async (course) => {
-    try {
-      // 先设置课程基本信息并打开弹窗，显示加载状态
-      setScoreDetail({
-        courseName: course.courseName,
-        year: course.year,
-        term: course.term,
-        teacherName: course.teacherName,
-        credit: course.credit,
-        gradePoint: course.gradePoint,
-        details: null
-      });
-      setScoreDetailVisible(true);
-      setScoreDetailLoading(true);
+    // 先设置课程基本信息并打开弹窗，显示加载状态
+    setScoreDetail({
+      courseName: course.courseName,
+      year: course.year,
+      term: course.term,
+      teacherName: course.teacherName,
+      credit: course.credit,
+      gradePoint: course.gradePoint,
+      details: null
+    });
+    setScoreDetailVisible(true);
+    setScoreDetailLoading(true);
 
+    // 等待弹窗渲染完成
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    try {
       const params = new URLSearchParams({
         courseName: course.courseName,
         classId: course.classId,
@@ -425,72 +428,83 @@ export default function ScorePage() {
         onCancel={handleCloseDetail}
         footer={null}
         width={600}
+        className="score-detail-modal"
         maskStyle={{
           backdropFilter: 'blur(8px)',
           backgroundColor: 'rgba(0, 0, 0, 0.45)'
         }}
         bodyStyle={{
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          borderRadius: '8px'
+          borderRadius: '8px',
+          minHeight: '200px'
         }}
       >
-        {scoreDetailLoading ? (
-          <Skeleton active paragraph={{ rows: 6 }} />
-        ) : scoreDetail && scoreDetail.details && (
-          <div>
-            <div className="score-meta">
-              <Text strong>学年学期：</Text>
-              <Text>{formatTermTitle(`${scoreDetail.year}-${scoreDetail.year + 1}/${scoreDetail.term}`)}</Text>
-            </div>
-            <div className="score-meta">
-              <Text strong>教师：</Text>
-              <Text>{scoreDetail.teacherName || '暂无'}</Text>
-            </div>
-            <div className="score-meta">
-              <Text strong>学分：</Text>
-              <Text>{scoreDetail.credit}</Text>
-            </div>
-            <div className="score-meta">
-              <Text strong>绩点：</Text>
-              <Text>{scoreDetail.gradePoint}</Text>
-            </div>
-
-            {scoreDetail.details.length > 0 ? (
-              <Table
-                dataSource={scoreDetail.details}
-                pagination={false}
-                rowKey="scoreColumn"
-                columns={[
-                  {
-                    title: '成绩分项',
-                    dataIndex: 'scoreColumn',
-                    key: 'scoreColumn',
-                    width: '50%'
-                  },
-                  {
-                    title: '比例',
-                    dataIndex: 'scoreRatio',
-                    key: 'scoreRatio',
-                    width: '20%'
-                  },
-                  {
-                    title: '成绩',
-                    dataIndex: 'score',
-                    key: 'score',
-                    width: '30%',
-                    render: (text) => (
-                      <span style={{ color: '#1890ff', fontWeight: 'bold' }}>{text}</span>
-                    )
-                  }
-                ]}
-              />
-            ) : (
-              <div className="no-detail-info">
-                <Text type="secondary">无详细分项成绩信息</Text>
+        <Spin
+          spinning={scoreDetailLoading}
+          tip="加载中..."
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '150px'
+          }}
+        >
+          {scoreDetail && scoreDetail.details && (
+            <div className="score-detail-content">
+              <div className="score-meta">
+                <Text strong>学年学期：</Text>
+                <Text>{formatTermTitle(`${scoreDetail.year}-${scoreDetail.year + 1}/${scoreDetail.term}`)}</Text>
               </div>
-            )}
-          </div>
-        )}
+              <div className="score-meta">
+                <Text strong>教师：</Text>
+                <Text>{scoreDetail.teacherName || '暂无'}</Text>
+              </div>
+              <div className="score-meta">
+                <Text strong>学分：</Text>
+                <Text>{scoreDetail.credit}</Text>
+              </div>
+              <div className="score-meta">
+                <Text strong>绩点：</Text>
+                <Text>{scoreDetail.gradePoint}</Text>
+              </div>
+
+              {scoreDetail.details.length > 0 ? (
+                <Table
+                  dataSource={scoreDetail.details}
+                  pagination={false}
+                  rowKey="scoreColumn"
+                  columns={[
+                    {
+                      title: '成绩分项',
+                      dataIndex: 'scoreColumn',
+                      key: 'scoreColumn',
+                      width: '50%'
+                    },
+                    {
+                      title: '比例',
+                      dataIndex: 'scoreRatio',
+                      key: 'scoreRatio',
+                      width: '20%'
+                    },
+                    {
+                      title: '成绩',
+                      dataIndex: 'score',
+                      key: 'score',
+                      width: '30%',
+                      render: (text) => (
+                        <span style={{ color: '#1890ff', fontWeight: 'bold' }}>{text}</span>
+                      )
+                    }
+                  ]}
+                />
+              ) : (
+                <div className="no-detail-info">
+                  <Text type="secondary">无详细分项成绩信息</Text>
+                </div>
+              )}
+            </div>
+          )}
+        </Spin>
       </Modal>
 
       <div style={{ textAlign: 'center', paddingBottom: '130px', fontSize: '14px', color: '#979B9B' }}>

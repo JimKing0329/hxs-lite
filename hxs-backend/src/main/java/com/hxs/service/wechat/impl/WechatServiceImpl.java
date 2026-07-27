@@ -85,9 +85,9 @@ public class WechatServiceImpl implements WechatService {
         log.info("收到微信文本消息 content={}", content);
         if (content.startsWith("绑定")) {
             return handleBindingKey(content, messageMap);
-        } else if (content.contains("课表")) {
+        } else if ("课表".equals(content)) {
             return sendCourseTable(messageMap);
-        } else if (content.contains("成绩")) {
+        } else if ("成绩".equals(content)) {
             return updateAndSendScore(messageMap);
         }
         return "";
