@@ -15,7 +15,10 @@ public interface ScoreDetailMapper extends BaseMapper<ScoreDetail> {
     /**
      * 查询指定学生在指定课程的成绩明细
      */
-    @Select("SELECT * FROM score_detail WHERE sid = #{sid} AND course_name = #{courseName} " +
+    @Select("SELECT id, sid, course_name AS courseName, class_id AS classId, " +
+            "grade_column AS scoreColumn, grade_ratio AS scoreRatio, " +
+            "grade AS score, year, term " +
+            "FROM score_detail WHERE sid = #{sid} AND course_name = #{courseName} " +
             "AND class_id = #{classId} AND year = #{year} AND term = #{term}")
     List<ScoreDetail> selectByCondition(@Param("sid") String sid,
                                         @Param("courseName") String courseName,
