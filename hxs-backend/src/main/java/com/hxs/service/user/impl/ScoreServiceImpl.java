@@ -108,9 +108,13 @@ public class ScoreServiceImpl implements ScoreService {
         String sid = UserContext.getCurrentId().toString();
 
         // 优先从本地数据库查询
-        List<ScoreDetail> localDetails = scoreDetailMapper.selectByCondition(
-                sid, queryDTO.getCourseName(), queryDTO.getClassId(),
-                queryDTO.getYear(), queryDTO.getTerm());
+        QueryWrapper<ScoreDetail> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("sid", sid)
+                .eq("course_name", queryDTO.getCourseName())
+                .eq("class_id", queryDTO.getClassId())
+                .eq("year", queryDTO.getYear())
+                .eq("term", queryDTO.getTerm());
+        List<ScoreDetail> localDetails = scoreDetailMapper.selectList(queryWrapper);
 
         if (localDetails != null && !localDetails.isEmpty()) {
             log.info("从本地缓存获取成绩详情 userId={} course={} count={}", sid, queryDTO.getCourseName(), localDetails.size());
