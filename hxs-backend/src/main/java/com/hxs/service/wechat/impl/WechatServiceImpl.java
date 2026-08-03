@@ -258,7 +258,7 @@ public class WechatServiceImpl implements WechatService {
 
             return sendScores(messageMap);
         } catch (Exception e) {
-            log.error("更新成绩失败", e);
+            log.error("更新成绩失败, sid = {}", user.getSid(), e);
             return textReply(messageMap, WechatMessageConstant.UPDATE_GRADE_FAIL);
         }
     }

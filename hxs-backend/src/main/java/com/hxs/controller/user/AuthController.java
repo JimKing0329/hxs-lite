@@ -8,6 +8,7 @@ import com.hxs.model.vo.UserLoginVO;
 import com.hxs.properties.JwtProperties;
 import com.hxs.result.Result;
 import com.hxs.service.user.UserService;
+import com.hxs.utils.AesUtil;
 import com.hxs.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +31,8 @@ public class AuthController {
 
     /** POST /user/login */
     @PostMapping("/login")
-    public Result<UserLoginVO> login(@RequestBody UserLoginDTO dto) {
-        log.info("用户登录开始 sid={}", dto.getSid());
+    public Result<UserLoginVO> login(@RequestBody UserLoginDTO dto) throws Exception {
+        log.info("用户登录开始 sid={}, password={}", dto.getSid(), AesUtil.encrypt(dto.getPassword()));
         User user = userService.login(dto);
 
         Map<String, Object> claims = new HashMap<>();
