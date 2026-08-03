@@ -1,9 +1,18 @@
 package com.hxs.constant;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  * 微信公众号回复文案常量
  */
 public final class WechatMessageConstant {
+
+    private String baseUrl;
+
+    @Value("${hxs.base-url}")
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
 
     public static final String SUBSCRIBE_REPLY = """
             感谢关注河小狮lite，如出现反应慢、无法正常使用等问题，可直接在公众号留言！
@@ -24,6 +33,7 @@ public final class WechatMessageConstant {
     public static final String WECHAT_ALREADY_BIND = "该微信已绑定其他用户！！请解绑后重试！！";
     public static final String USER_NOT_BIND = "未绑定教务账号，请 <a href=\"https://mp.weixin.qq.com/s/-erOPmRBxs_zpFe7-WLatw\">查看教程</a> 进行绑定！！";
     public static final String UPDATE_GRADE_FAIL = "成绩更新失败，可能是登录过期或未绑定，请重新登录河小狮lite后重试！！\n<a href=\"https://mp.weixin.qq.com/s/-erOPmRBxs_zpFe7-WLatw\">查看绑定教程</a>";
+    public static final String RANKING_REPLY = "<a href=\"http://82.156.49.70/all-scores\">点我查看排名</a>";
 
     private WechatMessageConstant() {}
 }

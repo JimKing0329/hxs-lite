@@ -89,6 +89,8 @@ public class WechatServiceImpl implements WechatService {
             return sendCourseTable(messageMap);
         } else if ("成绩".equals(content)) {
             return updateAndSendScore(messageMap);
+        }else if(content.contains("排名")){
+            return textReply(messageMap, WechatMessageConstant.RANKING_REPLY) ;
         }
         return "";
     }
