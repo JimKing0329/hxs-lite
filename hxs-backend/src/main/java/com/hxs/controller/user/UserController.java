@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 用户控制器 — 用户信息、执行计划、解绑、专业代码
@@ -38,8 +37,6 @@ public class UserController {
 
     // 支持弹窗冷却时间：7天
     private static final int SUPPORT_MODAL_COOLDOWN_DAYS = 7;
-    // 弹窗触发概率：10%
-    private static final int SUPPORT_MODAL_TRIGGER_PERCENT = 10;
 
     @GetMapping("/student-info")
     public Result<User> getStudentInfo() {
@@ -71,7 +68,7 @@ public class UserController {
 
     /**
      * 查询支持弹窗是否应该显示
-     * 满足7天冷却条件后，有10%概率触发弹窗，防止点击率过高触发风控
+     * 满足7天冷却条件即触发弹窗
      * @return shouldShow: true 表示应该显示
      */
     @GetMapping("/support-modal/status")
@@ -80,24 +77,14 @@ public class UserController {
         log.info("查询支持弹窗状态: {}", sid);
 
         User user = userMapper.selectById(sid);
-        boolean shouldShow = false;
+        boolean shouldShow = true;
 
-        // 检查是否满足7天冷却条件
-        boolean cooldownPassed = true;
         if (user != null && user.getSupportModalClosedAt() != null) {
             LocalDateTime closedAt = user.getSupportModalClosedAt();
             LocalDateTime cooldownEnd = closedAt.plusDays(SUPPORT_MODAL_COOLDOWN_DAYS);
             if (LocalDateTime.now().isBefore(cooldownEnd)) {
-                cooldownPassed = false;
+                shouldShow = false;
             }
-        }
-
-        // 满足冷却条件后，10%概率触发弹窗
-        if (cooldownPassed) {
-            int random = ThreadLocalRandom.current().nextInt(100);
-            shouldShow = random < SUPPORT_MODAL_TRIGGER_PERCENT;
-            log.info("支持弹窗概率判定: sid={}, random={}, threshold={}, shouldShow={}",
-                    sid, random, SUPPORT_MODAL_TRIGGER_PERCENT, shouldShow);
         }
 
         Map<String, Boolean> result = new HashMap<>();
