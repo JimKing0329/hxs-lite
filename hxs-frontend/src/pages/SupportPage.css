@@ -123,6 +123,14 @@
   color: #666;
 }
 
+/* Hint Text */
+.modal-hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
 /* 挽留弹窗特殊样式 */
 .reluctance-modal .modal-content {
   padding-top: 28px;

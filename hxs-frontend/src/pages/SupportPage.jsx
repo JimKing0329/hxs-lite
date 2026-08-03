@@ -3,6 +3,7 @@ import { Modal, Typography, message, Spin } from 'antd';
 import { HeartOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 import { API_PATHS } from '../constants/api';
+import { authFetch } from '../utils/request';
 import './SupportPage.css';
 
 const { Title, Paragraph, Text } = Typography;
@@ -13,15 +14,28 @@ export default function SupportPage() {
   const [showMainModal, setShowMainModal] = useState(true);
   const [showReluctModal, setShowReluctModal] = useState(false);
 
-  // 退出页面
-  const handleExit = () => {
-    setShowReluctModal(false);
-    // 尝试关闭窗口或跳转首页
-    if (window.history.length > 1) {
-      history.goBack();
-    } else {
-      history.push('/');
+  // 记录关闭弹窗（通过后端接口）
+  const recordModalClosed = async () => {
+    try {
+      await authFetch(API_PATHS.SUPPORT_MODAL_CLOSE, { method: 'POST' });
+    } catch (error) {
+      console.error('记录关闭失败:', error);
     }
+  };
+
+  // 退出页面
+  const handleExit = async () => {
+    setShowReluctModal(false);
+    await recordModalClosed();
+    message.info('7天内不会再显示此弹窗');
+    // 尝试关闭窗口或跳转首页
+    setTimeout(() => {
+      if (window.history.length > 1) {
+        history.goBack();
+      } else {
+        history.push('/');
+      }
+    }, 500);
   };
 
   // 狠心拒绝 - 第一次
@@ -39,10 +53,14 @@ export default function SupportPage() {
       const result = await response.json();
 
       if (result.code === 1 && result.data?.url) {
-        // 记录点击次数
+        // 记录关闭时间和点击次数
+        await recordModalClosed();
         await fetch(API_PATHS.PUBLIC.SUPPORT_CLICK, { method: 'POST' });
+        message.success('感谢你的支持！7天内不会再显示此弹窗');
         // 跳转到文章
-        window.location.href = result.data.url;
+        setTimeout(() => {
+          window.location.href = result.data.url;
+        }, 500);
       } else {
         message.error('暂无支持文章，请稍后再试');
       }
@@ -85,13 +103,15 @@ export default function SupportPage() {
 
           <Spin spinning={loading}>
             <button className="btn-support" onClick={handleSupport}>
-              <HeartOutlined /> 点击文章底部广告支持作者
+              <HeartOutlined /> 点击广告支持作者
             </button>
           </Spin>
 
           <button className="btn-reject" onClick={handleReject}>
             狠心拒绝
           </button>
+
+          <p className="modal-hint">点击任一选项后，7天内不会再显示此弹窗</p>
         </div>
       </Modal>
 
@@ -116,7 +136,7 @@ export default function SupportPage() {
           </Paragraph>
 
           <Paragraph className="modal-text">
-            广告不会影响你的任何信息，只是增加一点点收入维持服务器运转
+            广告不会影响你的任何信息，只是增加一点点收入维持服务器运转 🙏
           </Paragraph>
 
           <Spin spinning={loading}>
@@ -128,6 +148,8 @@ export default function SupportPage() {
           <button className="btn-reject" onClick={handleExit}>
             还是不了
           </button>
+
+          <p className="modal-hint">关闭后，7天内不会再显示此弹窗</p>
         </div>
       </Modal>
     </div>

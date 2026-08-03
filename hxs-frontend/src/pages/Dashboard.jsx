@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Card, List, Skeleton, Button, message, Modal, Table, Typography } from 'antd';
-import { EllipsisOutlined } from '@ant-design/icons';
+import { EllipsisOutlined, HeartOutlined } from '@ant-design/icons';
 import { Dropdown, Menu } from 'antd';
 import './Dashboard.css';
 import { Collapse } from 'antd';
@@ -11,6 +11,7 @@ import BottomNav from '../components/BottomNav';
 
 const { Header, Content } = Layout;
 const { Panel } = Collapse;
+const { Title, Paragraph, Text } = Typography;
 
 import { useState, useEffect } from 'react';
 import { Spin } from 'antd';
@@ -31,9 +32,81 @@ export default function Dashboard() {
   const [scoreDetail, setScoreDetail] = useState(null);
   const [grades, setGrades] = useState([]);
   const [gradesLoading, setGradesLoading] = useState(true);
+
+  // 支持弹窗相关状态
+  const [showMainModal, setShowMainModal] = useState(false);
+  const [showReluctModal, setShowReluctModal] = useState(false);
+  const [supportLoading, setSupportLoading] = useState(false);
+
   // 导航到GPA计算器页面
   const navigateToGPACalculator = () => {
     history.push('/gpa-calculator');
+  };
+
+  // 检查是否应该显示支持弹窗（通过后端接口）
+  useEffect(() => {
+    if (!isAuthenticated()) return;
+
+    const checkSupportModalStatus = async () => {
+      try {
+        const response = await authFetch(API_PATHS.SUPPORT_MODAL_STATUS);
+        const result = await response.json();
+        if (result.code === 1 && result.data?.shouldShow) {
+          setShowMainModal(true);
+        }
+      } catch (error) {
+        console.error('查询支持弹窗状态失败:', error);
+      }
+    };
+
+    checkSupportModalStatus();
+  }, []);
+
+  // 记录关闭弹窗（通过后端接口）
+  const recordModalClosed = async () => {
+    try {
+      await authFetch(API_PATHS.SUPPORT_MODAL_CLOSE, { method: 'POST' });
+    } catch (error) {
+      console.error('记录关闭失败:', error);
+    }
+  };
+
+  // 狠心拒绝 - 第一次
+  const handleReject = () => {
+    setShowMainModal(false);
+    setShowReluctModal(true);
+  };
+
+  // 最终拒绝
+  const handleFinalReject = async () => {
+    setShowReluctModal(false);
+    await recordModalClosed();
+    message.info('7天内不会再显示此弹窗');
+  };
+
+  // 支持作者
+  const handleSupport = async () => {
+    setSupportLoading(true);
+    try {
+      const response = await fetch(API_PATHS.PUBLIC.SUPPORT_ARTICLE);
+      const result = await response.json();
+
+      if (result.code === 1 && result.data?.url) {
+        await recordModalClosed();
+        await fetch(API_PATHS.PUBLIC.SUPPORT_CLICK, { method: 'POST' });
+        window.open(result.data.url, '_blank');
+        setShowMainModal(false);
+        setShowReluctModal(false);
+        message.info('感谢你的支持！7天内不会再显示此弹窗');
+      } else {
+        message.error('暂无支持文章，请稍后再试');
+      }
+    } catch (error) {
+      console.error('获取文章失败:', error);
+      message.error('网络异常，请稍后再试');
+    } finally {
+      setSupportLoading(false);
+    }
   };
 
   // Add back the fetchCourses effect
@@ -623,6 +696,85 @@ export default function Dashboard() {
             </div>
           )}
         </Spin>
+      </Modal>
+
+      {/* 支持弹窗 - 主弹窗 */}
+      <Modal
+        open={showMainModal}
+        footer={null}
+        closable={false}
+        centered
+        width={400}
+        className="support-modal"
+      >
+        <div className="modal-content">
+          <Title level={4} className="modal-title">各位使用河小狮的同学</Title>
+
+          <div className="letter-box">
+            <Typography.Paragraph className="letter-text">
+              河小狮已经稳定运行一年有余，其实这个平台一开始只是方便自己的一个小工具，机缘巧合之下做成了现在这个较为完善的平台，感谢同学们一年以来的支持。
+            </Typography.Paragraph>
+            <Typography.Paragraph className="letter-text">
+              这一年来的成本均由小狮个人承担，<Typography.Text strong>公众号文章广告是维系平台运转唯一的资金来源</Typography.Text>，支撑服务稳定、功能迭代与问题修复。
+            </Typography.Paragraph>
+            <Typography.Paragraph className="letter-text">
+              由衷感谢大家长久的使用、反馈与陪伴，你们的反馈、认可、推荐都是对我最真挚的回报。
+            </Typography.Paragraph>
+            <Typography.Paragraph className="letter-text letter-highlight">
+              恳请各位同学顺手点击广告施以微薄支持，你的每一次广告点击，都是支持平台开发的动力！❤️
+            </Typography.Paragraph>
+          </div>
+
+          <Spin spinning={supportLoading}>
+            <button className="btn-support" onClick={handleSupport}>
+              <HeartOutlined /> 点击广告支持作者
+            </button>
+          </Spin>
+
+          <button className="btn-reject" onClick={handleReject}>
+            狠心拒绝
+          </button>
+
+          <p className="modal-hint">点击任一选项后，7天内不会再显示此弹窗</p>
+        </div>
+      </Modal>
+
+      {/* 支持弹窗 - 二次挽留 */}
+      <Modal
+        open={showReluctModal}
+        footer={null}
+        closable={false}
+        centered
+        width={360}
+        className="support-modal reluctance-modal"
+      >
+        <div className="modal-content">
+          <div className="icon-wrapper">
+            <span className="sad-emoji">😢</span>
+          </div>
+
+          <Title level={4} className="modal-title">真的要走吗？</Title>
+
+          <Typography.Paragraph className="modal-text">
+            没有你的支持，河小狮可能撑不过这个月...
+          </Typography.Paragraph>
+
+          <Typography.Paragraph className="modal-text">
+            广告不会影响你的任何信息，只是增加一点点收入维持服务器运转 🙏
+          </Typography.Paragraph>
+
+          <Spin spinning={supportLoading}>
+            <button className="btn-support" onClick={handleSupport}>
+              <HeartOutlined /> 好吧，支持一下
+            </button>
+          </Spin>
+
+          <button className="btn-reject" onClick={handleFinalReject}>
+            还是不了
+          </button>
+
+          <p className="modal-hint">关闭后，7天内不会再显示此弹窗</p>
+        </div>
       </Modal>
 
       <BottomNav />

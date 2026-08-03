@@ -36,6 +36,8 @@ export const API_PATHS = {
   GET_EXECUTE_PLAN: `${API_HOST}/user/execute-plan`,
   UNBIND: `${API_HOST}/user/unbind`,
   UPDATE_MAJOR: `${API_HOST}/user/major-code`,
+  SUPPORT_MODAL_STATUS: `${API_HOST}/user/support-modal/status`,
+  SUPPORT_MODAL_CLOSE: `${API_HOST}/user/support-modal/close`,
 
   // 课程相关
   TODAY_COURSE: `${API_HOST}/courses/today`,

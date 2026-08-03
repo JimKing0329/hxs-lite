@@ -143,3 +143,127 @@
   border-bottom: 1px solid #f0f0f0;
   margin-bottom: 16px;
 }
+
+/* ===== 支持弹窗样式 ===== */
+
+/* Modal 样式 */
+.dashboard-container .support-modal .ant-modal-content {
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 0;
+}
+
+.dashboard-container .support-modal .ant-modal-body {
+  padding: 0;
+}
+
+/* Modal Content */
+.dashboard-container .modal-content {
+  padding: 28px 20px 20px;
+  text-align: center;
+}
+
+/* Icon */
+.dashboard-container .icon-wrapper {
+  margin-bottom: 12px;
+}
+
+.dashboard-container .sad-emoji {
+  font-size: 48px;
+}
+
+/* Title */
+.dashboard-container .modal-title {
+  margin-bottom: 12px !important;
+  color: #2d3748;
+  font-size: 18px !important;
+}
+
+/* Letter Box */
+.dashboard-container .letter-box {
+  background: #f5f7fa;
+  border-radius: 8px;
+  padding: 14px;
+  margin: 12px 0;
+  text-align: left;
+  border-left: 3px solid #1890ff;
+}
+
+.dashboard-container .letter-text {
+  font-size: 13px;
+  color: #4a5568;
+  margin: 0 0 8px 0 !important;
+  line-height: 1.7;
+}
+
+.dashboard-container .letter-text:last-child {
+  margin-bottom: 0 !important;
+}
+
+.dashboard-container .letter-highlight {
+  color: #2d3748;
+  font-weight: 500;
+  padding-top: 4px;
+  border-top: 1px dashed #d9d9d9;
+  margin-top: 8px !important;
+}
+
+/* Modal Text */
+.dashboard-container .modal-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #4a5568;
+  margin-bottom: 10px !important;
+}
+
+/* Buttons */
+.dashboard-container .btn-support {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 42px;
+  margin-top: 14px;
+  background: #1890ff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.dashboard-container .btn-support:hover {
+  background: #40a9ff;
+}
+
+.dashboard-container .btn-reject {
+  width: 100%;
+  height: 36px;
+  margin-top: 10px;
+  background: transparent;
+  color: #999;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.dashboard-container .btn-reject:hover {
+  color: #666;
+}
+
+/* Hint Text */
+.dashboard-container .modal-hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+/* 挽留弹窗特殊样式 */
+.dashboard-container .reluctance-modal .modal-content {
+  padding-top: 24px;
+}

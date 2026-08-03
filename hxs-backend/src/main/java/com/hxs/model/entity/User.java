@@ -93,5 +93,6 @@ public class User {
     private LocalDateTime lastLogin;
     private String openId;
     private String bindingKey;
+    private LocalDateTime supportModalClosedAt;
 
 }

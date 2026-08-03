@@ -1,27 +1,27 @@
 {
   "files": {
-    "main.css": "/static/css/main.a18230a6.css",
-    "main.js": "/static/js/main.c69c9aca.js",
+    "main.css": "/static/css/main.527d56dc.css",
+    "main.js": "/static/js/main.910636a4.js",
     "static/css/121.b781dba0.chunk.css": "/static/css/121.b781dba0.chunk.css",
     "static/js/121.29dc2998.chunk.js": "/static/js/121.29dc2998.chunk.js",
-    "static/css/650.a5a658cd.chunk.css": "/static/css/650.a5a658cd.chunk.css",
-    "static/js/650.57d89df8.chunk.js": "/static/js/650.57d89df8.chunk.js",
+    "static/css/650.b4d525fc.chunk.css": "/static/css/650.b4d525fc.chunk.css",
+    "static/js/650.96e50905.chunk.js": "/static/js/650.96e50905.chunk.js",
     "static/css/451.6b6fda27.chunk.css": "/static/css/451.6b6fda27.chunk.css",
     "static/js/451.9e218de9.chunk.js": "/static/js/451.9e218de9.chunk.js",
     "static/js/976.0f51bed0.chunk.js": "/static/js/976.0f51bed0.chunk.js",
     "index.html": "/index.html",
-    "main.a18230a6.css.map": "/static/css/main.a18230a6.css.map",
-    "main.c69c9aca.js.map": "/static/js/main.c69c9aca.js.map",
+    "main.527d56dc.css.map": "/static/css/main.527d56dc.css.map",
+    "main.910636a4.js.map": "/static/js/main.910636a4.js.map",
     "121.b781dba0.chunk.css.map": "/static/css/121.b781dba0.chunk.css.map",
     "121.29dc2998.chunk.js.map": "/static/js/121.29dc2998.chunk.js.map",
-    "650.a5a658cd.chunk.css.map": "/static/css/650.a5a658cd.chunk.css.map",
-    "650.57d89df8.chunk.js.map": "/static/js/650.57d89df8.chunk.js.map",
+    "650.b4d525fc.chunk.css.map": "/static/css/650.b4d525fc.chunk.css.map",
+    "650.96e50905.chunk.js.map": "/static/js/650.96e50905.chunk.js.map",
     "451.6b6fda27.chunk.css.map": "/static/css/451.6b6fda27.chunk.css.map",
     "451.9e218de9.chunk.js.map": "/static/js/451.9e218de9.chunk.js.map",
     "976.0f51bed0.chunk.js.map": "/static/js/976.0f51bed0.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.a18230a6.css",
-    "static/js/main.c69c9aca.js"
+    "static/css/main.527d56dc.css",
+    "static/js/main.910636a4.js"
   ]
 }
