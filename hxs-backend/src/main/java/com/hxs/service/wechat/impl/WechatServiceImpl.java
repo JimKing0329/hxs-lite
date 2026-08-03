@@ -359,17 +359,15 @@ public class WechatServiceImpl implements WechatService {
 
     /** 文本回复 */
     public String textReply(Map<String, String> messageMap, String content) {
-        String articleUrl = articleFactory.getArticle();
-        String fullContent = content;
-        if (articleUrl != null && !articleUrl.isEmpty()) {
-            fullContent = content + "\n\n<a href=\"" + articleUrl + "\">支持作者\uD83D\uDC97</a>";
-        }
+
+        content = content + '\n' + WechatMessageConstant.SUPPORT;
+
         WechatMessage reply = WechatMessage.builder()
                 .toUserName(messageMap.get("FromUserName"))
                 .fromUserName(messageMap.get("ToUserName"))
                 .createTime(System.currentTimeMillis() / 1000)
                 .msgType("text")
-                .content(fullContent)
+                .content(content)
                 .build();
         XStream xStream = new XStream();
         xStream.processAnnotations(WechatMessage.class);

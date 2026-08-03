@@ -34,6 +34,7 @@ public final class WechatMessageConstant {
     public static final String USER_NOT_BIND = "未绑定教务账号，请 <a href=\"https://mp.weixin.qq.com/s/-erOPmRBxs_zpFe7-WLatw\">查看教程</a> 进行绑定！！";
     public static final String UPDATE_GRADE_FAIL = "成绩更新失败，可能是登录过期或未绑定，请重新登录河小狮lite后重试！！\n<a href=\"https://mp.weixin.qq.com/s/-erOPmRBxs_zpFe7-WLatw\">查看绑定教程</a>";
     public static final String RANKING_REPLY = "<a href=\"http://82.156.49.70/all-scores\">点我查看排名</a>";
+    public static final String SUPPORT = "<a href=\"http://82.156.49.70/support\">点这里支持作者</a>";
 
     private WechatMessageConstant() {}
 }

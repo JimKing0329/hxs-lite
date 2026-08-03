@@ -145,6 +145,14 @@
 .stat-card-orange .stat-icon { background: #fff7e6; color: #fa8c16; }
 .stat-card-orange .stat-accent { background: linear-gradient(90deg, #fa8c16, #ffc069); }
 
+.stat-card-red .stat-value { color: #f5222d; }
+.stat-card-red .stat-icon { background: #fff1f0; color: #f5222d; }
+.stat-card-red .stat-accent { background: linear-gradient(90deg, #f5222d, #ff7875); }
+
+.stat-card-purple .stat-value { color: #722ed1; }
+.stat-card-purple .stat-icon { background: #f9f0ff; color: #722ed1; }
+.stat-card-purple .stat-accent { background: linear-gradient(90deg, #722ed1, #b37feb); }
+
 /* ===== Action Panel ===== */
 .action-section {
   margin-bottom: 24px;

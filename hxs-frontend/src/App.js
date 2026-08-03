@@ -16,6 +16,7 @@ import EmptyClassroomPage from './pages/EmptyClassroomPage';
 import FailRateRankPage from './pages/FailRateRankPage';
 import TextbookQueryPage from './pages/TextbookQueryPage';
 import NewCourseTablePage from './pages/NewCourseTablePage';
+import SupportPage from './pages/SupportPage';
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
       <Suspense fallback={<div>加载中...</div>}>
         <Switch>
           <Route exact path="/" component={MobileLogin} />
+          <Route path="/support" component={SupportPage} />
           <PrivateRoute path="/dashboard" component={Dashboard} />
           <PrivateRoute path="/user-profile" component={UserProfile} />
           <PrivateRoute path="/course-table" component={CourseTablePage} />

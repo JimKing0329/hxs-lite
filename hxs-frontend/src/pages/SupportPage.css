@@ -1,0 +1,150 @@
+/* SupportPage.css - 弹窗风格，与项目整体一致 */
+
+.support-page {
+  min-height: 100vh;
+  background: #f0f2f5;
+}
+
+/* Modal 样式 */
+.support-modal .ant-modal-content {
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 0;
+}
+
+.support-modal .ant-modal-body {
+  padding: 0;
+}
+
+/* Modal Content */
+.modal-content {
+  padding: 32px 24px 24px;
+  text-align: center;
+}
+
+/* Icon */
+.icon-wrapper {
+  margin-bottom: 16px;
+}
+
+.main-icon {
+  font-size: 48px;
+  color: #1890ff;
+}
+
+.sad-emoji {
+  font-size: 48px;
+}
+
+/* Title */
+.modal-title {
+  margin-bottom: 12px !important;
+  color: #2d3748;
+}
+
+/* Text */
+.modal-text {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #4a5568;
+  margin-bottom: 12px !important;
+}
+
+/* Letter Box - 信件样式 */
+.letter-box {
+  background: #f5f7fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  text-align: left;
+  border-left: 3px solid #1890ff;
+}
+
+.letter-text {
+  font-size: 14px;
+  color: #4a5568;
+  margin: 0 0 10px 0 !important;
+  line-height: 1.8;
+}
+
+.letter-text:last-child {
+  margin-bottom: 0 !important;
+}
+
+.letter-highlight {
+  color: #2d3748;
+  font-weight: 500;
+  padding-top: 4px;
+  border-top: 1px dashed #d9d9d9;
+  margin-top: 10px !important;
+}
+
+/* Buttons */
+.btn-support {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 44px;
+  margin-top: 16px;
+  background: #1890ff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-support:hover {
+  background: #40a9ff;
+  transform: translateY(-1px);
+}
+
+.btn-support:active {
+  transform: translateY(0);
+}
+
+.btn-reject {
+  width: 100%;
+  height: 40px;
+  margin-top: 12px;
+  background: transparent;
+  color: #999;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.btn-reject:hover {
+  color: #666;
+}
+
+/* 挽留弹窗特殊样式 */
+.reluctance-modal .modal-content {
+  padding-top: 28px;
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 24px 16px 20px;
+  }
+
+  .main-icon,
+  .sad-emoji {
+    font-size: 40px;
+  }
+
+  .modal-title {
+    font-size: 18px !important;
+  }
+
+  .btn-support {
+    height: 42px;
+    font-size: 14px;
+  }
+}

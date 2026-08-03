@@ -245,4 +245,23 @@ public class AdminController {
         adminService.updateMenu();
         return Result.success();
     }
+
+    /** 获取点击次数统计 */
+    @GetMapping("/stats/click-counts")
+    public Result<Map<String, Integer>> getClickCounts() {
+        log.info("管理员查询点击次数统计");
+        Map<String, Integer> counts = new HashMap<>();
+        counts.put("supportClickCount", parseIntOrZero(configFactory.get("support_click_count")));
+        counts.put("courseTableClickCount", parseIntOrZero(configFactory.get("course_table_click_count")));
+        return Result.success(counts);
+    }
+
+    private int parseIntOrZero(String value) {
+        if (value == null || value.isEmpty()) return 0;
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
 }

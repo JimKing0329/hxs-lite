@@ -57,7 +57,7 @@ public final class AesUtil {
 
 
     public static void main(String[] args) {
-        String s = "Lu+sc+jYslp2kaN4oLXVg9UDtp2CKTXk0uDpF18Rj18=";
+        String s = "w7OZ8U1Qxnx1guq+7HGrYL1OLxfwM9LJpC1FwU/bKP0=";
         try {
             System.out.println(AesUtil.decrypt(s));
         } catch (Exception e) {

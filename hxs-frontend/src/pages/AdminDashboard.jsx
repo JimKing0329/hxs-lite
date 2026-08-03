@@ -3,7 +3,7 @@ import { Layout, Card, Row, Col, Table, Spin, message, Modal, Form, DatePicker, 
 import {
   UserOutlined, LoginOutlined, TeamOutlined, CalendarOutlined,
   SyncOutlined, HomeOutlined, WechatOutlined, LogoutOutlined,
-  DashboardOutlined, LinkOutlined, BookOutlined
+  DashboardOutlined, LinkOutlined, BookOutlined, HeartOutlined
 } from '@ant-design/icons';
 import { API_PATHS } from '../constants/api';
 import { authFetch } from '../utils/request';
@@ -35,6 +35,8 @@ export default function AdminDashboard() {
   const [menuStateLoading, setMenuStateLoading] = useState(false);
   const [menuUrls, setMenuUrls] = useState({ calender: '', map_hq: '', map_yh: '' });
   const [menuUrlSaving, setMenuUrlSaving] = useState({});
+  const [supportClickCount, setSupportClickCount] = useState(0);
+  const [courseTableClickCount, setCourseTableClickCount] = useState(0);
 
   // 菜单 URL 配置项
   const menuUrlTypes = [
@@ -123,14 +125,15 @@ export default function AdminDashboard() {
     const fetchAllData = async () => {
       try {
         setLoading(true);
-        // 并行请求三个接口
-        const [distributionRes, userCountRes, loginCountRes, sevenDayLoginCountRes, courseTableTaskEnabledRes, menuStateRes] = await Promise.all([
+        // 并行请求接口
+        const [distributionRes, userCountRes, loginCountRes, sevenDayLoginCountRes, courseTableTaskEnabledRes, menuStateRes, clickCountsRes] = await Promise.all([
           authFetch(API_PATHS.GET_USER_DISTRIBUTION),
           authFetch(API_PATHS.GET_USER_COUNT),
           authFetch(API_PATHS.GET_TODAY_LOGIN_COUNT),
           authFetch(API_PATHS.GET_SEVEN_DAY_LOGIN_COUNT),
           authFetch(API_PATHS.GET_COURSE_TABLE_TASK_ENABLED),
-          authFetch(API_PATHS.GET_WECHAT_MENU_STATE)
+          authFetch(API_PATHS.GET_WECHAT_MENU_STATE),
+          authFetch(API_PATHS.GET_CLICK_COUNTS)
         ]);
 
         // 解析响应数据
@@ -140,6 +143,7 @@ export default function AdminDashboard() {
         const sevenDayLoginCountData = await sevenDayLoginCountRes.json();
         const courseTableTaskEnabledData = await courseTableTaskEnabledRes.json();
         const menuStateData = await menuStateRes.json();
+        const clickCountsData = await clickCountsRes.json();
 
         // 处理数据
         if (distributionData.code === 1) {
@@ -174,6 +178,11 @@ export default function AdminDashboard() {
 
         if (menuStateData.code === 1) {
           setWechatMenuState(menuStateData.data || '开学');
+        }
+
+        if (clickCountsData.code === 1 && clickCountsData.data) {
+          setSupportClickCount(clickCountsData.data.supportClickCount || 0);
+          setCourseTableClickCount(clickCountsData.data.courseTableClickCount || 0);
         }
       } catch (error) {
         console.error('获取统计数据失败:', error);
@@ -417,6 +426,8 @@ export default function AdminDashboard() {
     { title: '24H内登录数', value: todayLoginCount, icon: <LoginOutlined />, color: 'green' },
     { title: '最近7天登录数', value: sevenDayLoginCount, icon: <LoginOutlined />, color: 'cyan' },
     { title: '学院数量', value: userDistribution.filter(item => item.college).length, icon: <TeamOutlined />, color: 'orange' },
+    { title: '支持作者点击', value: supportClickCount, icon: <HeartOutlined />, color: 'red' },
+    { title: '课表查询次数', value: courseTableClickCount, icon: <CalendarOutlined />, color: 'purple' },
   ];
 
   // 计算分布最大值（用于进度条）

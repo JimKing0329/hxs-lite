@@ -24,6 +24,7 @@ export const API_PATHS = {
   ADMIN_UPDATE_CLASSES: `${API_HOST}/admin/classes`,
   GET_COURSE_TABLE_TASK_ENABLED: `${API_HOST}/admin/course-table-task/enabled`,
   UPDATE_COURSE_TABLE_TASK_ENABLED: `${API_HOST}/admin/course-table-task/enabled`,
+  GET_CLICK_COUNTS: `${API_HOST}/admin/stats/click-counts`,
   // 用户相关
   LOGIN: `${API_HOST}/user/login`,
   LOGOUT: `${API_HOST}/user/logout`,
@@ -66,6 +67,12 @@ export const API_PATHS = {
   NEW_COURSE_TABLE: {
     ALL_CLASS: `${API_HOST}/newCourseTable/allClass`,
     COURSE_TABLE: `${API_HOST}/newCourseTable/courseTable`,
+  },
+
+  // 公开接口（无需登录）
+  PUBLIC: {
+    SUPPORT_ARTICLE: `${API_HOST}/public/support-article`,
+    SUPPORT_CLICK: `${API_HOST}/public/support-article/click`,
   },
 
 };
