@@ -37,6 +37,7 @@ export default function AdminDashboard() {
   const [menuUrlSaving, setMenuUrlSaving] = useState({});
   const [supportClickCount, setSupportClickCount] = useState(0);
   const [courseTableClickCount, setCourseTableClickCount] = useState(0);
+  const [dailyJumps, setDailyJumps] = useState([]);
 
   // 菜单 URL 配置项
   const menuUrlTypes = [
@@ -126,14 +127,15 @@ export default function AdminDashboard() {
       try {
         setLoading(true);
         // 并行请求接口
-        const [distributionRes, userCountRes, loginCountRes, sevenDayLoginCountRes, courseTableTaskEnabledRes, menuStateRes, clickCountsRes] = await Promise.all([
+        const [distributionRes, userCountRes, loginCountRes, sevenDayLoginCountRes, courseTableTaskEnabledRes, menuStateRes, clickCountsRes, dailyJumpsRes] = await Promise.all([
           authFetch(API_PATHS.GET_USER_DISTRIBUTION),
           authFetch(API_PATHS.GET_USER_COUNT),
           authFetch(API_PATHS.GET_TODAY_LOGIN_COUNT),
           authFetch(API_PATHS.GET_SEVEN_DAY_LOGIN_COUNT),
           authFetch(API_PATHS.GET_COURSE_TABLE_TASK_ENABLED),
           authFetch(API_PATHS.GET_WECHAT_MENU_STATE),
-          authFetch(API_PATHS.GET_CLICK_COUNTS)
+          authFetch(API_PATHS.GET_CLICK_COUNTS),
+          authFetch(API_PATHS.GET_DAILY_JUMPS)
         ]);
 
         // 解析响应数据
@@ -144,6 +146,7 @@ export default function AdminDashboard() {
         const courseTableTaskEnabledData = await courseTableTaskEnabledRes.json();
         const menuStateData = await menuStateRes.json();
         const clickCountsData = await clickCountsRes.json();
+        const dailyJumpsData = await dailyJumpsRes.json();
 
         // 处理数据
         if (distributionData.code === 1) {
@@ -183,6 +186,10 @@ export default function AdminDashboard() {
         if (clickCountsData.code === 1 && clickCountsData.data) {
           setSupportClickCount(clickCountsData.data.supportClickCount || 0);
           setCourseTableClickCount(clickCountsData.data.courseTableClickCount || 0);
+        }
+
+        if (dailyJumpsData.code === 1 && dailyJumpsData.data) {
+          setDailyJumps(dailyJumpsData.data);
         }
       } catch (error) {
         console.error('获取统计数据失败:', error);
@@ -468,6 +475,39 @@ export default function AdminDashboard() {
               ))}
             </Row>
           </div>
+
+          {/* 每日跳转统计 */}
+          {dailyJumps.length > 0 && (
+            <div className="stats-section" style={{ marginTop: 16 }}>
+              <Card className="action-panel" title="支持弹窗 - 每日跳转统计" size="small">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', height: 100, padding: '0 8px' }}>
+                  {dailyJumps.map((item, index) => {
+                    const maxCount = Math.max(...dailyJumps.map(d => d.count), 1);
+                    const height = Math.max((item.count / maxCount) * 70, 4);
+                    const isToday = index === dailyJumps.length - 1;
+                    return (
+                      <div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+                        <span style={{ fontSize: 12, color: '#666', marginBottom: 4 }}>{item.count}</span>
+                        <div style={{
+                          width: 24,
+                          height: height,
+                          background: isToday ? '#1890ff' : '#e6f7ff',
+                          borderRadius: 4,
+                          transition: 'height 0.3s'
+                        }} />
+                        <span style={{ fontSize: 11, color: '#999', marginTop: 4 }}>
+                          {item.date.slice(5)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{ textAlign: 'center', marginTop: 12, fontSize: 12, color: '#999' }}>
+                  7天总跳转：{dailyJumps.reduce((sum, d) => sum + d.count, 0)} 次
+                </div>
+              </Card>
+            </div>
+          )}
 
           {/* 操作面板区域 */}
           <div className="action-section">

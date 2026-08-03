@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  * 公开接口 — 无需登录
@@ -22,6 +23,8 @@ public class PublicController {
 
     private final ArticleFactory articleFactory;
     private final ConfigFactory configFactory;
+
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     /**
      * 随机获取一篇支持文章
@@ -38,24 +41,21 @@ public class PublicController {
     }
 
     /**
-     * 记录点击次数 +1
+     * 记录跳转次数 +1（总次数 + 当天次数）
      */
     @PostMapping("/support-article/click")
     public Result<?> recordClick() {
         try {
-            // 读取当前 click_count
-            String countStr = configFactory.get("support_click_count");
-            int count = (countStr != null) ? Integer.parseInt(countStr) : 0;
-            count++;
+            // 1. 更新总点击次数
+            articleFactory.incrementClickCount("support_click_count");
 
-            // 更新到数据库（通过 configFactory 的底层 mapper 无法直接 update，
-            // 这里简化处理：直接更新内存缓存 + 数据库）
-            articleFactory.updateClickCount(count);
-            configFactory.refresh();
+            // 2. 更新当天跳转次数
+            String todayKey = "support_jump_" + LocalDate.now().format(DATE_FORMAT);
+            articleFactory.incrementClickCount(todayKey);
 
-            log.info("支持点击次数 +1, 当前: {}", count);
+            log.info("支持跳转次数 +1, 日期: {}", todayKey);
         } catch (Exception e) {
-            log.error("记录点击次数失败", e);
+            log.error("记录跳转次数失败", e);
         }
         return Result.success();
     }

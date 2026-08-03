@@ -256,6 +256,26 @@ public class AdminController {
         return Result.success(counts);
     }
 
+    /** 获取最近7天每日跳转数据 */
+    @GetMapping("/stats/daily-jumps")
+    public Result<List<Map<String, Object>>> getDailyJumps() {
+        log.info("管理员查询每日跳转统计");
+        List<Map<String, Object>> dailyStats = new java.util.ArrayList<>();
+        java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd");
+        java.time.LocalDate today = java.time.LocalDate.now();
+
+        for (int i = 6; i >= 0; i--) {
+            java.time.LocalDate date = today.minusDays(i);
+            String key = "support_jump_" + date.format(fmt);
+            int count = parseIntOrZero(configFactory.get(key));
+            Map<String, Object> dayStat = new HashMap<>();
+            dayStat.put("date", date.toString());  // yyyy-MM-dd
+            dayStat.put("count", count);
+            dailyStats.add(dayStat);
+        }
+        return Result.success(dailyStats);
+    }
+
     private int parseIntOrZero(String value) {
         if (value == null || value.isEmpty()) return 0;
         try {

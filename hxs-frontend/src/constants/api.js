@@ -25,6 +25,7 @@ export const API_PATHS = {
   GET_COURSE_TABLE_TASK_ENABLED: `${API_HOST}/admin/course-table-task/enabled`,
   UPDATE_COURSE_TABLE_TASK_ENABLED: `${API_HOST}/admin/course-table-task/enabled`,
   GET_CLICK_COUNTS: `${API_HOST}/admin/stats/click-counts`,
+  GET_DAILY_JUMPS: `${API_HOST}/admin/stats/daily-jumps`,
   // 用户相关
   LOGIN: `${API_HOST}/user/login`,
   LOGOUT: `${API_HOST}/user/logout`,
