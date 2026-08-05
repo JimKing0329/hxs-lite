@@ -37,6 +37,7 @@ export default function Dashboard() {
   const [showMainModal, setShowMainModal] = useState(false);
   const [showReluctModal, setShowReluctModal] = useState(false);
   const [supportLoading, setSupportLoading] = useState(false);
+  const [supportArticleUrl, setSupportArticleUrl] = useState(null);
 
   // 导航到GPA计算器页面
   const navigateToGPACalculator = () => {
@@ -53,6 +54,8 @@ export default function Dashboard() {
         const result = await response.json();
         if (result.code === 1 && result.data?.shouldShow) {
           setShowMainModal(true);
+          // 弹窗显示时预加载文章 URL
+          preloadArticleUrl();
         }
       } catch (error) {
         console.error('查询支持弹窗状态失败:', error);
@@ -61,6 +64,19 @@ export default function Dashboard() {
 
     checkSupportModalStatus();
   }, []);
+
+  // 预加载文章 URL
+  const preloadArticleUrl = async () => {
+    try {
+      const response = await fetch(API_PATHS.PUBLIC.SUPPORT_ARTICLE);
+      const result = await response.json();
+      if (result.code === 1 && result.data?.url) {
+        setSupportArticleUrl(result.data.url);
+      }
+    } catch (error) {
+      console.error('预加载文章失败:', error);
+    }
+  };
 
   // 记录关闭弹窗（通过后端接口）
   const recordModalClosed = async () => {
@@ -84,29 +100,20 @@ export default function Dashboard() {
     message.info('7天内不会再显示此弹窗');
   };
 
-  // 支持作者
-  const handleSupport = async () => {
-    setSupportLoading(true);
-    try {
-      const response = await fetch(API_PATHS.PUBLIC.SUPPORT_ARTICLE);
-      const result = await response.json();
-
-      if (result.code === 1 && result.data?.url) {
-        await recordModalClosed();
-        await fetch(API_PATHS.PUBLIC.SUPPORT_CLICK, { method: 'POST' });
-        window.open(result.data.url, '_blank');
-        setShowMainModal(false);
-        setShowReluctModal(false);
-        message.info('感谢你的支持！7天内不会再显示此弹窗');
-      } else {
-        message.error('暂无支持文章，请稍后再试');
-      }
-    } catch (error) {
-      console.error('获取文章失败:', error);
-      message.error('网络异常，请稍后再试');
-    } finally {
-      setSupportLoading(false);
+  // 支持作者 - 直接使用缓存的 URL 秒跳
+  const handleSupport = () => {
+    if (!supportArticleUrl) {
+      message.error('文章加载中，请稍后再试');
+      return;
     }
+    // 立即跳转
+    window.open(supportArticleUrl, '_blank');
+    setShowMainModal(false);
+    setShowReluctModal(false);
+    message.info('感谢你的支持！7天内不会再显示此弹窗');
+    // 异步记录，不阻塞
+    recordModalClosed();
+    fetch(API_PATHS.PUBLIC.SUPPORT_CLICK, { method: 'POST' });
   };
 
   // Add back the fetchCourses effect
@@ -725,11 +732,9 @@ export default function Dashboard() {
             </Typography.Paragraph>
           </div>
 
-          <Spin spinning={supportLoading}>
-            <button className="btn-support" onClick={handleSupport}>
-              <HeartOutlined /> 点击广告支持作者
-            </button>
-          </Spin>
+          <button className="btn-support" onClick={handleSupport}>
+            <HeartOutlined /> 点击广告支持作者
+          </button>
 
           <button className="btn-reject" onClick={handleReject}>
             狠心拒绝
@@ -763,11 +768,9 @@ export default function Dashboard() {
             广告不会影响你的任何信息，只是增加一点点收入维持服务器运转 🙏
           </Typography.Paragraph>
 
-          <Spin spinning={supportLoading}>
-            <button className="btn-support" onClick={handleSupport}>
-              <HeartOutlined /> 好吧，支持一下
-            </button>
-          </Spin>
+          <button className="btn-support" onClick={handleSupport}>
+            <HeartOutlined /> 好吧，支持一下
+          </button>
 
           <button className="btn-reject" onClick={handleFinalReject}>
             还是不了
