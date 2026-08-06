@@ -34,16 +34,21 @@ public final class WechatMessageConstant {
     public static final String WECHAT_ALREADY_BIND = "该微信已绑定其他用户！！请解绑后重试！！";
     public static final String USER_NOT_BIND = "未绑定教务账号，请 <a href=\"https://mp.weixin.qq.com/s/-erOPmRBxs_zpFe7-WLatw\">查看教程</a> 进行绑定！！";
     public static final String UPDATE_GRADE_FAIL = "成绩更新失败，可能是登录过期或未绑定，请重新登录河小狮lite后重试！！\n<a href=\"https://mp.weixin.qq.com/s/-erOPmRBxs_zpFe7-WLatw\">查看绑定教程</a>";
-    public static final String RANKING_REPLY = "<a href=\"http://82.156.49.70/all-scores\">点我查看排名</a>";
+    public static final String RANKING_REPLY = """
+            <a href="http://82.156.49.70/all-scores">点我查看排名</a>
+            
+            说明：排名仅统计使用河小狮lite且更新了成绩的同学，排名范围为同专业，排名仅供参考，有误差敬请谅解！！
+            邀请同学使用河小狮lite，获取更准确的数据！！
+            """;
     public static final String SUPPORT = "<a href=\"http://82.156.49.70/support\">点这里支持作者</a>";
     public static final String NOTICE_REPLY = """
             本公众号不是官方“狮小伴”小程序，请勿混淆！
             
             录取材料和入学电子材料在以下任一网站下载即可
             
-            <a href=\"https://zsjyc.hebtu.edu.cn/zsw/a/tzgg/\">河北师范大学招生信息网</a>
-            <a href=\"https://jwc.hebtu.edu.cn/a/newcyxz/index.html\">河北师范大学教务处</a>
-            <a href=\"https://yingxin.hebtu.edu.cn/\">河北师范大学迎新网</a>
+            <a href="https://zsjyc.hebtu.edu.cn/zsw/a/tzgg/">河北师范大学招生信息网</a>
+            <a href="https://jwc.hebtu.edu.cn/a/newcyxz/index.html">河北师范大学教务处</a>
+            <a href="https://yingxin.hebtu.edu.cn/">河北师范大学迎新网</a>
             
             欢迎2026级新同学~~
             您可以持续关注本公众号，获取课表查询、成绩查询等服务！
