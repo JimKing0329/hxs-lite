@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public final class WechatMessageConstant {
 
+
     private String baseUrl;
 
     @Value("${hxs.base-url}")
@@ -35,6 +36,18 @@ public final class WechatMessageConstant {
     public static final String UPDATE_GRADE_FAIL = "成绩更新失败，可能是登录过期或未绑定，请重新登录河小狮lite后重试！！\n<a href=\"https://mp.weixin.qq.com/s/-erOPmRBxs_zpFe7-WLatw\">查看绑定教程</a>";
     public static final String RANKING_REPLY = "<a href=\"http://82.156.49.70/all-scores\">点我查看排名</a>";
     public static final String SUPPORT = "<a href=\"http://82.156.49.70/support\">点这里支持作者</a>";
+    public static final String NOTICE_REPLY = """
+            本公众号不是官方“狮小伴”小程序，请勿混淆！
+            
+            录取材料和入学电子材料在以下任一网站下载即可
+            
+            <a href=\"https://zsjyc.hebtu.edu.cn/zsw/a/tzgg/\">河北师范大学招生信息网</a>
+            <a href=\"https://jwc.hebtu.edu.cn/a/newcyxz/index.html\">河北师范大学教务处</a>
+            <a href=\"https://yingxin.hebtu.edu.cn/\">河北师范大学迎新网</a>
+            
+            欢迎2026级新同学~~
+            您可以持续关注本公众号，获取课表查询、成绩查询等服务！
+            """;
 
     private WechatMessageConstant() {}
 }
