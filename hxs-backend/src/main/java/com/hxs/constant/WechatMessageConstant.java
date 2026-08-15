@@ -50,6 +50,8 @@ public final class WechatMessageConstant {
             <a href="https://jwc.hebtu.edu.cn/a/newcyxz/index.html">河北师范大学教务处</a>
             <a href="https://yingxin.hebtu.edu.cn/">河北师范大学迎新网</a>
             
+            易班使用手册如下
+            <a href="https://mp.weixin.qq.com/s/lYG7ddDTsTfb3whR6MCswQ">易班新生使用手册</a>
             欢迎2026级新同学~~
             您可以持续关注本公众号，获取课表查询、成绩查询等服务！
             """;

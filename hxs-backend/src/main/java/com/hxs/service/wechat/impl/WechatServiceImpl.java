@@ -45,6 +45,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class WechatServiceImpl implements WechatService {
 
+    // 通知类关键词
+    private static final String[] NOTICE_KEYWORDS = {"通知", "公告", "迎新","易班"};
+
     private final UserMapper userMapper;
     private final CourseService courseService;
     private final ScoreMapper scoreMapper;
@@ -91,8 +94,8 @@ public class WechatServiceImpl implements WechatService {
             return updateAndSendScore(messageMap);
         }else if(content.contains("排名")){
             return textReply(messageMap, WechatMessageConstant.RANKING_REPLY) ;
-        }else if(content.contains("通知") || content.contains("公告") || content.contains("迎新")){
-            return textReply(messageMap, WechatMessageConstant.NOTICE_REPLY) ;
+        } else if (java.util.Arrays.stream(NOTICE_KEYWORDS).anyMatch(content::contains)) {
+            return textReply(messageMap, WechatMessageConstant.NOTICE_REPLY);
         }
         return "";
     }
