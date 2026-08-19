@@ -8,6 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 public final class WechatMessageConstant {
 
 
+    public static final String DORMITORY_REPLY = """
+            <a href=\"http://202.206.100.146/yxxt/web/xsLogin/login.zf\">点我查询宿舍</a>
+            
+            提示：默认账号为身份证号，密码为身份证后六位~
+            """;
     private String baseUrl;
 
     @Value("${hxs.base-url}")
