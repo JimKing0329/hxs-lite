@@ -49,7 +49,7 @@ public class EduClassroomClient {
             formData.add(new BasicNameValuePair("zcd", week.toString()));
             formData.add(new BasicNameValuePair("xqj", weekday.toString()));
             formData.add(new BasicNameValuePair("jcd", sessionNum.toString()));
-            formData.add(new BasicNameValuePair("queryModel.showCount", "1000"));
+            formData.add(new BasicNameValuePair("queryModel.showCount", "5000"));
             emptyClassRoomPost.setEntity(new UrlEncodedFormEntity(formData, "UTF-8"));
 
             try (CloseableHttpResponse response = session.getHttpClient().execute(emptyClassRoomPost)) {

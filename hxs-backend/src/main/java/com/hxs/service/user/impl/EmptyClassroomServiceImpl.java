@@ -6,7 +6,6 @@ import com.hxs.client.EduLoginClient;
 import com.hxs.client.EduSession;
 import com.hxs.component.SystemDate;
 import com.hxs.mapper.EmptyClassroomMapper;
-import com.hxs.model.entity.EmptyClassroom;
 import com.hxs.model.support.EmptyClassRoomItem;
 import com.hxs.model.vo.EmptyClassroomVO;
 import com.hxs.properties.AdminProperties;
@@ -18,7 +17,9 @@ import javax.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -58,32 +59,21 @@ public class EmptyClassroomServiceImpl implements EmptyClassroomService {
         emptyClassroomMapper.deleteAvailabilityByWeek(week);
         emptyClassroomMapper.deleteClassroomByWeek(week);
 
+        Map<EmptyClassRoomItem, List<Integer>> emptySessionMap = new HashMap<>(284);
+
         for (int weekday = 1; weekday <= 7; weekday++) {
             for (int sessionNum = 1; sessionNum <= 13; sessionNum++) {
+                // 1.获取本周星期 weekday 第 sessionNum 节的空教室信息
                 List<EmptyClassRoomItem> items = client.getEmptyClassroom(
                         year, encodedTerm, 1 << (week - 1), weekday, 1 << (sessionNum - 1));
 
-                if (items.isEmpty()) continue;
-
-                List<EmptyClassroom> classrooms = new ArrayList<>();
-                for (EmptyClassRoomItem item : items) {
-                    EmptyClassroom ec = new EmptyClassroom();
-                    ec.setClassId(item.getClassId());
-                    ec.setClassName(item.getClassName());
-                    ec.setCampusName(item.getCampusName());
-                    ec.setClassCategory(item.getRoomType());
-                    ec.setBuilding(extractBuilding(item.getClassName()));
-                    ec.setWeekNumber(week);
-                    ec.setWeekday(weekday);
-                    classrooms.add(ec);
-                }
-
-                // 批量插入教室
-                emptyClassroomMapper.insertBatch(classrooms);
-
-                // 插入每个教室的空闲节次
-                for (EmptyClassroom ec : classrooms) {
-                    emptyClassroomMapper.insertAvailability(ec.getId(), List.of(sessionNum));
+                for (EmptyClassRoomItem classroom : items) {
+                    classroom.setWeekday(weekday);
+                    classroom.setWeekNumber(week);
+                    // 2.处理教室空闲节次数据
+                    List<Integer> emptySessions = emptySessionMap.getOrDefault(classroom, new ArrayList<>());
+                    emptySessions.add(sessionNum);
+                    emptySessionMap.put(classroom, emptySessions);
                 }
 
                 // 限速
@@ -93,18 +83,32 @@ public class EmptyClassroomServiceImpl implements EmptyClassroomService {
                     Thread.currentThread().interrupt();
                 }
             }
+
+            // 3.批量插入教室数据
+            if (!emptySessionMap.isEmpty()) {
+                // 先保存 sessions 信息到临时 Map（以 classId 为 key），避免 insertClassroom 后 id 变化导致 get 失败
+                Map<String, List<Integer>> sessionsByClassId = new HashMap<>();
+                for (Map.Entry<EmptyClassRoomItem, List<Integer>> entry : emptySessionMap.entrySet()) {
+                    sessionsByClassId.put(entry.getKey().getClassId(), entry.getValue());
+                }
+
+                List<EmptyClassRoomItem> roomList = new ArrayList<>(emptySessionMap.keySet());
+                emptyClassroomMapper.insertClassroom(roomList);
+
+                for (EmptyClassRoomItem room : roomList) {
+                    List<Integer> emptySessions = sessionsByClassId.get(room.getClassId());
+                    if (emptySessions != null && !emptySessions.isEmpty()) {
+                        emptyClassroomMapper.insertEmptySession(room.getId(), emptySessions);
+                    }
+                }
+
+                // 4.清空map
+                emptySessionMap.clear();
+            }
         }
 
         session.close();
         log.info("空教室更新完成，耗时 {} 秒", (System.currentTimeMillis() - startTime) / 1000);
-    }
-
-    /** 从教室名称提取楼栋信息 */
-    private String extractBuilding(String className) {
-        if (className == null) return "";
-        if (className.contains("公教楼")) return "公教楼";
-        if (className.contains("综合楼")) return "综合楼";
-        return "";
     }
 
     @Override
@@ -114,4 +118,5 @@ public class EmptyClassroomServiceImpl implements EmptyClassroomService {
         emptyClassroomMapper.deleteAllClassroom();
         log.info("历史空教室数据清理完成");
     }
+
 }
