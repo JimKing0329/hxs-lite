@@ -1,6 +1,8 @@
 # 河小狮 (hxs-lite)
 
-河北师范大学教务信息助手系统，为学生提供便捷的教务信息查询服务。
+河北师范大学教务信息助手系统，为学生提供便捷的教务信息查询服务，累计服务**15000+** 同学。
+<img width="2000" height="393" alt="image" src="https://github.com/user-attachments/assets/46031676-c908-487c-bc57-dd334f2c87a3" />
+
 
 > 关注微信服务号 **河小狮lite** 或直接访问[河小狮lite](http://82.156.49.70/dashboard)可直接体验已有功能
 
